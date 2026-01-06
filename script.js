@@ -1,7 +1,5 @@
-// ✅ Apps Script Web App URL kamu
 const API_URL = "https://script.google.com/macros/s/AKfycbwPTAFJzw7k8f7bRhKGBgYW_jlGftNlKth3P3wL9IIfgyMEodqqerNZyyNITbxMMg_5/exec";
 
-// Fungsi untuk normalize semua status supaya consistent
 function normalizeStatus(status) {
     if (!status) return "unknown";
     const s = status.trim().toLowerCase();
@@ -21,10 +19,7 @@ function loadData() {
     tableBody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
 
     fetch(API_URL)
-        .then(res => {
-            if (!res.ok) throw new Error("Network response was not ok");
-            return res.json();
-        })
+        .then(res => res.ok ? res.json() : Promise.reject("Network response not ok"))
         .then(data => {
             if (!Array.isArray(data) || data.length === 0) {
                 tableBody.innerHTML = "<tr><td colspan='5'>No data available</td></tr>";
@@ -33,8 +28,7 @@ function loadData() {
             }
 
             const today = new Date();
-            const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - today.getDay());
+            const startOfWeek = new Date(today); startOfWeek.setDate(today.getDate() - today.getDay());
             const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
             const filteredData = data.filter(row => {
@@ -51,44 +45,28 @@ function loadData() {
                 return;
             }
 
-            // Counters
-            let totalViolations = 0;
-            let helmetViolations = 0;
-            let gloveViolations = 0;
-            let fullPPE = 0;
-            let helmetOK = 0;
-            let gloveOK = 0;
-
+            let totalViolations = 0, helmetViolations = 0, gloveViolations = 0;
+            let fullPPE = 0, helmetOK = 0, gloveOK = 0;
             let html = "";
+
             filteredData.reverse().forEach((row, idx) => {
-                const helmet_status_clean = normalizeStatus(row.helmet_status);
-                const glove_status_clean = normalizeStatus(row.glove_status);
+                const helmet = normalizeStatus(row.helmet_status);
+                const glove = normalizeStatus(row.glove_status);
 
-                // Total Violations: siapa ada pelanggaran
-                if (helmet_status_clean === "no_helmet" || glove_status_clean === "no_glove") totalViolations++;
-
-                // Helmet Violations
-                if (helmet_status_clean === "no_helmet") helmetViolations++;
-
-                // Glove Violations
-                if (glove_status_clean === "no_glove") gloveViolations++;
-
-                // Full PPE
-                if (helmet_status_clean === "helmet" && glove_status_clean === "glove") fullPPE++;
-
-                // Status Helmet
-                if (helmet_status_clean === "helmet") helmetOK++;
-
-                // Status Glove
-                if (glove_status_clean === "glove") gloveOK++;
+                if (helmet === "no_helmet" || glove === "no_glove") totalViolations++;
+                if (helmet === "no_helmet") helmetViolations++;
+                if (glove === "no_glove") gloveViolations++;
+                if (helmet === "helmet" && glove === "glove") fullPPE++;
+                if (helmet === "helmet") helmetOK++;
+                if (glove === "glove") gloveOK++;
 
                 html += `
                     <tr>
                         <td>${idx+1}</td>
                         <td>${row.datetime}</td>
                         <td>${row.image_url ? `<img src="${row.image_url}" alt="PPE Image">` : ""}</td>
-                        <td>${helmet_status_clean}</td>
-                        <td>${glove_status_clean}</td>
+                        <td>${helmet}</td>
+                        <td>${glove}</td>
                     </tr>
                 `;
             });
@@ -97,14 +75,13 @@ function loadData() {
             updateSummary(totalViolations, helmetViolations, gloveViolations, fullPPE, helmetOK, gloveOK);
         })
         .catch(err => {
-            console.error("Error fetching data:", err);
+            console.error(err);
             tableBody.innerHTML = "<tr><td colspan='5'>Failed to load data</td></tr>";
             updateSummary(0,0,0,0,0,0);
         });
 }
 
-// Update summary boxes
-function updateSummary(total, helmetV, gloveV, full, helmetOK, gloveOK) {
+function updateSummary(total, helmetV, gloveV, full, helmetOK, gloveOK){
     document.getElementById("totalViolations").innerText = total;
     document.getElementById("helmetViolations").innerText = helmetV;
     document.getElementById("gloveViolations").innerText = gloveV;
@@ -113,7 +90,4 @@ function updateSummary(total, helmetV, gloveV, full, helmetOK, gloveOK) {
     document.getElementById("gloveOK").innerText = gloveOK;
 }
 
-// Load data bila page dibuka
-window.addEventListener("DOMContentLoaded", () => {
-    loadData();
-});
+window.addEventListener("DOMContentLoaded", loadData);
