@@ -1,16 +1,16 @@
 // ✅ Apps Script Web App URL kamu
 const API_URL = "https://script.google.com/macros/s/AKfycbwPTAFJzw7k8f7bRhKGBgYW_jlGftNlKth3P3wL9IIfgyMEodqqerNZyyNITbxMMg_5/exec";
 
-// Fungsi normalize semua status supaya consistent
+// Fungsi untuk normalize semua status supaya consistent
 function normalizeStatus(status) {
     if (!status) return "unknown";
     const s = status.trim().toLowerCase();
     // Helmet mapping
-    if (s === "helmet" || s === "helmet") return "helmet";
-    if (s === "no_helmet" || s === "no helmet") return "no_helmet";
+    if (["helmet","helm","h"].includes(s)) return "helmet";
+    if (["no helmet","no_helmet","nh","n"].includes(s)) return "no_helmet";
     // Glove mapping
-    if (s === "glove") return "glove";
-    if (s === "no_glove" || s === "no glove") return "no_glove";
+    if (["glove","g"].includes(s)) return "glove";
+    if (["no glove","no_glove","ng","n"].includes(s)) return "no_glove";
     return "unknown";
 }
 
@@ -64,17 +64,23 @@ function loadData() {
                 const helmet_status_clean = normalizeStatus(row.helmet_status);
                 const glove_status_clean = normalizeStatus(row.glove_status);
 
-                const violation = helmet_status_clean === "no_helmet" || glove_status_clean === "no_glove";
+                // Total Violations: siapa ada pelanggaran
+                if (helmet_status_clean === "no_helmet" || glove_status_clean === "no_glove") totalViolations++;
 
-                if (violation) totalViolations++;
+                // Helmet Violations
                 if (helmet_status_clean === "no_helmet") helmetViolations++;
+
+                // Glove Violations
                 if (glove_status_clean === "no_glove") gloveViolations++;
 
-                if (!violation) {
-                    fullPPE++;
-                    if (helmet_status_clean === "helmet") helmetOK++;
-                    if (glove_status_clean === "glove") gloveOK++;
-                }
+                // Full PPE
+                if (helmet_status_clean === "helmet" && glove_status_clean === "glove") fullPPE++;
+
+                // Status Helmet
+                if (helmet_status_clean === "helmet") helmetOK++;
+
+                // Status Glove
+                if (glove_status_clean === "glove") gloveOK++;
 
                 html += `
                     <tr>
