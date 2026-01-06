@@ -1,4 +1,4 @@
-// ✅ Apps Script Web App URL kamu
+// ✅ Apps Script Web App URL
 const API_URL = "https://script.google.com/macros/s/AKfycbwPTAFJzw7k8f7bRhKGBgYW_jlGftNlKth3P3wL9IIfgyMEodqqerNZyyNITbxMMg_5/exec";
 
 function loadData() {
@@ -19,19 +19,17 @@ function loadData() {
                 return;
             }
 
-            // Dapatkan tarikh hari ini, minggu, bulan
             const today = new Date();
             const startOfWeek = new Date(today);
-            startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday as start
+            startOfWeek.setDate(today.getDate() - today.getDay());
             const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
 
-            // Filter ikut date range
             const filteredData = data.filter(row => {
                 const rowDate = new Date(row.datetime);
                 if (dateFilter === "today") return rowDate.toDateString() === today.toDateString();
                 if (dateFilter === "week") return rowDate >= startOfWeek;
                 if (dateFilter === "month") return rowDate >= startOfMonth;
-                return true; // all
+                return true;
             });
 
             if (filteredData.length === 0) {
@@ -40,7 +38,7 @@ function loadData() {
                 return;
             }
 
-            // Summary counters
+            // Counters
             let totalViolations = 0;
             let helmetViolations = 0;
             let gloveViolations = 0;
@@ -48,21 +46,22 @@ function loadData() {
             let helmetOK = 0;
             let gloveOK = 0;
 
-            // Build table HTML
             let html = "";
             filteredData.reverse().forEach((row, idx) => {
-                const helmet_status = row.helmet_status || "unknown";
-                const glove_status = row.glove_status || "unknown";
-                const violation = helmet_status === "no_helmet" || glove_status === "no_glove";
+                // Trim & lowercase supaya consistent
+                const helmet_status_clean = (row.helmet_status || "").trim().toLowerCase();
+                const glove_status_clean = (row.glove_status || "").trim().toLowerCase();
 
-                // Summary counters
+                const violation = helmet_status_clean === "no_helmet" || glove_status_clean === "no_glove";
+
                 if (violation) totalViolations++;
-                if (helmet_status === "no_helmet") helmetViolations++;
-                if (glove_status === "no_glove") gloveViolations++;
+                if (helmet_status_clean === "no_helmet") helmetViolations++;
+                if (glove_status_clean === "no_glove") gloveViolations++;
+
                 if (!violation) {
                     fullPPE++;
-                    if (helmet_status === "helmet") helmetOK++;
-                    if (glove_status === "glove") gloveOK++;
+                    if (helmet_status_clean === "helmet") helmetOK++;
+                    if (glove_status_clean === "glove") gloveOK++;
                 }
 
                 html += `
@@ -70,8 +69,8 @@ function loadData() {
                         <td>${idx+1}</td>
                         <td>${row.datetime}</td>
                         <td>${row.image_url ? `<img src="${row.image_url}" alt="PPE Image">` : ""}</td>
-                        <td>${helmet_status}</td>
-                        <td>${glove_status}</td>
+                        <td>${helmet_status_clean}</td>
+                        <td>${glove_status_clean}</td>
                     </tr>
                 `;
             });
@@ -86,7 +85,6 @@ function loadData() {
         });
 }
 
-// Update summary boxes
 function updateSummary(total, helmetV, gloveV, full, helmetOK, gloveOK) {
     document.getElementById("totalViolations").innerText = total;
     document.getElementById("helmetViolations").innerText = helmetV;
@@ -96,7 +94,6 @@ function updateSummary(total, helmetV, gloveV, full, helmetOK, gloveOK) {
     document.getElementById("gloveOK").innerText = gloveOK;
 }
 
-// Optional: load data on page load
 window.addEventListener("DOMContentLoaded", () => {
     loadData();
 });
