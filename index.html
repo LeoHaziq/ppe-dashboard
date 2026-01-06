@@ -1,64 +1,58 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>PPE Record Dashboard</title>
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>PPE Record Dashboard</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <header>
-        <img src="umplogo.png" alt="UMPSA Logo" class="logo-left">
-        <h2>PPE RECORD</h2>
-        <img src="versafac.png" alt="Versafac Logo" class="logo-right">
-    </header>
+<header>
+  <img src="umplogo.png" alt="UMPSA Logo" class="logo-left">
+  <h2>PPE RECORD</h2>
+  <img src="versafac.png" alt="Versafac Logo" class="logo-right">
+</header>
 
-    <section class="summary">
-        <div class="box red">
-            <h3>Total Violations</h3>
-            <div id="totalViolations" class="number">0</div>
-            <div class="sub-boxes">
-                <div>Helmet Violations<br><span id="helmetViolations">0</span></div>
-                <div>Glove Violations<br><span id="gloveViolations">0</span></div>
-            </div>
-        </div>
-        <div class="box green">
-            <h3>Full PPE</h3>
-            <div id="fullPPE" class="number">0</div>
-            <div class="sub-boxes">
-                <div>Helmet Status<br><span id="helmetOK">0</span></div>
-                <div>Glove Status<br><span id="gloveOK">0</span></div>
-            </div>
-        </div>
-    </section>
+<section class="summary">
+  <div class="box red">
+    <h3>Total Violations</h3>
+    <div id="totalViolations" class="number">0</div>
+    <div class="sub-boxes">
+      <div>Helmet Violations<br><span id="helmetViolations">0</span></div>
+      <div>Glove Violations<br><span id="gloveViolations">0</span></div>
+    </div>
+  </div>
+  <div class="box green">
+    <h3>Full PPE</h3>
+    <div id="fullPPE" class="number">0</div>
+    <div class="sub-boxes">
+      <div>Helmet Status<br><span id="helmetOK">0</span></div>
+      <div>Glove Status<br><span id="gloveOK">0</span></div>
+    </div>
+  </div>
+</section>
 
-    <section class="table-section">
-        <div class="table-header">
-            <h3>Table Record</h3>
-            <select id="dateFilter">
-                <option value="all">Select date range</option>
-                <option value="today">Today</option>
-                <option value="week">This Week</option>
-                <option value="month">This Month</option>
-            </select>
-            <button onclick="loadData()">🔄 Refresh Data</button>
-        </div>
+<section class="table-section">
+  <div class="table-header">
+    <h3>Table Record</h3>
+    <button onclick="loadData()">🔄 Refresh Data</button>
+  </div>
 
-        <table>
-            <thead>
-                <tr>
-                    <th>#</th>
-                    <th>DateTime</th>
-                    <th>Image</th>
-                    <th>Helmet Status</th>
-                    <th>Glove Status</th>
-                </tr>
-            </thead>
-            <tbody id="tableBody">
-                <tr><td colspan="5">Press "Refresh Data" to load records.</td></tr>
-            </tbody>
-        </table>
-    </section>
+  <table>
+    <thead>
+      <tr>
+        <th>#</th>
+        <th>DateTime</th>
+        <th>Image</th>
+        <th>Helmet Status</th>
+        <th>Glove Status</th>
+      </tr>
+    </thead>
+    <tbody id="tableBody">
+      <tr><td colspan="5">Press "Refresh Data" to load records.</td></tr>
+    </tbody>
+  </table>
+</section>
 
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>
