@@ -1,5 +1,18 @@
-// ✅ Apps Script Web App URL
+// ✅ Apps Script Web App URL kamu
 const API_URL = "https://script.google.com/macros/s/AKfycbwPTAFJzw7k8f7bRhKGBgYW_jlGftNlKth3P3wL9IIfgyMEodqqerNZyyNITbxMMg_5/exec";
+
+// Fungsi normalize semua status supaya consistent
+function normalizeStatus(status) {
+    if (!status) return "unknown";
+    const s = status.trim().toLowerCase();
+    // Helmet mapping
+    if (s === "helmet" || s === "helmet") return "helmet";
+    if (s === "no_helmet" || s === "no helmet") return "no_helmet";
+    // Glove mapping
+    if (s === "glove") return "glove";
+    if (s === "no_glove" || s === "no glove") return "no_glove";
+    return "unknown";
+}
 
 function loadData() {
     const tableBody = document.getElementById("tableBody");
@@ -48,9 +61,8 @@ function loadData() {
 
             let html = "";
             filteredData.reverse().forEach((row, idx) => {
-                // Trim & lowercase supaya consistent
-                const helmet_status_clean = (row.helmet_status || "").trim().toLowerCase();
-                const glove_status_clean = (row.glove_status || "").trim().toLowerCase();
+                const helmet_status_clean = normalizeStatus(row.helmet_status);
+                const glove_status_clean = normalizeStatus(row.glove_status);
 
                 const violation = helmet_status_clean === "no_helmet" || glove_status_clean === "no_glove";
 
@@ -85,6 +97,7 @@ function loadData() {
         });
 }
 
+// Update summary boxes
 function updateSummary(total, helmetV, gloveV, full, helmetOK, gloveOK) {
     document.getElementById("totalViolations").innerText = total;
     document.getElementById("helmetViolations").innerText = helmetV;
@@ -94,6 +107,7 @@ function updateSummary(total, helmetV, gloveV, full, helmetOK, gloveOK) {
     document.getElementById("gloveOK").innerText = gloveOK;
 }
 
+// Load data bila page dibuka
 window.addEventListener("DOMContentLoaded", () => {
     loadData();
 });
