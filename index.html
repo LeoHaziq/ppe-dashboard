@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PPE Monitoring System</title>
+    <title>PPE Monitoring Dashboard</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -10,9 +10,10 @@
     <h1>PPE Monitoring Dashboard</h1>
     <p>Final Year Project</p>
 
-    <div class="box">
-        <p>Helmet Status: <span id="helmet">Loading...</span></p>
-        <p>Glove Status: <span id="glove">Loading...</span></p>
+    <button onclick="loadData()">🔄 Refresh Data</button>
+
+    <div id="data" class="data-container">
+        <p>Press "Refresh Data" to load latest records.</p>
     </div>
 
     <script src="script.js"></script>
