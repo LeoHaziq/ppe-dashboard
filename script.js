@@ -1,5 +1,5 @@
 // 🔴 Ganti dengan Apps Script Web App URL kamu
-const API_URL = "https://script.google.com/macros/s/AKfycbwjV3eKA0rQ0uru5PNhk69sACMpKnsbLoosDypuORe-Kiq55RqwE3ybq6TOn6CUKIP3/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwkTJAWizV7PHxkpGcwXK1M_R4eupfdCWFGD7rA7fbBu8jrxTx4q4dRehyjEATdiERg/exec";
 
 function loadData() {
     const tableBody = document.getElementById("tableBody");
@@ -65,3 +65,4 @@ function loadData() {
             tableBody.innerHTML = "<tr><td colspan='5'>Failed to load data</td></tr>";
         });
 }
+
