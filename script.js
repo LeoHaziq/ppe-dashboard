@@ -1,5 +1,5 @@
 // Ganti dengan Apps Script Web App URL kamu
-const API_URL = "https://script.google.com/macros/s/AKfycbzFAxdlvEZvh0X3jJxLonZim7GKF9W9DY9x4Tf69aY-ziQuUzdrqKZV4_wFYTxdR1ID/exec";
+const API_URL = "https://script.google.com/macros/s/AKfycbwQQ--ITriDlxvNTboMMMxY724fVl7K9UtZcdKXWb0-6yPxBlZHTbD3r3O-dBv9D6dx/exec";
 
 function loadData() {
     const tableBody = document.getElementById("tableBody");
@@ -80,3 +80,4 @@ function updateSummary(total, helmetV, gloveV, full, helmetOK, gloveOK){
 
 // Load data bila page dibuka
 window.addEventListener("DOMContentLoaded", loadData);
+
