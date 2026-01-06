@@ -1,14 +1,42 @@
-// 🔴 Ganti dengan Apps Script Web App URL kamu
-const API_URL = "https://script.google.com/macros/s/AKfycbxbir3ElA1YVqec8WDwO99aqcFOKNPIswDpiVWE1OiOGDasyU6eMg_gj5hWm4jUvv5g/exec";
+// ✅ Apps Script Web App URL kamu
+const API_URL = "https://script.google.com/macros/s/AKfycbwPTAFJzw7k8f7bRhKGBgYW_jlGftNlKth3P3wL9IIfgyMEodqqerNZyyNITbxMMg_5/exec";
 
 function loadData() {
     const tableBody = document.getElementById("tableBody");
+    const dateFilter = document.getElementById("dateFilter").value;
+
+    tableBody.innerHTML = "<tr><td colspan='5'>Loading...</td></tr>";
 
     fetch(API_URL)
-        .then(res => res.json())
+        .then(res => {
+            if (!res.ok) throw new Error("Network response was not ok");
+            return res.json();
+        })
         .then(data => {
-            if (data.length === 0) {
+            if (!Array.isArray(data) || data.length === 0) {
                 tableBody.innerHTML = "<tr><td colspan='5'>No data available</td></tr>";
+                updateSummary(0,0,0,0,0,0);
+                return;
+            }
+
+            // Dapatkan tarikh hari ini, minggu, bulan
+            const today = new Date();
+            const startOfWeek = new Date(today);
+            startOfWeek.setDate(today.getDate() - today.getDay()); // Sunday as start
+            const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+            // Filter ikut date range
+            const filteredData = data.filter(row => {
+                const rowDate = new Date(row.datetime);
+                if (dateFilter === "today") return rowDate.toDateString() === today.toDateString();
+                if (dateFilter === "week") return rowDate >= startOfWeek;
+                if (dateFilter === "month") return rowDate >= startOfMonth;
+                return true; // all
+            });
+
+            if (filteredData.length === 0) {
+                tableBody.innerHTML = "<tr><td colspan='5'>No data for selected date range</td></tr>";
+                updateSummary(0,0,0,0,0,0);
                 return;
             }
 
@@ -20,16 +48,14 @@ function loadData() {
             let helmetOK = 0;
             let gloveOK = 0;
 
-            // Reverse latest first
-            const rows = data.reverse();
-
+            // Build table HTML
             let html = "";
-            rows.forEach((row, idx) => {
-                const helmet_status = row.helmet_status;
-                const glove_status = row.glove_status;
+            filteredData.reverse().forEach((row, idx) => {
+                const helmet_status = row.helmet_status || "unknown";
+                const glove_status = row.glove_status || "unknown";
                 const violation = helmet_status === "no_helmet" || glove_status === "no_glove";
 
-                // Summary stats
+                // Summary counters
                 if (violation) totalViolations++;
                 if (helmet_status === "no_helmet") helmetViolations++;
                 if (glove_status === "no_glove") gloveViolations++;
@@ -51,19 +77,26 @@ function loadData() {
             });
 
             tableBody.innerHTML = html;
-
-            // Update summary boxes
-            document.getElementById("totalViolations").innerText = totalViolations;
-            document.getElementById("helmetViolations").innerText = helmetViolations;
-            document.getElementById("gloveViolations").innerText = gloveViolations;
-            document.getElementById("fullPPE").innerText = fullPPE;
-            document.getElementById("helmetOK").innerText = helmetOK;
-            document.getElementById("gloveOK").innerText = gloveOK;
+            updateSummary(totalViolations, helmetViolations, gloveViolations, fullPPE, helmetOK, gloveOK);
         })
         .catch(err => {
-            console.error(err);
+            console.error("Error fetching data:", err);
             tableBody.innerHTML = "<tr><td colspan='5'>Failed to load data</td></tr>";
+            updateSummary(0,0,0,0,0,0);
         });
 }
 
+// Update summary boxes
+function updateSummary(total, helmetV, gloveV, full, helmetOK, gloveOK) {
+    document.getElementById("totalViolations").innerText = total;
+    document.getElementById("helmetViolations").innerText = helmetV;
+    document.getElementById("gloveViolations").innerText = gloveV;
+    document.getElementById("fullPPE").innerText = full;
+    document.getElementById("helmetOK").innerText = helmetOK;
+    document.getElementById("gloveOK").innerText = gloveOK;
+}
 
+// Optional: load data on page load
+window.addEventListener("DOMContentLoaded", () => {
+    loadData();
+});
