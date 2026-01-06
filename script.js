@@ -1,43 +1,67 @@
-// 🔴 Ganti dengan URL Web App Apps Script kamu
+// 🔴 Ganti dengan Apps Script Web App URL kamu
 const API_URL = "https://script.google.com/macros/s/AKfycbwjV3eKA0rQ0uru5PNhk69sACMpKnsbLoosDypuORe-Kiq55RqwE3ybq6TOn6CUKIP3/exec";
 
 function loadData() {
-    const container = document.getElementById("data");
-    container.innerHTML = "<p>Loading data...</p>";
+    const tableBody = document.getElementById("tableBody");
 
     fetch(API_URL)
-        .then(response => response.json())
+        .then(res => res.json())
         .then(data => {
             if (data.length === 0) {
-                container.innerHTML = "<p>No data available</p>";
+                tableBody.innerHTML = "<tr><td colspan='5'>No data available</td></tr>";
                 return;
             }
 
-            let html = "";
+            // Summary counters
+            let totalViolations = 0;
+            let helmetViolations = 0;
+            let gloveViolations = 0;
+            let fullPPE = 0;
+            let helmetOK = 0;
+            let gloveOK = 0;
 
-            // Papar data terbaru di atas
-            data.reverse().forEach(row => {
-                const helmet_status = row.helmet_status || "N/A";
-                const glove_status = row.glove_status || "N/A";
-                const violation = (helmet_status === "no_helmet" || glove_status === "no_glove") ? true : false;
+            // Reverse latest first
+            const rows = data.reverse();
+
+            let html = "";
+            rows.forEach((row, idx) => {
+                const helmet_status = row.helmet_status;
+                const glove_status = row.glove_status;
+                const violation = helmet_status === "no_helmet" || glove_status === "no_glove";
+
+                // Summary stats
+                if (violation) totalViolations++;
+                if (helmet_status === "no_helmet") helmetViolations++;
+                if (glove_status === "no_glove") gloveViolations++;
+                if (!violation) {
+                    fullPPE++;
+                    if (helmet_status === "helmet") helmetOK++;
+                    if (glove_status === "glove") gloveOK++;
+                }
 
                 html += `
-                    <div class="card">
-                        <p><b>Time:</b> ${row.datetime}</p>
-                        <p>Helmet: ${helmet_status}</p>
-                        <p>Glove: ${glove_status}</p>
-                        <p class="${violation ? 'violation' : ''}">
-                            Violation: ${violation ? 'YES' : 'NO'}
-                        </p>
-                        ${row.image_url ? `<img src="${row.image_url}" alt="PPE Image">` : ""}
-                    </div>
+                    <tr>
+                        <td>${idx+1}</td>
+                        <td>${row.datetime}</td>
+                        <td>${row.image_url ? `<img src="${row.image_url}" alt="PPE Image">` : ""}</td>
+                        <td>${helmet_status}</td>
+                        <td>${glove_status}</td>
+                    </tr>
                 `;
             });
 
-            container.innerHTML = html;
+            tableBody.innerHTML = html;
+
+            // Update summary boxes
+            document.getElementById("totalViolations").innerText = totalViolations;
+            document.getElementById("helmetViolations").innerText = helmetViolations;
+            document.getElementById("gloveViolations").innerText = gloveViolations;
+            document.getElementById("fullPPE").innerText = fullPPE;
+            document.getElementById("helmetOK").innerText = helmetOK;
+            document.getElementById("gloveOK").innerText = gloveOK;
         })
-        .catch(error => {
-            console.error(error);
-            container.innerHTML = "<p>Failed to load data</p>";
+        .catch(err => {
+            console.error(err);
+            tableBody.innerHTML = "<tr><td colspan='5'>Failed to load data</td></tr>";
         });
 }
