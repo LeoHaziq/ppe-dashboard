@@ -1,7 +1,7 @@
 // Configuration
 const CONFIG = {
     // Replace this with your Google Apps Script Web App URL
-    API_URL: "https://script.google.com/macros/s/AKfycbwacmIPjA3i_yyk3WNcrHlkWIWTQ_qv0lf80ekWOq-cw2RLi0ruHCsT1KhtpKFJUu9T/exec",
+    API_URL: "https://script.google.com/macros/s/AKfycbwj7kyIxP1lVeCHlJ99V4e7kLZjzo8zvzrRFoL216klLmXE_i-zT-EMy5zP2uKzAmFD/exec",
     
     // Mock data for initial display (will be replaced by API data)
     mockData: {
@@ -253,3 +253,4 @@ function exportData() {
     linkElement.setAttribute('download', exportFileDefaultName);
     linkElement.click();
 }
+
