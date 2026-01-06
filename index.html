@@ -3,72 +3,73 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPE Record Dashboard - UMPSA</title>
+    <title>PPE Monitoring Dashboard - UMPSA Prevent Highway</title>
     <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/96/000000/helmet.png">
 </head>
 <body>
     <div class="container">
-        <!-- Header -->
+        <!-- HEADER SECTION -->
         <header class="header">
-            <div class="logo-left">
-                <div class="logo-placeholder">UMPSA</div>
+            <div class="logo-box">
+                <div>UMPSA</div>
             </div>
             <div class="header-title">
                 <h1>PREVENT HIGHWAY</h1>
-                <h2>PPE RECORD</h2>
+                <h2>PPE RECORD MONITORING SYSTEM</h2>
             </div>
-            <div class="logo-right">
-                <div class="logo-placeholder">VERSITRON</div>
+            <div class="logo-box">
+                <div>VERSITRON</div>
             </div>
         </header>
 
-        <!-- Stats Section -->
+        <!-- STATISTICS SECTION -->
         <div class="stats-container">
-            <div class="stats-box red-box">
-                <h3>Tidal Violations</h3>
-                <div class="big-number" id="totalViolations">200</div>
-                <div class="sub-stats">
-                    <div class="sub-stat">
+            <div class="stats-card violations">
+                <h3 class="stats-title">TIDAL VIOLATIONS</h3>
+                <div class="stats-main-number" id="totalViolations">0</div>
+                <div class="stats-details">
+                    <div class="stat-detail">
                         <h4>Helmet Violations</h4>
-                        <div class="small-number" id="helmetViolations">59</div>
+                        <div class="number" id="helmetViolations">0</div>
                     </div>
-                    <div class="sub-stat">
+                    <div class="stat-detail">
                         <h4>Glove Violations</h4>
-                        <div class="small-number" id="gloveViolations">141</div>
+                        <div class="number" id="gloveViolations">0</div>
                     </div>
                 </div>
             </div>
             
-            <div class="stats-box green-box">
-                <h3>Full IPTE</h3>
-                <div class="big-number" id="fullPPE">26</div>
-                <div class="sub-stats">
-                    <div class="sub-stat">
-                        <h4>Helmet Status</h4>
-                        <div class="small-number" id="helmetOK">117</div>
+            <div class="stats-card compliance">
+                <h3 class="stats-title">FULL IPTE COMPLIANCE</h3>
+                <div class="stats-main-number" id="fullPPE">0</div>
+                <div class="stats-details">
+                    <div class="stat-detail">
+                        <h4>Helmet Status OK</h4>
+                        <div class="number" id="helmetOK">0</div>
                     </div>
-                    <div class="sub-stat">
-                        <h4>Glove Status</h4>
-                        <div class="small-number" id="gloveOK">36</div>
+                    <div class="stat-detail">
+                        <h4>Glove Status OK</h4>
+                        <div class="number" id="gloveOK">0</div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- Table Section -->
+        <!-- TABLE SECTION -->
         <div class="table-section">
             <div class="table-header">
-                <h3>Table Record</h3>
+                <h3><i class="fas fa-table"></i> TABLE RECORD</h3>
                 <div class="table-controls">
                     <select id="dateFilter">
-                        <option value="all">Select data range</option>
+                        <option value="all">Select date range</option>
                         <option value="today">Today</option>
                         <option value="yesterday">Yesterday</option>
-                        <option value="week">This Week</option>
-                        <option value="month">This Month</option>
+                        <option value="week">Last 7 Days</option>
+                        <option value="month">Last 30 Days</option>
                     </select>
-                    <button onclick="refreshData()" class="refresh-btn">
+                    <button class="refresh-btn">
                         <i class="fas fa-redo"></i> Refresh Data
                     </button>
                 </div>
@@ -78,16 +79,37 @@
                 <thead>
                     <tr>
                         <th width="5%">#</th>
-                        <th width="25%">Date & Time</th>
-                        <th width="30%">Image URL</th>
-                        <th width="20%">Helmet Status</th>
-                        <th width="20%">Glove Status</th>
+                        <th width="25%">DATE & TIME</th>
+                        <th width="30%">IMAGE SNAPSHOT</th>
+                        <th width="20%">HELMET STATUS</th>
+                        <th width="20%">GLOVE STATUS</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
-                    <!-- Data will be populated by JavaScript -->
+                    <tr>
+                        <td colspan="5" class="loading-container">
+                            <i class="fas fa-spinner fa-spin"></i>
+                            <p>Loading PPE records from Google Sheet...</p>
+                        </td>
+                    </tr>
                 </tbody>
             </table>
+        </div>
+
+        <!-- FOOTER -->
+        <div class="footer">
+            <p>PPE Monitoring System &copy; 2025 | UMPSA Safety Department | Real-time Monitoring Dashboard</p>
+            <div class="footer-links">
+                <a href="https://drive.google.com/drive/folders/1oUFpxplD2EjtlrjG7pof62F06ffgYaJD" target="_blank">
+                    <i class="fas fa-folder-open"></i> View Image Folder
+                </a>
+                |
+                <a href="#" onclick="showAppState()">
+                    <i class="fas fa-info-circle"></i> System Info
+                </a>
+                |
+                <span id="lastUpdate">--:--:--</span>
+            </div>
         </div>
     </div>
 
