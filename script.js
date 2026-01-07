@@ -3,12 +3,13 @@
 // ============================================
 
 // CONFIGURATION - GANTI DENGAN URL ANDA!
+// Ganti URL di bawah dengan URL deployment Apps Script anda
 const CONFIG = {
-    API_URL: "https://script.google.com/macros/s/AKfycbw041rpacAojoRYLn6iE16kN2iwKtiMT0DgoiRz_EYm1wG5NGBIbmr6CNDW0IgmxYlT/exec", // GANTI INI!
+    API_URL: "https://script.google.com/macros/s/AKfycbzR20U7gfumeDQNLVnQSZj5-A5Rpi-S8bZfGwf_2CJxQ42d1p0lq7gclRHqwxKJtgzN/exec",
     SHEET_ID: "1UQd4xVSONK4aVy2NKu0pjA__Y4DoM1VFHusznmJJ0Sc",
     AUTO_REFRESH: true,
     REFRESH_INTERVAL: 60000, // 1 minute
-    USE_SAMPLE_DATA: false // Set false for real data
+    USE_SAMPLE_DATA: false // Set true untuk gunakan data contoh jika API gagal
 };
 
 // Global State
@@ -16,8 +17,7 @@ let dashboardState = {
     data: null,
     filteredData: null,
     lastUpdate: null,
-    apiStatus: 'disconnected',
-    currentImage: null
+    apiStatus: 'disconnected'
 };
 
 // Initialize Dashboard
@@ -70,12 +70,6 @@ function setupEventListeners() {
     if (systemInfoBtn) {
         systemInfoBtn.addEventListener('click', showSystemInfo);
     }
-    
-    // Modal Close
-    const modalClose = document.getElementById('modalClose');
-    if (modalClose) {
-        modalClose.addEventListener('click', closeModal);
-    }
 }
 
 // Test API Connection
@@ -117,7 +111,7 @@ async function loadData() {
         showLoadingState();
         
         // Add cache busting
-        const url = `${CONFIG.API_URL}?action=getRecords&t=${Date.now()}`;
+        const url = `${CONFIG.API_URL}?action=getData&t=${Date.now()}`;
         console.log('Fetching from:', url);
         
         const response = await fetch(url);
@@ -162,6 +156,8 @@ async function loadData() {
         // Try sample data
         if (CONFIG.USE_SAMPLE_DATA) {
             loadSampleData();
+        } else {
+            showNoDataState();
         }
     }
 }
@@ -177,9 +173,9 @@ function updateDashboard(stats) {
     document.getElementById('totalViolations').textContent = totalViolations;
     document.getElementById('helmetViolations').textContent = stats.helmetViolations || 0;
     document.getElementById('gloveViolations').textContent = stats.gloveViolations || 0;
-    document.getElementById('fullPPE').textContent = stats.compliance || 0;
-    document.getElementById('helmetOK').textContent = stats.helmetOk || 0;
-    document.getElementById('gloveOK').textContent = stats.gloveOk || 0;
+    document.getElementById('fullPPE').textContent = stats.fullPPE || 0;
+    document.getElementById('helmetOK').textContent = stats.helmetOK || 0;
+    document.getElementById('gloveOK').textContent = stats.gloveOK || 0;
 }
 
 // Update Table with Records
@@ -215,32 +211,20 @@ function createTableRow(record, rowNumber) {
     const helmetText = helmetClass === 'status-ok' ? 'HELMET OK' : 'NO HELMET';
     const gloveText = gloveClass === 'status-ok' ? 'GLOVE OK' : 'NO GLOVE';
     
-    // Image URL - FIXED VERSION
+    // Image URL
     let imageUrl = 'https://via.placeholder.com/160x100/2c3e50/ffffff?text=No+Image';
     let imageAlt = 'No Image Available';
     
     if (record.imageUrl) {
-        // Use the image URL from Google Sheets
         imageUrl = record.imageUrl;
         imageAlt = 'PPE Snapshot';
         
         // Ensure it's a direct image URL for Google Drive
         if (imageUrl.includes('drive.google.com')) {
-            if (imageUrl.includes('/uc?id=')) {
-                // Already a direct link
-            } else if (imageUrl.includes('/file/d/')) {
-                // Convert share link to direct link
-                const fileId = imageUrl.split('/file/d/')[1]?.split('/')[0];
-                if (fileId) {
-                    imageUrl = `https://drive.google.com/uc?id=${fileId}&export=view`;
-                }
-            } else if (record.imageId) {
-                imageUrl = `https://drive.google.com/uc?id=${record.imageId}&export=view`;
+            if (!imageUrl.includes('export=view')) {
+                imageUrl += (imageUrl.includes('?') ? '&' : '?') + 'export=view';
             }
         }
-    } else if (record.imageId) {
-        imageUrl = `https://drive.google.com/uc?id=${record.imageId}&export=view`;
-        imageAlt = 'PPE Snapshot';
     }
     
     // Create cells
@@ -257,14 +241,6 @@ function createTableRow(record, rowNumber) {
                      class="camera-image"
                      loading="lazy"
                      onerror="this.onerror=null; this.src='https://via.placeholder.com/160x100/2c3e50/ffffff?text=Image+Error'">
-                <div class="image-actions">
-                    <button class="btn-view" onclick="viewImageModal('${imageUrl}', '${record.datetime || ''}')" title="View Image">
-                        <i class="fas fa-eye"></i>
-                    </button>
-                    <button class="btn-download" onclick="downloadImage('${imageUrl}', 'ppe_${record.id || Date.now()}')" title="Download">
-                        <i class="fas fa-download"></i>
-                    </button>
-                </div>
             </div>
         </td>
         <td class="status-cell">
@@ -293,16 +269,14 @@ function createTableRow(record, rowNumber) {
 // Handle Date Filter
 function handleDateFilter() {
     const filter = document.getElementById('dateFilter').value;
-    
     if (!dashboardState.data) return;
     
-    let filtered = [...dashboardState.data];
+    let filteredRecords = [...dashboardState.data];
     
     if (filter === 'today') {
         const today = new Date().toDateString();
-        filtered = filtered.filter(record => {
-            if (!record.datetime) return false;
-            const recordDate = new Date(record.datetime).toDateString();
+        filteredRecords = filteredRecords.filter(record => {
+            const recordDate = new Date(record.timestamp || record.datetime).toDateString();
             return recordDate === today;
         });
     } else if (filter === 'yesterday') {
@@ -310,36 +284,33 @@ function handleDateFilter() {
         yesterday.setDate(yesterday.getDate() - 1);
         const yesterdayStr = yesterday.toDateString();
         
-        filtered = filtered.filter(record => {
-            if (!record.datetime) return false;
-            const recordDate = new Date(record.datetime).toDateString();
+        filteredRecords = filteredRecords.filter(record => {
+            const recordDate = new Date(record.timestamp || record.datetime).toDateString();
             return recordDate === yesterdayStr;
         });
     } else if (filter === 'week') {
         const weekAgo = new Date();
         weekAgo.setDate(weekAgo.getDate() - 7);
         
-        filtered = filtered.filter(record => {
-            if (!record.datetime) return false;
-            const recordDate = new Date(record.datetime);
+        filteredRecords = filteredRecords.filter(record => {
+            const recordDate = new Date(record.timestamp || record.datetime);
             return recordDate >= weekAgo;
         });
     } else if (filter === 'month') {
         const monthAgo = new Date();
         monthAgo.setMonth(monthAgo.getMonth() - 1);
         
-        filtered = filtered.filter(record => {
-            if (!record.datetime) return false;
-            const recordDate = new Date(record.datetime);
+        filteredRecords = filteredRecords.filter(record => {
+            const recordDate = new Date(record.timestamp || record.datetime);
             return recordDate >= monthAgo;
         });
     }
     
-    dashboardState.filteredData = filtered;
-    updateTable(filtered);
+    dashboardState.filteredData = filteredRecords;
+    updateTable(filteredRecords);
     updateRecordsCount();
     
-    showNotification(`Showing ${filtered.length} records`, 'info');
+    showNotification(`Showing ${filteredRecords.length} records`, 'info');
 }
 
 // Show No Data State
@@ -400,60 +371,58 @@ function showLoadingState() {
     `;
 }
 
-// Image Functions
-function viewImageModal(imageUrl, info) {
-    const modal = document.getElementById('imageModal');
-    const modalImage = document.getElementById('modalImage');
-    const imageInfo = document.getElementById('imageInfo');
+// Sample Data for Testing
+function loadSampleData() {
+    console.log('Loading sample data...');
     
-    if (!modal || !modalImage) return;
-    
-    dashboardState.currentImage = imageUrl;
-    
-    // Set image
-    modalImage.src = imageUrl;
-    
-    // Set info
-    imageInfo.textContent = info || 'PPE Monitoring Image';
-    
-    // Setup download button
-    const downloadBtn = document.getElementById('downloadImageBtn');
-    if (downloadBtn) {
-        downloadBtn.onclick = () => downloadImage(imageUrl, `ppe_image_${Date.now()}`);
-    }
-    
-    // Setup view in drive button
-    const viewDriveBtn = document.getElementById('viewInDriveBtn');
-    if (viewDriveBtn) {
-        if (imageUrl.includes('drive.google.com')) {
-            viewDriveBtn.style.display = 'flex';
-            viewDriveBtn.onclick = () => window.open(imageUrl.replace('/uc?id=', '/file/d/').replace('&export=view', ''), '_blank');
-        } else {
-            viewDriveBtn.style.display = 'none';
+    const sampleData = [
+        {
+            id: 1,
+            datetime: "Nov 4, 2025, 09:55:42 AM",
+            timestamp: "2025-11-04T09:55:42",
+            imageUrl: "https://drive.google.com/uc?id=1kaqbrGBlIDoGqj&export=view",
+            helmetStatus: "no_helmet",
+            gloveStatus: "glove"
+        },
+        {
+            id: 2,
+            datetime: "Nov 4, 2025, 09:56:09 AM",
+            timestamp: "2025-11-04T09:56:09",
+            imageUrl: "https://drive.google.com/uc?id=1nOxycdenBHwUJ&export=view",
+            helmetStatus: "helmet",
+            gloveStatus: "glove"
+        },
+        {
+            id: 3,
+            datetime: "Nov 4, 2025, 10:15:33 AM",
+            timestamp: "2025-11-04T10:15:33",
+            imageUrl: "https://drive.google.com/uc?id=1abc123def456&export=view",
+            helmetStatus: "helmet",
+            gloveStatus: "no_glove"
         }
-    }
+    ];
     
-    // Show modal
-    modal.classList.remove('hidden');
-}
-
-function closeModal() {
-    const modal = document.getElementById('imageModal');
-    if (modal) {
-        modal.classList.add('hidden');
-    }
-}
-
-function downloadImage(url, filename) {
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = filename || `ppe_image_${Date.now()}.jpg`;
-    link.target = '_blank';
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const sampleStats = {
+        helmetViolations: 23,
+        gloveViolations: 24,
+        helmetOK: 56,
+        gloveOK: 55,
+        totalRecords: 100,
+        violations: 47,
+        fullPPE: 53
+    };
     
-    showNotification('Image download started', 'success');
+    dashboardState.data = sampleData;
+    dashboardState.filteredData = sampleData;
+    dashboardState.lastUpdate = new Date();
+    
+    updateDashboard(sampleStats);
+    updateTable(sampleData);
+    updateLastUpdateTime();
+    updateRecordsCount();
+    updateApiStatus('connected');
+    
+    showNotification('Loaded sample data (Google Sheets unavailable)', 'warning');
 }
 
 // Utility Functions
@@ -507,8 +476,13 @@ function updateRecordsCount() {
 }
 
 function showNotification(message, type = 'info') {
-    const container = document.getElementById('notificationContainer');
-    if (!container) return;
+    // Remove existing notifications
+    const existingNotifications = document.querySelectorAll('.notification');
+    existingNotifications.forEach(notification => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    });
     
     // Create notification
     const notification = document.createElement('div');
@@ -529,8 +503,8 @@ function showNotification(message, type = 'info') {
         </button>
     `;
     
-    // Add to container
-    container.appendChild(notification);
+    // Add to body
+    document.body.appendChild(notification);
     
     // Auto remove after 5 seconds
     setTimeout(() => {
@@ -557,66 +531,5 @@ Version: 2.0
     alert(info);
 }
 
-// Sample Data for Testing
-function loadSampleData() {
-    console.log('Loading sample data...');
-    
-    const sampleData = [
-        {
-            id: 1,
-            datetime: "Nov 4, 2025, 09:55:42 AM",
-            timestamp: "2025-11-04T09:55:42",
-            imageUrl: "https://drive.google.com/uc?id=1kaqbrGBlIDoGqj&export=view",
-            helmetStatus: "no_helmet",
-            gloveStatus: "glove"
-        },
-        {
-            id: 2,
-            datetime: "Nov 4, 2025, 09:56:09 AM",
-            timestamp: "2025-11-04T09:56:09",
-            imageUrl: "https://drive.google.com/uc?id=1nOxycdenBHwUJ&export=view",
-            helmetStatus: "helmet",
-            gloveStatus: "glove"
-        },
-        {
-            id: 3,
-            datetime: "Nov 4, 2025, 10:15:33 AM",
-            timestamp: "2025-11-04T10:15:33",
-            imageUrl: "https://drive.google.com/uc?id=1abc123def456&export=view",
-            helmetStatus: "helmet",
-            gloveStatus: "no_glove"
-        }
-    ];
-    
-    const sampleStats = {
-        helmetViolations: 23,
-        gloveViolations: 24,
-        helmetOk: 56,
-        gloveOk: 55,
-        totalRecords: 100,
-        violations: 47,
-        compliance: 53
-    };
-    
-    dashboardState.data = sampleData;
-    dashboardState.filteredData = sampleData;
-    dashboardState.lastUpdate = new Date();
-    
-    updateDashboard(sampleStats);
-    updateTable(sampleData);
-    updateLastUpdateTime();
-    updateRecordsCount();
-    updateApiStatus('connected');
-    
-    showNotification('Loaded sample data (Google Sheets unavailable)', 'warning');
-}
-
 // Initialize when page loads
-window.onload = initializeDashboard;
-
-// Make functions available globally
-window.viewImageModal = viewImageModal;
-window.downloadImage = downloadImage;
-window.closeModal = closeModal;
-window.loadData = loadData;
-window.handleDateFilter = handleDateFilter;
+document.addEventListener('DOMContentLoaded', initializeDashboard);
