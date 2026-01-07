@@ -4,53 +4,80 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PPE Monitoring Dashboard - UMPSA Prevent Highway</title>
-    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/96/000000/helmet.png">
+    <style>
+        /* Inline minimal CSS untuk loading awal */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', sans-serif; 
+            background: #0a0a1a; 
+            color: white; 
+            padding: 20px;
+            min-height: 100vh;
+        }
+        .loading { 
+            text-align: center; 
+            margin-top: 100px; 
+            font-size: 20px;
+        }
+        .loading i { 
+            color: #3498db; 
+            margin-bottom: 20px;
+            font-size: 48px;
+        }
+    </style>
 </head>
 <body>
-    <div class="container">
+    <!-- Loading screen (akan diganti saat CSS dimuat) -->
+    <div class="loading" id="loadingScreen">
+        <i class="fas fa-spinner fa-spin"></i>
+        <p>Loading PPE Dashboard...</p>
+    </div>
+
+    <!-- Main Dashboard Container (akan ditampilkan setelah loading) -->
+    <div class="container" id="mainContent" style="display: none;">
         <!-- HEADER SECTION -->
         <header class="header">
             <div class="logo-box">
-                <div>UMPSA</div>
+                <div><i class="fas fa-university"></i> UMPSA</div>
             </div>
             <div class="header-title">
-                <h1>PREVENT HIGHWAY</h1>
+                <h1><i class="fas fa-hard-hat"></i> PREVENT HIGHWAY</h1>
                 <h2>PPE RECORD MONITORING SYSTEM</h2>
             </div>
             <div class="logo-box">
-                <div>VERSITRON</div>
+                <div><i class="fas fa-robot"></i> VERSITRON</div>
             </div>
         </header>
 
         <!-- STATISTICS SECTION -->
         <div class="stats-container">
             <div class="stats-card violations">
-                <h3 class="stats-title">TIDAL VIOLATIONS</h3>
+                <h3 class="stats-title"><i class="fas fa-exclamation-triangle"></i> TOTAL VIOLATIONS</h3>
                 <div class="stats-main-number" id="totalViolations">0</div>
                 <div class="stats-details">
                     <div class="stat-detail">
-                        <h4>Helmet Violations</h4>
+                        <h4><i class="fas fa-hard-hat"></i> Helmet Violations</h4>
                         <div class="number" id="helmetViolations">0</div>
                     </div>
                     <div class="stat-detail">
-                        <h4>Glove Violations</h4>
+                        <h4><i class="fas fa-hand-paper"></i> Glove Violations</h4>
                         <div class="number" id="gloveViolations">0</div>
                     </div>
                 </div>
             </div>
             
             <div class="stats-card compliance">
-                <h3 class="stats-title">FULL IPTE COMPLIANCE</h3>
+                <h3 class="stats-title"><i class="fas fa-check-circle"></i> FULL PPE COMPLIANCE</h3>
                 <div class="stats-main-number" id="fullPPE">0</div>
                 <div class="stats-details">
                     <div class="stat-detail">
-                        <h4>Helmet Status OK</h4>
+                        <h4><i class="fas fa-hard-hat"></i> Helmet Status OK</h4>
                         <div class="number" id="helmetOK">0</div>
                     </div>
                     <div class="stat-detail">
-                        <h4>Glove Status OK</h4>
+                        <h4><i class="fas fa-hand-paper"></i> Glove Status OK</h4>
                         <div class="number" id="gloveOK">0</div>
                     </div>
                 </div>
@@ -63,7 +90,7 @@
                 <h3><i class="fas fa-table"></i> TABLE RECORD</h3>
                 <div class="table-controls">
                     <select id="dateFilter">
-                        <option value="all">Select date range</option>
+                        <option value="all">All Time</option>
                         <option value="today">Today</option>
                         <option value="yesterday">Yesterday</option>
                         <option value="week">Last 7 Days</option>
@@ -72,6 +99,10 @@
                     <button class="refresh-btn">
                         <i class="fas fa-redo"></i> Refresh Data
                     </button>
+                    <a href="https://drive.google.com/drive/folders/1oUFpxplD2EjtlrjG7pof62F06ffgYaJD" 
+                       target="_blank" class="folder-btn">
+                        <i class="fas fa-folder-open"></i> Image Folder
+                    </a>
                 </div>
             </div>
             
@@ -80,9 +111,9 @@
                     <tr>
                         <th width="5%">#</th>
                         <th width="25%">DATE & TIME</th>
-                        <th width="30%">IMAGE SNAPSHOT</th>
-                        <th width="20%">HELMET STATUS</th>
-                        <th width="20%">GLOVE STATUS</th>
+                        <th width="25%">IMAGE SNAPSHOT</th>
+                        <th width="22%">HELMET STATUS</th>
+                        <th width="23%">GLOVE STATUS</th>
                     </tr>
                 </thead>
                 <tbody id="tableBody">
@@ -108,11 +139,24 @@
                     <i class="fas fa-info-circle"></i> System Info
                 </a>
                 |
-                <span id="lastUpdate">--:--:--</span>
+                <span id="lastUpdate">Loading...</span>
             </div>
         </div>
     </div>
 
+    <!-- Link ke CSS eksternal -->
+    <link rel="stylesheet" href="style.css">
+    
+    <!-- JavaScript -->
+    <script>
+        // Sembunyikan loading screen dan tampilkan konten utama saat CSS dimuat
+        window.addEventListener('load', function() {
+            document.getElementById('loadingScreen').style.display = 'none';
+            document.getElementById('mainContent').style.display = 'block';
+        });
+    </script>
+    
+    <!-- Link ke JavaScript eksternal -->
     <script src="script.js"></script>
 </body>
 </html>
