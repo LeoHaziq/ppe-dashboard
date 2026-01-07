@@ -40,73 +40,23 @@
             margin: 0 auto;
         }
         
-        /* ========== LOGO TEXT CONTAINERS ========== */
-        .logo-text-container {
+        /* ========== HEADER BARU YANG LEBIH KEMAS ========== */
+        .header-container {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            height: 70px;
-            padding: 10px 20px;
-            border-radius: 15px;
-            font-weight: 700;
-            letter-spacing: 1px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s;
-        }
-        
-        .logo-text-container:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
-        }
-        
-        .logo-left {
-            position: absolute;
-            left: 30px;
-            top: 20px;
-            z-index: 100;
-            background: linear-gradient(135deg, var(--umpsa-blue), #1a73e8);
-            color: white;
-            font-size: 1.8rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .logo-right {
-            position: absolute;
-            right: 30px;
-            top: 20px;
-            z-index: 100;
-            background: linear-gradient(135deg, var(--versafac-green), #228B22);
-            color: white;
-            font-size: 1.8rem;
-            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
-        }
-        
-        .logo-left::before {
-            content: "🏛️";
-            margin-right: 10px;
-            font-size: 1.5rem;
-        }
-        
-        .logo-right::before {
-            content: "⚡";
-            margin-right: 10px;
-            font-size: 1.5rem;
-        }
-        
-        /* Header */
-        .header {
             background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-            padding: 25px 30px 25px 200px; /* Extra left padding for logo text */
+            padding: 20px 30px;
             border-radius: 20px;
             margin-bottom: 25px;
-            text-align: center;
             border-left: 8px solid var(--warning);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             position: relative;
             overflow: hidden;
-            min-height: 120px;
+            flex-wrap: wrap;
         }
         
-        .header::before {
+        .header-container::before {
             content: '';
             position: absolute;
             top: 0;
@@ -116,42 +66,79 @@
             background: linear-gradient(90deg, var(--primary), var(--success), var(--warning));
         }
         
-        .header-content {
+        /* Logo/Institution Section */
+        .institution-section {
             display: flex;
-            align-items: center;
-            justify-content: space-between;
-            flex-wrap: wrap;
-            gap: 20px;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 200px;
         }
         
-        .header-title {
-            text-align: center;
-            flex-grow: 1;
-        }
-        
-        .header h1 {
+        .institution-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 1px;
             color: white;
-            font-size: 2.5rem;
-            margin-bottom: 5px;
-            font-weight: 700;
             display: flex;
             align-items: center;
-            justify-content: center;
+            gap: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .institution-badge {
+            font-size: 0.9rem;
+            font-weight: 600;
+            padding: 6px 15px;
+            border-radius: 20px;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        .umpsa-badge {
+            background: linear-gradient(135deg, var(--umpsa-blue), #1a73e8);
+            color: white;
+        }
+        
+        .versafac-badge {
+            background: linear-gradient(135deg, var(--versafac-green), #228B22);
+            color: white;
+        }
+        
+        /* Main Title Section */
+        .title-section {
+            flex-grow: 1;
+            text-align: center;
+            padding: 0 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .main-title {
+            color: white;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0;
+            display: flex;
+            align-items: center;
             gap: 15px;
         }
         
-        .header h2 {
+        .subtitle {
             color: rgba(255, 255, 255, 0.9);
             font-weight: 400;
-            font-size: 1.2rem;
+            font-size: 1.1rem;
+            margin: 0;
         }
         
-        .header-stats {
+        /* Header Stats Section */
+        .header-stats-container {
             display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-            margin-top: 10px;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 200px;
+            align-items: flex-end;
         }
         
         .header-stat {
@@ -160,14 +147,103 @@
             border-radius: 15px;
             display: flex;
             align-items: center;
-            gap: 10px;
-            font-weight: 500;
+            gap: 12px;
+            font-weight: 600;
+            width: 100%;
+            justify-content: center;
         }
         
         .header-stat i {
             color: var(--warning);
+            font-size: 1.2rem;
         }
         
+        .datetime-display {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        /* Responsive Design for Header */
+        @media (max-width: 1200px) {
+            .header-container {
+                flex-direction: column;
+                gap: 20px;
+                padding: 25px 20px;
+            }
+            
+            .institution-section, .title-section, .header-stats-container {
+                width: 100%;
+                text-align: center;
+                align-items: center;
+            }
+            
+            .institution-section {
+                flex-direction: row;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .header-stats-container {
+                align-items: center;
+            }
+            
+            .main-title {
+                font-size: 1.9rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 1.6rem;
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .institution-name {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+            
+            .header-stat {
+                padding: 8px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .datetime-display {
+                font-size: 0.9rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .institution-section {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .main-title {
+                font-size: 1.4rem;
+            }
+            
+            .institution-name {
+                font-size: 1.3rem;
+            }
+            
+            .header-container {
+                padding: 20px 15px;
+            }
+        }
+        
+        /* ========== CONTENT STYLES (SAMA SEPERTI SEBELUM) ========== */
         /* Stats Grid */
         .stats-grid {
             display: grid;
@@ -909,78 +985,16 @@
             to { transform: rotate(360deg); }
         }
         
-        /* Responsive */
+        /* Responsive for other sections */
         @media (max-width: 1200px) {
             .stats-grid {
                 grid-template-columns: 1fr;
-            }
-            
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .header-title {
-                text-align: center;
-            }
-        }
-        
-        @media (max-width: 992px) {
-            .header {
-                padding: 25px 30px 25px 150px;
-            }
-            
-            .logo-left, .logo-right {
-                position: relative;
-                left: auto;
-                right: auto;
-                top: auto;
-                margin-bottom: 15px;
-            }
-            
-            .logo-left {
-                order: 1;
-                margin-right: auto;
-                font-size: 1.5rem;
-                padding: 8px 15px;
-            }
-            
-            .logo-right {
-                order: 3;
-                margin-left: auto;
-                font-size: 1.5rem;
-                padding: 8px 15px;
-            }
-            
-            .header-title {
-                order: 2;
-                width: 100%;
             }
         }
         
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
-            }
-            
-            .header {
-                padding: 25px 20px;
-            }
-            
-            .header h1 {
-                font-size: 1.8rem;
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .logo-left, .logo-right {
-                position: relative;
-                left: auto;
-                right: auto;
-                top: auto;
-                margin: 0 auto 15px;
-                width: 90%;
-                justify-content: center;
             }
             
             .controls {
@@ -1054,40 +1068,44 @@
 </head>
 <body>
     <div class="container">
-        <!-- ========== NAMA UMPSA - KIRI ATAS ========== -->
-        <div class="logo-text-container logo-left">
-            UMPSA
-        </div>
-        
-        <!-- ========== NAMA VERSAFAC - KANAN ATAS ========== -->
-        <div class="logo-text-container logo-right">
-            VERSAFAC
-        </div>
-        
-        <!-- Header -->
-        <div class="header">
-            <div class="header-content">
-                <div class="header-title">
-                    <!-- JUDUL UTAMA: PPE Safety Monitoring System -->
-                    <h1>
-                        <i class="fas fa-hard-hat"></i>
-                        PPE SAFETY MONITORING SYSTEM
-                    </h1>
-                    <h2>Industrial Safety Compliance & Monitoring</h2>
+        <!-- ========== HEADER BARU YANG LEBIH KEMAS ========== -->
+        <div class="header-container">
+            <!-- Kiri: UMPSA -->
+            <div class="institution-section">
+                <div class="institution-name">
+                    <i class="fas fa-university"></i>
+                    UMPSA
                 </div>
-                <div class="header-stats">
-                    <div class="header-stat">
-                        <i class="fas fa-shield-alt"></i>
-                        <span>SAFETY FIRST</span>
-                    </div>
-                    <div class="header-stat">
-                        <i class="fas fa-industry"></i>
-                        <span>INDUSTRIAL COMPLIANCE</span>
-                    </div>
-                    <div class="header-stat">
-                        <i class="fas fa-clock"></i>
-                        <span id="currentDateTimeHeader">Loading...</span>
-                    </div>
+                <span class="institution-badge umpsa-badge">UNIVERSITY</span>
+            </div>
+            
+            <!-- Tengah: Judul Utama -->
+            <div class="title-section">
+                <h1 class="main-title">
+                    <i class="fas fa-hard-hat"></i>
+                    PPE SAFETY MONITORING SYSTEM
+                </h1>
+                <p class="subtitle">Industrial Safety Compliance & Monitoring</p>
+            </div>
+            
+            <!-- Kanan: VERSAFAC & Stats -->
+            <div class="header-stats-container">
+                <div class="institution-name">
+                    <i class="fas fa-bolt"></i>
+                    VERSAFAC
+                </div>
+                <span class="institution-badge versafac-badge">SAFETY SOLUTION</span>
+                
+                <div class="header-stat">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>SAFETY FIRST</span>
+                </div>
+                <div class="header-stat">
+                    <i class="fas fa-industry"></i>
+                    <span>INDUSTRIAL COMPLIANCE</span>
+                </div>
+                <div class="datetime-display" id="currentDateTimeHeader">
+                    Wed, Jan 7, 2026, 05:02 PM
                 </div>
             </div>
         </div>
