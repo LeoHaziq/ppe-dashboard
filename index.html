@@ -316,6 +316,54 @@
             transform: translateY(-2px);
         }
         
+        /* PPE Icon Button Styling */
+        .ppe-icon-btn {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            border: none;
+            border-radius: 12px;
+            width: 60px;
+            height: 60px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 8px;
+            gap: 5px;
+        }
+        
+        .ppe-icon-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
+            background: linear-gradient(135deg, #283593 0%, #1a237e 100%);
+        }
+        
+        .ppe-icon-btn i {
+            font-size: 24px;
+        }
+        
+        .ppe-icon-btn.violation-btn {
+            background: linear-gradient(135deg, #b71c1c 0%, #c62828 100%);
+        }
+        
+        .ppe-icon-btn.violation-btn:hover {
+            background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
+            box-shadow: 0 8px 20px rgba(234, 67, 53, 0.4);
+        }
+        
+        .ppe-icon-btn.compliant-btn {
+            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+        }
+        
+        .ppe-icon-btn.compliant-btn:hover {
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+            box-shadow: 0 8px 20px rgba(52, 168, 83, 0.4);
+        }
+        
         /* Table */
         .table-container {
             background: var(--dark-secondary);
@@ -403,51 +451,6 @@
             width: 180px;
         }
         
-        .image-preview {
-            width: 160px;
-            height: 100px;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            cursor: pointer;
-            transition: all 0.3s;
-            position: relative;
-        }
-        
-        .image-preview:hover {
-            border-color: var(--primary);
-            transform: scale(1.02);
-        }
-        
-        .image-preview img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-        
-        .image-overlay {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: rgba(0, 0, 0, 0.5);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        
-        .image-preview:hover .image-overlay {
-            opacity: 1;
-        }
-        
-        .image-overlay i {
-            font-size: 24px;
-            color: white;
-        }
-        
         .status-badge {
             padding: 10px 20px;
             border-radius: 30px;
@@ -524,7 +527,7 @@
         .modal-content {
             background: var(--dark-secondary);
             border-radius: 20px;
-            max-width: 600px; /* Reduced width since no image */
+            max-width: 600px;
             width: 100%;
             overflow: hidden;
             position: relative;
@@ -677,9 +680,14 @@
                 padding: 15px 10px;
             }
             
-            .image-preview {
-                width: 120px;
-                height: 80px;
+            .ppe-icon-btn {
+                width: 50px;
+                height: 50px;
+                font-size: 10px;
+            }
+            
+            .ppe-icon-btn i {
+                font-size: 20px;
             }
             
             .modal-content {
@@ -836,12 +844,12 @@
                     <thead>
                         <tr>
                             <th><i class="fas fa-hashtag"></i> #</th>
-                            <th><i class="far fa-calendar-alt"></i> Date & Time</th>
-                            <th><i class="fas fa-camera"></i> Image</th>
-                            <th><i class="fas fa-hard-hat"></i> Helmet Status</th>
-                            <th><i class="fas fa-hand-paper"></i> Glove Status</th>
-                            <th><i class="fas fa-id-card"></i> Compliance Status</th>
-                            <th><i class="fas fa-user"></i> Worker ID</th>
+                            <th><i class="far fa-calendar-alt"></i> DATE & TIME</th>
+                            <th><i class="fas fa-search"></i> DETAILS</th>
+                            <th><i class="fas fa-hard-hat"></i> HELMET STATUS</th>
+                            <th><i class="fas fa-hand-paper"></i> GLOVE STATUS</th>
+                            <th><i class="fas fa-id-card"></i> COMPLIANCE STATUS</th>
+                            <th><i class="fas fa-user"></i> WORKER ID</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -880,59 +888,59 @@
         </div>
     </div>
     
-    <!-- Image Modal - Modified: Removed left image section -->
-    <div class="modal" id="imageModal">
+    <!-- Violation Details Modal -->
+    <div class="modal" id="detailsModal">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">
                     <i class="fas fa-info-circle"></i>
-                    Violation Details
+                    VIOLATION DETAILS
                 </div>
                 <button class="close-modal" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="modal-info">
                     <div class="info-item">
-                        <div class="info-label">Timestamp</div>
+                        <div class="info-label">TIMESTAMP</div>
                         <div class="info-value" id="modalTime">-</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Helmet Status</div>
+                        <div class="info-label">HELMET STATUS</div>
                         <div class="info-value">
-                            <span id="modalHelmetStatus" class="status-badge badge-danger">No Helmet</span>
+                            <span id="modalHelmetStatus" class="status-badge badge-danger">NO HELMET</span>
                         </div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Glove Status</div>
+                        <div class="info-label">GLOVE STATUS</div>
                         <div class="info-value">
-                            <span id="modalGloveStatus" class="status-badge badge-danger">No Glove</span>
+                            <span id="modalGloveStatus" class="status-badge badge-danger">NO GLOVES</span>
                         </div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Compliance Status</div>
+                        <div class="info-label">COMPLIANCE STATUS</div>
                         <div class="info-value">
-                            <span id="modalCompliance" class="status-badge badge-danger">Non-Compliant</span>
+                            <span id="modalCompliance" class="status-badge badge-danger">NON-COMPLIANT</span>
                         </div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Image URL</div>
-                        <div class="info-value">
-                            <a href="#" id="modalImageLink" target="_blank" style="color: var(--primary); word-break: break-all; font-size: 0.9rem;">
-                                <i class="fas fa-external-link-alt"></i> Open in new tab
-                            </a>
-                        </div>
+                        <div class="info-label">WORKER ID</div>
+                        <div class="info-value" id="modalWorkerId">-</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Record ID</div>
-                        <div class="info-value" id="modalRecordId">-</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">Date</div>
+                        <div class="info-label">DATE</div>
                         <div class="info-value" id="modalDate">-</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">Time</div>
+                        <div class="info-label">TIME</div>
                         <div class="info-value" id="modalTimeOnly">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">IMAGE</div>
+                        <div class="info-value">
+                            <a href="#" id="modalImageLink" target="_blank" style="color: var(--primary); word-break: break-all; font-size: 0.9rem;">
+                                <i class="fas fa-external-link-alt"></i> VIEW IMAGE
+                            </a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -971,13 +979,13 @@
             autoRefreshStatus: document.getElementById('autoRefreshStatus'),
             autoRefreshFooter: document.getElementById('autoRefreshFooter'),
             // Modal elements
-            imageModal: document.getElementById('imageModal'),
+            detailsModal: document.getElementById('detailsModal'),
             modalTime: document.getElementById('modalTime'),
             modalHelmetStatus: document.getElementById('modalHelmetStatus'),
             modalGloveStatus: document.getElementById('modalGloveStatus'),
             modalCompliance: document.getElementById('modalCompliance'),
             modalImageLink: document.getElementById('modalImageLink'),
-            modalRecordId: document.getElementById('modalRecordId'),
+            modalWorkerId: document.getElementById('modalWorkerId'),
             modalDate: document.getElementById('modalDate'),
             modalTimeOnly: document.getElementById('modalTimeOnly')
         };
@@ -1119,41 +1127,41 @@
             let tableHTML = '';
             
             data.forEach((item, index) => {
-                // Determine badge classes
+                // Determine status and badge classes
+                const isCompliant = (item.helmetStatus === 'helmet' && item.gloveStatus === 'glove');
+                const helmetText = item.helmetStatus === 'helmet' ? 'HELMET' : 'NO_HELMET';
+                const gloveText = item.gloveStatus === 'glove' ? 'GLOVE' : 'NO_GLOVE';
+                const complianceText = isCompliant ? 'COMPLIANT' : 'NON-COMPLIANT';
+                
                 const helmetBadgeClass = item.helmetStatus === 'helmet' ? 'badge-success' : 'badge-danger';
                 const gloveBadgeClass = item.gloveStatus === 'glove' ? 'badge-success' : 'badge-danger';
-                const complianceBadgeClass = (item.helmetStatus === 'helmet' && item.gloveStatus === 'glove') 
-                    ? 'badge-success' 
-                    : 'badge-danger';
-                const complianceText = (item.helmetStatus === 'helmet' && item.gloveStatus === 'glove') 
-                    ? 'Compliant' 
-                    : 'Non-Compliant';
+                const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
                 
                 // Format date time
                 const formattedTime = item.datetime || 
                     (item.timestamp ? new Date(item.timestamp).toLocaleString() : 'N/A');
                 
-                // Create image preview
-                const imageHTML = item.imageUrl && item.imageUrl.trim() !== '' 
-                    ? `<div class="image-preview" onclick="openImageModal('${item.imageUrl}', '${formattedTime}', '${item.helmetStatus}', '${item.gloveStatus}', '${item.id}')">
-                          <img src="${item.imageUrl}" alt="PPE Image" 
-                               onerror="this.src='https://via.placeholder.com/160x100/1e293b/64748b?text=Image+Error'">
-                          <div class="image-overlay">
-                              <i class="fas fa-search-plus"></i>
-                          </div>
-                       </div>`
-                    : `<div class="empty-state" style="padding: 10px;">
-                          <i class="fas fa-image" style="font-size: 24px;"></i>
-                          <div style="font-size: 0.8rem; margin-top: 5px;">No Image</div>
-                       </div>`;
+                // Create PPE icon button
+                const iconButtonClass = isCompliant ? 'compliant-btn' : 'violation-btn';
+                const iconType = isCompliant ? 'fa-check-circle' : 'fa-exclamation-triangle';
+                const buttonText = isCompliant ? 'COMPLIANT' : 'VIOLATION';
+                
+                const iconButtonHTML = `
+                    <button class="ppe-icon-btn ${iconButtonClass}" 
+                            onclick="openDetailsModal('${item.imageUrl}', '${formattedTime}', '${item.helmetStatus}', '${item.gloveStatus}', '${item.id}')"
+                            title="Click to view details">
+                        <i class="fas ${iconType}"></i>
+                        <span>${buttonText}</span>
+                    </button>
+                `;
                 
                 tableHTML += `
                     <tr>
                         <td class="row-number">${index + 1}</td>
                         <td class="datetime-cell">${formattedTime}</td>
-                        <td class="image-cell">${imageHTML}</td>
-                        <td><span class="status-badge ${helmetBadgeClass}">${item.helmetStatus}</span></td>
-                        <td><span class="status-badge ${gloveBadgeClass}">${item.gloveStatus}</span></td>
+                        <td class="image-cell">${iconButtonHTML}</td>
+                        <td><span class="status-badge ${helmetBadgeClass}">${helmetText}</span></td>
+                        <td><span class="status-badge ${gloveBadgeClass}">${gloveText}</span></td>
                         <td><span class="status-badge ${complianceBadgeClass}">${complianceText}</span></td>
                         <td>${item.id || 'N/A'}</td>
                     </tr>
@@ -1163,8 +1171,8 @@
             elements.tableBody.innerHTML = tableHTML;
         }
         
-        // Open image modal
-        function openImageModal(imageUrl, time, helmetStatus, gloveStatus, recordId) {
+        // Open details modal
+        function openDetailsModal(imageUrl, time, helmetStatus, gloveStatus, workerId) {
             // Parse date and time separately
             const dateObj = new Date(time);
             const dateOnly = dateObj.toLocaleDateString('en-US', {
@@ -1183,36 +1191,39 @@
             elements.modalTime.textContent = time;
             elements.modalDate.textContent = dateOnly;
             elements.modalTimeOnly.textContent = timeOnly;
-            elements.modalRecordId.textContent = recordId || 'N/A';
+            elements.modalWorkerId.textContent = workerId || 'N/A';
             
             // Set helmet status
-            const helmetBadgeClass = helmetStatus === 'helmet' ? 'badge-success' : 'badge-danger';
-            const helmetText = helmetStatus === 'helmet' ? 'HELMET DETECTED' : 'NO HELMET';
+            const isHelmetOK = helmetStatus === 'helmet';
+            const helmetBadgeClass = isHelmetOK ? 'badge-success' : 'badge-danger';
+            const helmetText = isHelmetOK ? 'HELMET DETECTED' : 'NO HELMET';
             elements.modalHelmetStatus.className = `status-badge ${helmetBadgeClass}`;
             elements.modalHelmetStatus.textContent = helmetText;
             
             // Set glove status
-            const gloveBadgeClass = gloveStatus === 'glove' ? 'badge-success' : 'badge-danger';
-            const gloveText = gloveStatus === 'glove' ? 'GLOVES DETECTED' : 'NO GLOVES';
+            const isGloveOK = gloveStatus === 'glove';
+            const gloveBadgeClass = isGloveOK ? 'badge-success' : 'badge-danger';
+            const gloveText = isGloveOK ? 'GLOVES DETECTED' : 'NO GLOVES';
             elements.modalGloveStatus.className = `status-badge ${gloveBadgeClass}`;
             elements.modalGloveStatus.textContent = gloveText;
             
             // Set compliance status
-            const complianceBadgeClass = (helmetStatus === 'helmet' && gloveStatus === 'glove') 
-                ? 'badge-success' 
-                : 'badge-danger';
-            const complianceText = (helmetStatus === 'helmet' && gloveStatus === 'glove') 
-                ? 'COMPLIANT' 
-                : 'NON-COMPLIANT';
+            const isCompliant = isHelmetOK && isGloveOK;
+            const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
+            const complianceText = isCompliant ? 'COMPLIANT' : 'NON-COMPLIANT';
             elements.modalCompliance.className = `status-badge ${complianceBadgeClass}`;
             elements.modalCompliance.textContent = complianceText;
             
             // Set image link
-            elements.modalImageLink.href = imageUrl;
-            elements.modalImageLink.innerHTML = `<i class="fas fa-external-link-alt"></i> Open in new tab`;
+            if (imageUrl && imageUrl.trim() !== '' && !imageUrl.includes('undefined')) {
+                elements.modalImageLink.href = imageUrl;
+                elements.modalImageLink.style.display = 'block';
+            } else {
+                elements.modalImageLink.style.display = 'none';
+            }
             
             // Show modal
-            elements.imageModal.style.display = 'flex';
+            elements.detailsModal.style.display = 'flex';
             
             // Prevent body scroll
             document.body.style.overflow = 'hidden';
@@ -1220,13 +1231,13 @@
         
         // Close modal
         function closeModal() {
-            elements.imageModal.style.display = 'none';
+            elements.detailsModal.style.display = 'none';
             document.body.style.overflow = 'auto';
         }
         
         // Close modal when clicking outside
-        elements.imageModal.addEventListener('click', function(event) {
-            if (event.target === elements.imageModal) {
+        elements.detailsModal.addEventListener('click', function(event) {
+            if (event.target === elements.detailsModal) {
                 closeModal();
             }
         });
@@ -1279,24 +1290,6 @@
                 clearInterval(autoRefreshInterval);
                 autoRefreshInterval = null;
             }
-        }
-        
-        // Export data function (optional)
-        function exportData() {
-            if (!currentData) {
-                alert('No data to export');
-                return;
-            }
-            
-            const dataStr = JSON.stringify(currentData, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `ppe-data-${new Date().toISOString().split('T')[0]}.json`;
-            
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            linkElement.click();
         }
     </script>
 </body>
