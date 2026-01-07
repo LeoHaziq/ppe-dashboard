@@ -1,421 +1,622 @@
-// Configuration
+// ============================================
+// PPE DASHBOARD - MAIN JAVASCRIPT
+// ============================================
+
+// CONFIGURATION - GANTI DENGAN URL ANDA!
 const CONFIG = {
-  API_URL: "https://script.google.com/macros/s/AKfycbydxsfDfPpRjEJPqlQmkpP64IsyO6R9pau96hZpSg9ahQfhKMmAeKLbg6kOVrh46dEm/exec",
-  CACHE_DURATION: 30000 // 30 seconds
+    API_URL: "https://script.google.com/macros/s/AKfycbw041rpacAojoRYLn6iE16kN2iwKtiMT0DgoiRz_EYm1wG5NGBIbmr6CNDW0IgmxYlT/exec", // GANTI INI!
+    SHEET_ID: "1UQd4xVSONK4aVy2NKu0pjA__Y4DoM1VFHusznmJJ0Sc",
+    AUTO_REFRESH: true,
+    REFRESH_INTERVAL: 60000, // 1 minute
+    USE_SAMPLE_DATA: false // Set false for real data
 };
 
-// Global state
-let currentData = null;
-let lastUpdateTime = null;
+// Global State
+let dashboardState = {
+    data: null,
+    filteredData: null,
+    lastUpdate: null,
+    apiStatus: 'disconnected',
+    currentImage: null
+};
 
-// Initialize
-document.addEventListener('DOMContentLoaded', function() {
-  console.log('PPE Dashboard initialized');
-  
-  // Update last update time
-  updateLastUpdateTime();
-  
-  // Setup event listeners
-  const refreshBtn = document.querySelector('.refresh-btn');
-  if (refreshBtn) {
-    refreshBtn.addEventListener('click', loadData);
-  }
-  
-  const dateFilter = document.getElementById('dateFilter');
-  if (dateFilter) {
-    dateFilter.addEventListener('change', filterTable);
-  }
-  
-  // Load initial data
-  loadData();
-  
-  // Auto-refresh every 5 minutes
-  setInterval(loadData, 5 * 60 * 1000);
-});
-
-// Update last update time display
-function updateLastUpdateTime() {
-  const now = new Date();
-  const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-  const lastUpdateElement = document.getElementById('lastUpdate');
-  if (lastUpdateElement) {
-    lastUpdateElement.textContent = `Last updated: ${timeString}`;
-  }
+// Initialize Dashboard
+function initializeDashboard() {
+    console.log('Initializing PPE Dashboard...');
+    
+    // Update API Status
+    updateApiStatus('connecting');
+    
+    // Setup Event Listeners
+    setupEventListeners();
+    
+    // Test API Connection
+    testApiConnection().then(success => {
+        if (success) {
+            // Load data
+            loadData();
+            
+            // Setup auto-refresh
+            if (CONFIG.AUTO_REFRESH) {
+                setInterval(loadData, CONFIG.REFRESH_INTERVAL);
+            }
+        } else {
+            // Use sample data if API fails
+            if (CONFIG.USE_SAMPLE_DATA) {
+                loadSampleData();
+            } else {
+                showNoDataState();
+            }
+        }
+    });
 }
 
-// Load data from Google Sheets
+// Setup Event Listeners
+function setupEventListeners() {
+    // Refresh Button
+    const refreshBtn = document.getElementById('refreshBtn');
+    if (refreshBtn) {
+        refreshBtn.addEventListener('click', loadData);
+    }
+    
+    // Date Filter
+    const dateFilter = document.getElementById('dateFilter');
+    if (dateFilter) {
+        dateFilter.addEventListener('change', handleDateFilter);
+    }
+    
+    // System Info Button
+    const systemInfoBtn = document.getElementById('systemInfoBtn');
+    if (systemInfoBtn) {
+        systemInfoBtn.addEventListener('click', showSystemInfo);
+    }
+    
+    // Modal Close
+    const modalClose = document.getElementById('modalClose');
+    if (modalClose) {
+        modalClose.addEventListener('click', closeModal);
+    }
+}
+
+// Test API Connection
+async function testApiConnection() {
+    try {
+        const testUrl = `${CONFIG.API_URL}?action=test&t=${Date.now()}`;
+        console.log('Testing API connection:', testUrl);
+        
+        const response = await fetch(testUrl);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success) {
+            console.log('API Connection successful:', data);
+            updateApiStatus('connected');
+            showNotification('Connected to Google Sheets API', 'success');
+            return true;
+        } else {
+            throw new Error(data.error || 'API test failed');
+        }
+    } catch (error) {
+        console.error('API Connection failed:', error);
+        updateApiStatus('disconnected');
+        showNotification(`API Connection failed: ${error.message}`, 'error');
+        return false;
+    }
+}
+
+// Load Data from Google Sheets
 async function loadData() {
-  try {
-    console.log('Loading data from Google Sheets...');
-    
-    // Show loading state
-    showLoadingState();
-    
-    // Add timestamp to avoid caching
-    const timestamp = new Date().getTime();
-    const url = `${CONFIG.API_URL}?t=${timestamp}&action=getData`;
-    
-    const response = await fetch(url);
-    
-    if (!response.ok) {
-      throw new Error(`HTTP error! status: ${response.status}`);
+    try {
+        console.log('Loading data from Google Sheets...');
+        
+        // Show loading state
+        showLoadingState();
+        
+        // Add cache busting
+        const url = `${CONFIG.API_URL}?action=getRecords&t=${Date.now()}`;
+        console.log('Fetching from:', url);
+        
+        const response = await fetch(url);
+        
+        if (!response.ok) {
+            throw new Error(`HTTP Error ${response.status}: ${response.statusText}`);
+        }
+        
+        const result = await response.json();
+        console.log('Data received:', result);
+        
+        if (!result.success) {
+            throw new Error(result.error || 'Unknown error');
+        }
+        
+        // Store data
+        dashboardState.data = result.data || [];
+        dashboardState.filteredData = [...dashboardState.data];
+        dashboardState.lastUpdate = new Date();
+        dashboardState.apiStatus = 'connected';
+        
+        // Update UI
+        updateDashboard(result.stats);
+        updateTable(dashboardState.filteredData);
+        updateLastUpdateTime();
+        updateRecordsCount();
+        
+        // Show success message
+        const count = dashboardState.data.length;
+        showNotification(`Loaded ${count} PPE records`, 'success');
+        
+    } catch (error) {
+        console.error('Error loading data:', error);
+        
+        // Update status
+        dashboardState.apiStatus = 'disconnected';
+        updateApiStatus('disconnected');
+        
+        // Show error
+        showNotification(`Failed to load data: ${error.message}`, 'error');
+        
+        // Try sample data
+        if (CONFIG.USE_SAMPLE_DATA) {
+            loadSampleData();
+        }
     }
-    
-    const data = await response.json();
-    console.log('Data received:', data);
-    
-    if (data.error) {
-      throw new Error(data.error);
-    }
-    
-    if (data.success === false) {
-      throw new Error(data.error || 'Failed to load data');
-    }
-    
-    currentData = data;
-    lastUpdateTime = new Date();
-    
-    // Update dashboard with real data
-    updateDashboard(data.stats || data.summary || getDefaultStats());
-    populateTable(data.records || []);
-    
-    showNotification('Data loaded successfully', 'success');
-    updateLastUpdateTime();
-    
-  } catch (error) {
-    console.error('Error loading data:', error);
-    
-    // Fallback to sample data
-    const sampleData = getSampleData();
-    currentData = sampleData;
-    updateDashboard(sampleData.summary);
-    populateTable(sampleData.records);
-    
-    showNotification('Using sample data: ' + error.message, 'warning');
-  }
 }
 
-// Show loading state in table
-function showLoadingState() {
-  const tbody = document.getElementById('tableBody');
-  if (tbody) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" class="loading-container">
-          <i class="fas fa-spinner fa-spin fa-2x"></i>
-          <p>Loading PPE records...</p>
-        </td>
-      </tr>
-    `;
-  }
+// Update Dashboard Statistics
+function updateDashboard(stats) {
+    if (!stats) return;
+    
+    // Calculate total violations
+    const totalViolations = (stats.helmetViolations || 0) + (stats.gloveViolations || 0);
+    
+    // Update counters
+    document.getElementById('totalViolations').textContent = totalViolations;
+    document.getElementById('helmetViolations').textContent = stats.helmetViolations || 0;
+    document.getElementById('gloveViolations').textContent = stats.gloveViolations || 0;
+    document.getElementById('fullPPE').textContent = stats.compliance || 0;
+    document.getElementById('helmetOK').textContent = stats.helmetOk || 0;
+    document.getElementById('gloveOK').textContent = stats.gloveOk || 0;
 }
 
-// Update dashboard statistics
-function updateDashboard(summary) {
-  // Ensure we have a summary object
-  if (!summary) summary = getDefaultStats();
-  
-  // Update counters with fallback
-  document.getElementById('totalViolations').textContent = 
-    (summary.helmetViolations || 0) + (summary.gloveViolations || 0);
-  document.getElementById('helmetViolations').textContent = summary.helmetViolations || 0;
-  document.getElementById('gloveViolations').textContent = summary.gloveViolations || 0;
-  
-  // Calculate full PPE compliance
-  const totalRecords = summary.totalRecords || 0;
-  const violations = (summary.helmetViolations || 0) + (summary.gloveViolations || 0);
-  const fullPPE = totalRecords - violations;
-  document.getElementById('fullPPE').textContent = fullPPE > 0 ? fullPPE : 0;
-  
-  document.getElementById('helmetOK').textContent = summary.helmetOk || 0;
-  document.getElementById('gloveOK').textContent = summary.gloveOk || 0;
+// Update Table with Records
+function updateTable(records) {
+    const tbody = document.getElementById('tableBody');
+    
+    if (!tbody) return;
+    
+    // Clear table
+    tbody.innerHTML = '';
+    
+    if (!records || records.length === 0) {
+        showNoDataInTable();
+        return;
+    }
+    
+    // Build table rows
+    records.forEach((record, index) => {
+        const row = createTableRow(record, index + 1);
+        tbody.appendChild(row);
+    });
 }
 
-// Populate table with records
-function populateTable(records) {
-  const tbody = document.getElementById('tableBody');
-  
-  if (!tbody) return;
-  
-  if (!records || records.length === 0) {
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" class="no-data">
-          <div class="no-data-content">
-            <i class="fas fa-database"></i>
-            <h3>No Records Found</h3>
-            <p>No PPE data available for the selected period</p>
-            <button class="btn-retry" onclick="loadData()">
-              <i class="fas fa-redo"></i> Retry
-            </button>
-          </div>
-        </td>
-      </tr>
-    `;
-    return;
-  }
-  
-  let html = '';
-  
-  records.forEach((record, index) => {
-    // Determine status classes
-    const helmetClass = (record.helmetStatus || '').toLowerCase().includes('no_helmet') 
-      ? 'status-violation' 
-      : 'status-ok';
+// Create Table Row
+function createTableRow(record, rowNumber) {
+    const row = document.createElement('tr');
     
-    const gloveClass = (record.gloveStatus || '').toLowerCase().includes('no_glove') 
-      ? 'status-violation' 
-      : 'status-ok';
+    // Status classes
+    const helmetClass = (record.helmetStatus || '').includes('no_helmet') ? 'status-violation' : 'status-ok';
+    const gloveClass = (record.gloveStatus || '').includes('no_glove') ? 'status-violation' : 'status-ok';
     
-    // Determine status text
+    // Status text
     const helmetText = helmetClass === 'status-ok' ? 'HELMET OK' : 'NO HELMET';
     const gloveText = gloveClass === 'status-ok' ? 'GLOVE OK' : 'NO GLOVE';
     
-    // Format datetime
-    let displayDateTime = record.datetime || 'N/A';
-    if (record.timestamp) {
-      try {
-        const date = new Date(record.timestamp);
-        if (!isNaN(date.getTime())) {
-          displayDateTime = date.toLocaleString('en-US', {
-            year: 'numeric',
-            month: 'short',
-            day: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            second: '2-digit'
-          });
-        }
-      } catch (e) {
-        console.log('Error formatting date:', e);
-      }
-    }
-    
-    // **FIXED: IMAGE HANDLING - Extract image URL properly**
+    // Image URL - FIXED VERSION
     let imageUrl = 'https://via.placeholder.com/160x100/2c3e50/ffffff?text=No+Image';
     let imageAlt = 'No Image Available';
     
-    // Check for image in various possible fields
     if (record.imageUrl) {
-      imageUrl = record.imageUrl;
-      imageAlt = 'PPE Snapshot';
+        // Use the image URL from Google Sheets
+        imageUrl = record.imageUrl;
+        imageAlt = 'PPE Snapshot';
+        
+        // Ensure it's a direct image URL for Google Drive
+        if (imageUrl.includes('drive.google.com')) {
+            if (imageUrl.includes('/uc?id=')) {
+                // Already a direct link
+            } else if (imageUrl.includes('/file/d/')) {
+                // Convert share link to direct link
+                const fileId = imageUrl.split('/file/d/')[1]?.split('/')[0];
+                if (fileId) {
+                    imageUrl = `https://drive.google.com/uc?id=${fileId}&export=view`;
+                }
+            } else if (record.imageId) {
+                imageUrl = `https://drive.google.com/uc?id=${record.imageId}&export=view`;
+            }
+        }
     } else if (record.imageId) {
-      // Convert Google Drive ID to direct image URL
-      imageUrl = `https://drive.google.com/uc?id=${record.imageId}`;
-      imageAlt = 'PPE Snapshot';
-    } else if (record.image) {
-      imageUrl = record.image;
-      imageAlt = 'PPE Snapshot';
+        imageUrl = `https://drive.google.com/uc?id=${record.imageId}&export=view`;
+        imageAlt = 'PPE Snapshot';
     }
     
-    // Check if it's a Google Drive share link and convert it
-    if (imageUrl.includes('drive.google.com/file/d/')) {
-      const match = imageUrl.match(/\/d\/(.*?)\//);
-      if (match && match[1]) {
-        imageUrl = `https://drive.google.com/uc?id=${match[1]}`;
-      }
-    }
-    
-    html += `
-      <tr>
-        <td class="row-number">${index + 1}</td>
+    // Create cells
+    row.innerHTML = `
+        <td class="row-number">${rowNumber}</td>
         <td class="datetime-cell">
-          <div class="datetime-primary">${displayDateTime}</div>
-          ${record.id ? `<div class="datetime-secondary">ID: ${record.id}</div>` : ''}
+            <div class="datetime-primary">${record.datetime || 'N/A'}</div>
+            <div class="datetime-secondary">ID: ${record.id || 'N/A'}</div>
         </td>
         <td class="image-cell">
-          <div class="image-wrapper">
-            <img src="${imageUrl}" 
-                 alt="${imageAlt}" 
-                 class="camera-image"
-                 onerror="this.onerror=null; this.src='https://via.placeholder.com/160x100/2c3e50/ffffff?text=Image+Error'">
-            <div class="image-actions">
-              <button class="btn-view" onclick="viewImage('${imageUrl}')" title="View Image">
-                <i class="fas fa-eye"></i>
-              </button>
-              <button class="btn-download" onclick="downloadImage('${imageUrl}')" title="Download">
-                <i class="fas fa-download"></i>
-              </button>
+            <div class="image-wrapper">
+                <img src="${imageUrl}" 
+                     alt="${imageAlt}" 
+                     class="camera-image"
+                     loading="lazy"
+                     onerror="this.onerror=null; this.src='https://via.placeholder.com/160x100/2c3e50/ffffff?text=Image+Error'">
+                <div class="image-actions">
+                    <button class="btn-view" onclick="viewImageModal('${imageUrl}', '${record.datetime || ''}')" title="View Image">
+                        <i class="fas fa-eye"></i>
+                    </button>
+                    <button class="btn-download" onclick="downloadImage('${imageUrl}', 'ppe_${record.id || Date.now()}')" title="Download">
+                        <i class="fas fa-download"></i>
+                    </button>
+                </div>
             </div>
-          </div>
         </td>
         <td class="status-cell">
-          <div class="status-wrapper ${helmetClass}">
-            <i class="fas fa-${helmetClass === 'status-ok' ? 'check-circle' : 'exclamation-circle'}"></i>
-            <div>
-              <div class="status-text">${helmetText}</div>
-              <div class="status-detail">${record.helmetStatus || 'N/A'}</div>
+            <div class="status-wrapper ${helmetClass}">
+                <i class="fas fa-${helmetClass === 'status-ok' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <div>
+                    <div class="status-text">${helmetText}</div>
+                    <div class="status-detail">${record.helmetStatus || 'N/A'}</div>
+                </div>
             </div>
-          </div>
         </td>
         <td class="status-cell">
-          <div class="status-wrapper ${gloveClass}">
-            <i class="fas fa-${gloveClass === 'status-ok' ? 'check-circle' : 'exclamation-circle'}"></i>
-            <div>
-              <div class="status-text">${gloveText}</div>
-              <div class="status-detail">${record.gloveStatus || 'N/A'}</div>
+            <div class="status-wrapper ${gloveClass}">
+                <i class="fas fa-${gloveClass === 'status-ok' ? 'check-circle' : 'exclamation-circle'}"></i>
+                <div>
+                    <div class="status-text">${gloveText}</div>
+                    <div class="status-detail">${record.gloveStatus || 'N/A'}</div>
+                </div>
             </div>
-          </div>
         </td>
-      </tr>
     `;
-  });
-  
-  tbody.innerHTML = html;
-}
-
-// Filter table by date
-function filterTable() {
-  const filter = document.getElementById('dateFilter').value;
-  if (!currentData || !currentData.records) return;
-  
-  let filteredRecords = [...currentData.records];
-  
-  if (filter === 'today') {
-    const today = new Date().toDateString();
-    filteredRecords = filteredRecords.filter(record => {
-      const recordDate = new Date(record.timestamp || record.datetime).toDateString();
-      return recordDate === today;
-    });
-  } else if (filter === 'yesterday') {
-    const yesterday = new Date();
-    yesterday.setDate(yesterday.getDate() - 1);
-    const yesterdayStr = yesterday.toDateString();
     
-    filteredRecords = filteredRecords.filter(record => {
-      const recordDate = new Date(record.timestamp || record.datetime).toDateString();
-      return recordDate === yesterdayStr;
-    });
-  } else if (filter === 'week') {
-    const weekAgo = new Date();
-    weekAgo.setDate(weekAgo.getDate() - 7);
+    return row;
+}
+
+// Handle Date Filter
+function handleDateFilter() {
+    const filter = document.getElementById('dateFilter').value;
     
-    filteredRecords = filteredRecords.filter(record => {
-      const recordDate = new Date(record.timestamp || record.datetime);
-      return recordDate >= weekAgo;
-    });
-  } else if (filter === 'month') {
-    const monthAgo = new Date();
-    monthAgo.setMonth(monthAgo.getMonth() - 1);
+    if (!dashboardState.data) return;
     
-    filteredRecords = filteredRecords.filter(record => {
-      const recordDate = new Date(record.timestamp || record.datetime);
-      return recordDate >= monthAgo;
-    });
-  }
-  
-  populateTable(filteredRecords);
-  showNotification(`Showing ${filteredRecords.length} records`, 'info');
-}
-
-// Get default stats structure
-function getDefaultStats() {
-  return {
-    helmetViolations: 0,
-    gloveViolations: 0,
-    helmetOk: 0,
-    gloveOk: 0,
-    totalRecords: 0
-  };
-}
-
-// Sample data for testing
-function getSampleData() {
-  return {
-    summary: {
-      totalViolations: 47,
-      helmetViolations: 23,
-      gloveViolations: 24,
-      fullPPE: 32,
-      helmetOK: 56,
-      gloveOK: 55
-    },
-    records: [
-      {
-        id: 1,
-        datetime: "Nov 4, 2025, 09:55:42 AM",
-        timestamp: "2025-11-04T09:55:42",
-        imageId: "1kaqbrGBlIDoGqj", // Direct Google Drive ID
-        helmetStatus: "no_helmet",
-        gloveStatus: "glove"
-      },
-      {
-        id: 2,
-        datetime: "Nov 4, 2025, 09:56:09 AM",
-        timestamp: "2025-11-04T09:56:09",
-        imageUrl: "https://drive.google.com/uc?id=1nOxycdenBHwUJ", // Direct image URL
-        helmetStatus: "helmet",
-        gloveStatus: "glove"
-      },
-      {
-        id: 3,
-        datetime: "Nov 4, 2025, 10:15:33 AM",
-        timestamp: "2025-11-04T10:15:33",
-        image: "https://drive.google.com/file/d/1abc123def456/view", // Share link
-        helmetStatus: "helmet",
-        gloveStatus: "no_glove"
-      }
-    ]
-  };
-}
-
-// Show notification
-function showNotification(message, type = 'info') {
-  // Create notification element
-  const notification = document.createElement('div');
-  notification.className = `notification notification-${type}`;
-  
-  const icons = {
-    success: 'fas fa-check-circle',
-    error: 'fas fa-exclamation-circle',
-    warning: 'fas fa-exclamation-triangle',
-    info: 'fas fa-info-circle'
-  };
-  
-  notification.innerHTML = `
-    <div class="notification-content">
-      <i class="${icons[type] || icons.info}"></i>
-      <span>${message}</span>
-      <button class="notification-close" onclick="this.parentElement.parentElement.remove()">
-        <i class="fas fa-times"></i>
-      </button>
-    </div>
-  `;
-  
-  // Add to document
-  document.body.appendChild(notification);
-  
-  // Remove after 3 seconds
-  setTimeout(() => {
-    if (notification.parentElement) {
-      notification.remove();
+    let filtered = [...dashboardState.data];
+    
+    if (filter === 'today') {
+        const today = new Date().toDateString();
+        filtered = filtered.filter(record => {
+            if (!record.datetime) return false;
+            const recordDate = new Date(record.datetime).toDateString();
+            return recordDate === today;
+        });
+    } else if (filter === 'yesterday') {
+        const yesterday = new Date();
+        yesterday.setDate(yesterday.getDate() - 1);
+        const yesterdayStr = yesterday.toDateString();
+        
+        filtered = filtered.filter(record => {
+            if (!record.datetime) return false;
+            const recordDate = new Date(record.datetime).toDateString();
+            return recordDate === yesterdayStr;
+        });
+    } else if (filter === 'week') {
+        const weekAgo = new Date();
+        weekAgo.setDate(weekAgo.getDate() - 7);
+        
+        filtered = filtered.filter(record => {
+            if (!record.datetime) return false;
+            const recordDate = new Date(record.datetime);
+            return recordDate >= weekAgo;
+        });
+    } else if (filter === 'month') {
+        const monthAgo = new Date();
+        monthAgo.setMonth(monthAgo.getMonth() - 1);
+        
+        filtered = filtered.filter(record => {
+            if (!record.datetime) return false;
+            const recordDate = new Date(record.datetime);
+            return recordDate >= monthAgo;
+        });
     }
-  }, 3000);
+    
+    dashboardState.filteredData = filtered;
+    updateTable(filtered);
+    updateRecordsCount();
+    
+    showNotification(`Showing ${filtered.length} records`, 'info');
 }
 
-// View image in modal
-function viewImage(url) {
-  window.open(url, '_blank');
+// Show No Data State
+function showNoDataState() {
+    const tbody = document.getElementById('tableBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="5" class="no-data">
+                <div class="no-data-content">
+                    <i class="fas fa-database"></i>
+                    <h3>No Data Available</h3>
+                    <p>Unable to connect to Google Sheets or no data found.</p>
+                    <button class="btn-retry" onclick="loadData()">
+                        <i class="fas fa-redo"></i> Retry Connection
+                    </button>
+                    <p style="margin-top: 20px; font-size: 12px;">
+                        Check your API URL in CONFIG.API_URL
+                    </p>
+                </div>
+            </td>
+        </tr>
+    `;
 }
 
-// Download image
-function downloadImage(url) {
-  const link = document.createElement('a');
-  link.href = url;
-  link.download = `ppe_image_${new Date().getTime()}.jpg`;
-  document.body.appendChild(link);
-  link.click();
-  document.body.removeChild(link);
+function showNoDataInTable() {
+    const tbody = document.getElementById('tableBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="5" class="no-data">
+                <div class="no-data-content">
+                    <i class="fas fa-search"></i>
+                    <h3>No Matching Records</h3>
+                    <p>No PPE records found for the selected filter.</p>
+                    <button class="btn-retry" onclick="document.getElementById('dateFilter').value='all'; handleDateFilter()">
+                        <i class="fas fa-times"></i> Clear Filter
+                    </button>
+                </div>
+            </td>
+        </tr>
+    `;
 }
 
-// Show app state info
-function showAppState() {
-  const info = `
-    PPE Monitoring Dashboard
-    Last Update: ${lastUpdateTime ? lastUpdateTime.toLocaleString() : 'Never'}
-    Records Loaded: ${currentData?.records?.length || 0}
-    API Status: ${currentData ? 'Connected' : 'Disconnected'}
-  `;
-  
-  alert(info);
+function showLoadingState() {
+    const tbody = document.getElementById('tableBody');
+    if (!tbody) return;
+    
+    tbody.innerHTML = `
+        <tr>
+            <td colspan="5" class="loading-container">
+                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                <p>Loading PPE records from Google Sheets...</p>
+            </td>
+        </tr>
+    `;
 }
+
+// Image Functions
+function viewImageModal(imageUrl, info) {
+    const modal = document.getElementById('imageModal');
+    const modalImage = document.getElementById('modalImage');
+    const imageInfo = document.getElementById('imageInfo');
+    
+    if (!modal || !modalImage) return;
+    
+    dashboardState.currentImage = imageUrl;
+    
+    // Set image
+    modalImage.src = imageUrl;
+    
+    // Set info
+    imageInfo.textContent = info || 'PPE Monitoring Image';
+    
+    // Setup download button
+    const downloadBtn = document.getElementById('downloadImageBtn');
+    if (downloadBtn) {
+        downloadBtn.onclick = () => downloadImage(imageUrl, `ppe_image_${Date.now()}`);
+    }
+    
+    // Setup view in drive button
+    const viewDriveBtn = document.getElementById('viewInDriveBtn');
+    if (viewDriveBtn) {
+        if (imageUrl.includes('drive.google.com')) {
+            viewDriveBtn.style.display = 'flex';
+            viewDriveBtn.onclick = () => window.open(imageUrl.replace('/uc?id=', '/file/d/').replace('&export=view', ''), '_blank');
+        } else {
+            viewDriveBtn.style.display = 'none';
+        }
+    }
+    
+    // Show modal
+    modal.classList.remove('hidden');
+}
+
+function closeModal() {
+    const modal = document.getElementById('imageModal');
+    if (modal) {
+        modal.classList.add('hidden');
+    }
+}
+
+function downloadImage(url, filename) {
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = filename || `ppe_image_${Date.now()}.jpg`;
+    link.target = '_blank';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    showNotification('Image download started', 'success');
+}
+
+// Utility Functions
+function updateApiStatus(status) {
+    const statusElement = document.getElementById('apiStatus');
+    if (!statusElement) return;
+    
+    dashboardState.apiStatus = status;
+    
+    statusElement.className = 'api-status ' + status;
+    
+    const icons = {
+        connected: 'fas fa-check-circle',
+        disconnected: 'fas fa-times-circle',
+        connecting: 'fas fa-spinner fa-spin'
+    };
+    
+    const texts = {
+        connected: 'Connected',
+        disconnected: 'Disconnected',
+        connecting: 'Connecting...'
+    };
+    
+    statusElement.innerHTML = `<i class="${icons[status]}"></i> ${texts[status]}`;
+}
+
+function updateLastUpdateTime() {
+    const element = document.getElementById('lastUpdate');
+    if (!element) return;
+    
+    if (dashboardState.lastUpdate) {
+        const timeStr = dashboardState.lastUpdate.toLocaleTimeString([], { 
+            hour: '2-digit', 
+            minute: '2-digit',
+            second: '2-digit'
+        });
+        element.textContent = `Last updated: ${timeStr}`;
+    } else {
+        element.textContent = 'Never updated';
+    }
+}
+
+function updateRecordsCount() {
+    const element = document.getElementById('recordsCount');
+    if (!element) return;
+    
+    const count = dashboardState.filteredData ? dashboardState.filteredData.length : 0;
+    const total = dashboardState.data ? dashboardState.data.length : 0;
+    
+    element.textContent = `${count} / ${total}`;
+}
+
+function showNotification(message, type = 'info') {
+    const container = document.getElementById('notificationContainer');
+    if (!container) return;
+    
+    // Create notification
+    const notification = document.createElement('div');
+    notification.className = `notification ${type}`;
+    
+    const icons = {
+        success: 'fas fa-check-circle',
+        error: 'fas fa-exclamation-circle',
+        warning: 'fas fa-exclamation-triangle',
+        info: 'fas fa-info-circle'
+    };
+    
+    notification.innerHTML = `
+        <i class="${icons[type] || icons.info}"></i>
+        <span>${message}</span>
+        <button class="notification-close" onclick="this.parentElement.remove()">
+            <i class="fas fa-times"></i>
+        </button>
+    `;
+    
+    // Add to container
+    container.appendChild(notification);
+    
+    // Auto remove after 5 seconds
+    setTimeout(() => {
+        if (notification.parentElement) {
+            notification.remove();
+        }
+    }, 5000);
+}
+
+function showSystemInfo() {
+    const info = `
+PPE MONITORING DASHBOARD
+=========================
+Last Update: ${dashboardState.lastUpdate ? dashboardState.lastUpdate.toLocaleString() : 'Never'}
+API Status: ${dashboardState.apiStatus}
+Records Loaded: ${dashboardState.data ? dashboardState.data.length : 0}
+Google Sheet: ${CONFIG.SHEET_ID}
+API URL: ${CONFIG.API_URL}
+=========================
+Contact: UMPSA Safety Department
+Version: 2.0
+    `.trim();
+    
+    alert(info);
+}
+
+// Sample Data for Testing
+function loadSampleData() {
+    console.log('Loading sample data...');
+    
+    const sampleData = [
+        {
+            id: 1,
+            datetime: "Nov 4, 2025, 09:55:42 AM",
+            timestamp: "2025-11-04T09:55:42",
+            imageUrl: "https://drive.google.com/uc?id=1kaqbrGBlIDoGqj&export=view",
+            helmetStatus: "no_helmet",
+            gloveStatus: "glove"
+        },
+        {
+            id: 2,
+            datetime: "Nov 4, 2025, 09:56:09 AM",
+            timestamp: "2025-11-04T09:56:09",
+            imageUrl: "https://drive.google.com/uc?id=1nOxycdenBHwUJ&export=view",
+            helmetStatus: "helmet",
+            gloveStatus: "glove"
+        },
+        {
+            id: 3,
+            datetime: "Nov 4, 2025, 10:15:33 AM",
+            timestamp: "2025-11-04T10:15:33",
+            imageUrl: "https://drive.google.com/uc?id=1abc123def456&export=view",
+            helmetStatus: "helmet",
+            gloveStatus: "no_glove"
+        }
+    ];
+    
+    const sampleStats = {
+        helmetViolations: 23,
+        gloveViolations: 24,
+        helmetOk: 56,
+        gloveOk: 55,
+        totalRecords: 100,
+        violations: 47,
+        compliance: 53
+    };
+    
+    dashboardState.data = sampleData;
+    dashboardState.filteredData = sampleData;
+    dashboardState.lastUpdate = new Date();
+    
+    updateDashboard(sampleStats);
+    updateTable(sampleData);
+    updateLastUpdateTime();
+    updateRecordsCount();
+    updateApiStatus('connected');
+    
+    showNotification('Loaded sample data (Google Sheets unavailable)', 'warning');
+}
+
+// Initialize when page loads
+window.onload = initializeDashboard;
+
+// Make functions available globally
+window.viewImageModal = viewImageModal;
+window.downloadImage = downloadImage;
+window.closeModal = closeModal;
+window.loadData = loadData;
+window.handleDateFilter = handleDateFilter;
