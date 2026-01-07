@@ -24,7 +24,6 @@
             text-align: center;
             margin-bottom: 30px;
             border: 2px solid #00bcd4;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .header h1 { 
             color: #00bcd4; 
@@ -53,9 +52,6 @@
             font-size: 60px;
             font-weight: bold;
             margin: 20px 0;
-            padding: 20px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
         }
         .violations .big-number { color: #ff6b6b; }
         .compliance .big-number { color: #2ecc71; }
@@ -137,7 +133,6 @@
         thead { background: #ff9800; }
         th { padding: 18px 15px; text-align: left; font-weight: bold; }
         tbody tr { border-bottom: 1px solid #333; }
-        tbody tr:nth-child(even) { background: rgba(255,255,255,0.06); }
         td { padding: 20px 15px; vertical-align: middle; }
         .row-no { font-weight: bold; color: #3498db; text-align: center; }
         .image-box {
@@ -293,13 +288,15 @@
         </div>
     </div>
     
+    <!-- JAVASCRIPT -->
     <script>
         // =============================================
         // CONFIGURATION
         // =============================================
-        // GANTI INI DENGAN URL APPS SCRIPT BARU ANDA
-        const API_URL = "https://script.google.com/macros/s/AKfycbx_OmuGtWQimtcafyZxsBdemZRqZNacAzhujrrmP7Ia_6YlVDIp5cfkkTh_hZnIZqRZ/exec";
+        // GANTI INI DENGAN URL APPS SCRIPT ANDA
+        const API_URL = "https://script.google.com/macros/s/AKfycbxYG-uexA9SuC4wCjRDa6If1E6uM63d6qMhHwQ8VJ6DINd89L4DjHd6ddia-R1GLMML/exec";
         
+        // Global variables
         let currentData = [];
         
         // =============================================
@@ -318,51 +315,79 @@
         });
         
         // =============================================
-        // LOAD DATA (NO PROXY NEEDED)
+        // LOAD DATA (Using JSONP to bypass CORS)
         // =============================================
         async function loadData() {
             try {
                 showLoading();
-                updateStatus('Loading data...', 'loading');
+                updateStatus('Loading...', 'loading');
                 
-                // Direct fetch to Apps Script
+                // Use JSONP approach for CORS
                 const url = `${API_URL}?action=getData&t=${Date.now()}`;
-                console.log('Fetching from:', url);
+                console.log('Fetching:', url);
                 
-                const response = await fetch(url);
+                // Try direct fetch first
+                const response = await fetch(url, {
+                    mode: 'no-cors' // This won't give us response data
+                });
                 
-                // Check if response is JSON
-                const contentType = response.headers.get('content-type');
-                if (!contentType || !contentType.includes('application/json')) {
-                    // Get response as text to see what's wrong
-                    const text = await response.text();
-                    console.error('Non-JSON response:', text.substring(0, 200));
-                    throw new Error('Server returned HTML instead of JSON. Check Apps Script deployment.');
-                }
-                
-                const result = await response.json();
-                console.log('Data received:', result);
-                
-                if (!result.success) {
-                    throw new Error(result.error || 'Failed to load data');
-                }
-                
-                // Update dashboard
-                updateStats(result.stats);
-                displayTable(result.data);
-                updateStatus('Connected', 'connected');
-                updateLastUpdate();
-                
-                showMessage(`Loaded ${result.data.length} records successfully!`, 'success');
+                // If we're here, fetch succeeded but we can't read response
+                // Use JSONP instead
+                loadDataWithJsonp();
                 
             } catch (error) {
-                console.error('Error:', error);
-                updateStatus('Connection failed', 'error');
-                showMessage('Error: ' + error.message, 'error');
-                
-                // Fallback to sample data
-                useSampleData();
+                console.error('Fetch error:', error);
+                // Fallback to JSONP
+                loadDataWithJsonp();
             }
+        }
+        
+        // JSONP method
+        function loadDataWithJsonp() {
+            const callbackName = 'jsonp_callback_' + Date.now();
+            const script = document.createElement('script');
+            
+            window[callbackName] = function(data) {
+                // Clean up
+                delete window[callbackName];
+                document.head.removeChild(script);
+                
+                // Process data
+                processData(data);
+            };
+            
+            const url = `${API_URL}?action=getData&callback=${callbackName}&t=${Date.now()}`;
+            script.src = url;
+            document.head.appendChild(script);
+            
+            // Timeout fallback
+            setTimeout(() => {
+                if (window[callbackName]) {
+                    delete window[callbackName];
+                    document.head.removeChild(script);
+                    useSampleData();
+                    showMessage('Request timeout, using sample data', 'warning');
+                }
+            }, 10000);
+        }
+        
+        // Process data from API
+        function processData(result) {
+            console.log('Data received:', result);
+            
+            if (!result || !result.success) {
+                throw new Error(result?.error || 'Invalid response');
+            }
+            
+            currentData = result.data || [];
+            
+            // Update dashboard
+            updateStats(result.stats);
+            displayTable(currentData);
+            updateStatus('Connected', 'connected');
+            updateLastUpdate();
+            
+            showMessage(`Loaded ${currentData.length} records`, 'success');
         }
         
         // =============================================
@@ -460,35 +485,27 @@
         }
         
         // =============================================
-        // TEST CONNECTION
+        // TEST CONNECTION (Using JSONP)
         // =============================================
-        async function testConnection() {
-            try {
-                updateStatus('Testing connection...', 'loading');
+        function testConnection() {
+            const callbackName = 'test_callback_' + Date.now();
+            const script = document.createElement('script');
+            
+            window[callbackName] = function(data) {
+                delete window[callbackName];
+                document.head.removeChild(script);
                 
-                const url = `${API_URL}?action=test&t=${Date.now()}`;
-                const response = await fetch(url);
-                
-                const text = await response.text();
-                console.log('Test response:', text);
-                
-                // Try to parse as JSON
-                try {
-                    const data = JSON.parse(text);
-                    if (data.success) {
-                        showMessage('✅ API Connection Successful!', 'success');
-                        updateStatus('Connected', 'connected');
-                    } else {
-                        throw new Error(data.error || 'API test failed');
-                    }
-                } catch (parseError) {
-                    throw new Error('Not a valid JSON response: ' + text.substring(0, 100));
+                if (data.success) {
+                    showMessage('✅ API Connection Successful!', 'success');
+                    updateStatus('Connected', 'connected');
+                } else {
+                    showMessage('❌ API Error: ' + data.error, 'error');
                 }
-                
-            } catch (error) {
-                showMessage('❌ Connection Failed: ' + error.message, 'error');
-                updateStatus('Connection failed', 'error');
-            }
+            };
+            
+            const url = `${API_URL}?action=test&callback=${callbackName}&t=${Date.now()}`;
+            script.src = url;
+            document.head.appendChild(script);
         }
         
         // =============================================
@@ -543,7 +560,6 @@ Records: ${currentData.length}
 Browser: ${navigator.userAgent}
 ========================
 UMPSA Safety Department
-Contact: safety@umpsa.edu.my
             `.trim();
             
             alert(info);
