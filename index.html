@@ -506,7 +506,7 @@
             color: var(--primary);
         }
         
-        /* Modal */
+        /* Modal - Modified: Removed left image section */
         .modal {
             display: none;
             position: fixed;
@@ -524,7 +524,7 @@
         .modal-content {
             background: var(--dark-secondary);
             border-radius: 20px;
-            max-width: 900px;
+            max-width: 600px; /* Reduced width since no image */
             width: 100%;
             overflow: hidden;
             position: relative;
@@ -582,31 +582,11 @@
         
         .modal-body {
             padding: 30px;
-            display: grid;
-            grid-template-columns: 1fr 300px;
-            gap: 30px;
-        }
-        
-        .modal-image {
-            width: 100%;
-            border-radius: 15px;
-            overflow: hidden;
-            background: var(--dark);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 400px;
-        }
-        
-        .modal-image img {
-            max-width: 100%;
-            max-height: 500px;
-            object-fit: contain;
         }
         
         .modal-info {
-            display: flex;
-            flex-direction: column;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
             gap: 20px;
         }
         
@@ -658,10 +638,6 @@
             .stats-grid {
                 grid-template-columns: 1fr;
             }
-            
-            .modal-body {
-                grid-template-columns: 1fr;
-            }
         }
         
         @media (max-width: 768px) {
@@ -704,6 +680,14 @@
             .image-preview {
                 width: 120px;
                 height: 80px;
+            }
+            
+            .modal-content {
+                max-width: 95%;
+            }
+            
+            .modal-info {
+                grid-template-columns: 1fr;
             }
         }
         
@@ -896,20 +880,17 @@
         </div>
     </div>
     
-    <!-- Image Modal -->
+    <!-- Image Modal - Modified: Removed left image section -->
     <div class="modal" id="imageModal">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">
-                    <i class="fas fa-image"></i>
-                    Image Details
+                    <i class="fas fa-info-circle"></i>
+                    Violation Details
                 </div>
                 <button class="close-modal" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="modal-image">
-                    <img id="modalImage" src="" alt="Violation Image" onerror="this.src='https://via.placeholder.com/800x500/1e293b/64748b?text=Image+Not+Available'">
-                </div>
                 <div class="modal-info">
                     <div class="info-item">
                         <div class="info-label">Timestamp</div>
@@ -937,9 +918,21 @@
                         <div class="info-label">Image URL</div>
                         <div class="info-value">
                             <a href="#" id="modalImageLink" target="_blank" style="color: var(--primary); word-break: break-all; font-size: 0.9rem;">
-                                Open in new tab
+                                <i class="fas fa-external-link-alt"></i> Open in new tab
                             </a>
                         </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Record ID</div>
+                        <div class="info-value" id="modalRecordId">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Date</div>
+                        <div class="info-value" id="modalDate">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">Time</div>
+                        <div class="info-value" id="modalTimeOnly">-</div>
                     </div>
                 </div>
             </div>
@@ -979,12 +972,14 @@
             autoRefreshFooter: document.getElementById('autoRefreshFooter'),
             // Modal elements
             imageModal: document.getElementById('imageModal'),
-            modalImage: document.getElementById('modalImage'),
             modalTime: document.getElementById('modalTime'),
             modalHelmetStatus: document.getElementById('modalHelmetStatus'),
             modalGloveStatus: document.getElementById('modalGloveStatus'),
             modalCompliance: document.getElementById('modalCompliance'),
-            modalImageLink: document.getElementById('modalImageLink')
+            modalImageLink: document.getElementById('modalImageLink'),
+            modalRecordId: document.getElementById('modalRecordId'),
+            modalDate: document.getElementById('modalDate'),
+            modalTimeOnly: document.getElementById('modalTimeOnly')
         };
         
         // Initialize
@@ -1140,7 +1135,7 @@
                 
                 // Create image preview
                 const imageHTML = item.imageUrl && item.imageUrl.trim() !== '' 
-                    ? `<div class="image-preview" onclick="openImageModal('${item.imageUrl}', '${formattedTime}', '${item.helmetStatus}', '${item.gloveStatus}')">
+                    ? `<div class="image-preview" onclick="openImageModal('${item.imageUrl}', '${formattedTime}', '${item.helmetStatus}', '${item.gloveStatus}', '${item.id}')">
                           <img src="${item.imageUrl}" alt="PPE Image" 
                                onerror="this.src='https://via.placeholder.com/160x100/1e293b/64748b?text=Image+Error'">
                           <div class="image-overlay">
@@ -1169,20 +1164,36 @@
         }
         
         // Open image modal
-        function openImageModal(imageUrl, time, helmetStatus, gloveStatus) {
+        function openImageModal(imageUrl, time, helmetStatus, gloveStatus, recordId) {
+            // Parse date and time separately
+            const dateObj = new Date(time);
+            const dateOnly = dateObj.toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit'
+            });
+            const timeOnly = dateObj.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit',
+                hour12: true
+            });
+            
             // Set modal content
-            elements.modalImage.src = imageUrl;
             elements.modalTime.textContent = time;
+            elements.modalDate.textContent = dateOnly;
+            elements.modalTimeOnly.textContent = timeOnly;
+            elements.modalRecordId.textContent = recordId || 'N/A';
             
             // Set helmet status
             const helmetBadgeClass = helmetStatus === 'helmet' ? 'badge-success' : 'badge-danger';
-            const helmetText = helmetStatus === 'helmet' ? 'Helmet Detected' : 'No Helmet';
+            const helmetText = helmetStatus === 'helmet' ? 'HELMET DETECTED' : 'NO HELMET';
             elements.modalHelmetStatus.className = `status-badge ${helmetBadgeClass}`;
             elements.modalHelmetStatus.textContent = helmetText;
             
             // Set glove status
             const gloveBadgeClass = gloveStatus === 'glove' ? 'badge-success' : 'badge-danger';
-            const gloveText = gloveStatus === 'glove' ? 'Gloves Detected' : 'No Gloves';
+            const gloveText = gloveStatus === 'glove' ? 'GLOVES DETECTED' : 'NO GLOVES';
             elements.modalGloveStatus.className = `status-badge ${gloveBadgeClass}`;
             elements.modalGloveStatus.textContent = gloveText;
             
@@ -1191,13 +1202,14 @@
                 ? 'badge-success' 
                 : 'badge-danger';
             const complianceText = (helmetStatus === 'helmet' && gloveStatus === 'glove') 
-                ? 'Fully Compliant' 
-                : 'Non-Compliant';
+                ? 'COMPLIANT' 
+                : 'NON-COMPLIANT';
             elements.modalCompliance.className = `status-badge ${complianceBadgeClass}`;
             elements.modalCompliance.textContent = complianceText;
             
             // Set image link
             elements.modalImageLink.href = imageUrl;
+            elements.modalImageLink.innerHTML = `<i class="fas fa-external-link-alt"></i> Open in new tab`;
             
             // Show modal
             elements.imageModal.style.display = 'flex';
