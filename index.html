@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PPE Record Monitoring System | UMPSA</title>
+    <title>PPE Safety Monitoring System | UMPSA</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -17,6 +17,8 @@
             --dark-secondary: #1e293b;
             --light: #f8fafc;
             --gray: #64748b;
+            --umpsa-blue: #0047AB;
+            --versafac-green: #006400;
         }
         
         * {
@@ -38,11 +40,22 @@
             margin: 0 auto;
         }
         
-        /* ========== LOGO CONTAINERS ========== */
-        .logo-container {
+        /* ========== LOGO TEXT CONTAINERS ========== */
+        .logo-text-container {
             display: flex;
             align-items: center;
             height: 70px;
+            padding: 10px 20px;
+            border-radius: 15px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+        }
+        
+        .logo-text-container:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.3);
         }
         
         .logo-left {
@@ -50,6 +63,10 @@
             left: 30px;
             top: 20px;
             z-index: 100;
+            background: linear-gradient(135deg, var(--umpsa-blue), #1a73e8);
+            color: white;
+            font-size: 1.8rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         .logo-right {
@@ -57,19 +74,28 @@
             right: 30px;
             top: 20px;
             z-index: 100;
+            background: linear-gradient(135deg, var(--versafac-green), #228B22);
+            color: white;
+            font-size: 1.8rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         
-        .logo-img {
-            max-height: 70px;
-            max-width: 200px;
-            object-fit: contain;
-            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        .logo-left::before {
+            content: "🏛️";
+            margin-right: 10px;
+            font-size: 1.5rem;
+        }
+        
+        .logo-right::before {
+            content: "⚡";
+            margin-right: 10px;
+            font-size: 1.5rem;
         }
         
         /* Header */
         .header {
             background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-            padding: 25px 30px 25px 200px; /* Extra left padding for logo */
+            padding: 25px 30px 25px 200px; /* Extra left padding for logo text */
             border-radius: 20px;
             margin-bottom: 25px;
             text-align: center;
@@ -140,23 +166,6 @@
         
         .header-stat i {
             color: var(--warning);
-        }
-        
-        /* ========== TAMBAHAN STYLE UNTUK LOGO ========== */
-        .logo-placeholder {
-            background: rgba(255, 255, 255, 0.1);
-            border: 2px dashed rgba(255, 255, 255, 0.3);
-            border-radius: 10px;
-            padding: 15px;
-            text-align: center;
-            color: rgba(255, 255, 255, 0.7);
-            font-size: 0.9rem;
-            width: 200px;
-            height: 70px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
         }
         
         /* Stats Grid */
@@ -932,11 +941,15 @@
             .logo-left {
                 order: 1;
                 margin-right: auto;
+                font-size: 1.5rem;
+                padding: 8px 15px;
             }
             
             .logo-right {
                 order: 3;
                 margin-left: auto;
+                font-size: 1.5rem;
+                padding: 8px 15px;
             }
             
             .header-title {
@@ -966,12 +979,8 @@
                 right: auto;
                 top: auto;
                 margin: 0 auto 15px;
-            }
-            
-            .logo-placeholder {
-                width: 150px;
-                height: 60px;
-                font-size: 0.8rem;
+                width: 90%;
+                justify-content: center;
             }
             
             .controls {
@@ -1045,36 +1054,26 @@
 </head>
 <body>
     <div class="container">
-        <!-- ========== LOGO UMPSA - KIRI ATAS ========== -->
-        <!-- ARAHAN: Gantikan div ini dengan tag <img> yang merujuk kepada logo UMPSA -->
-        <!-- CONTOH: <img src="umpsa_logo.png" alt="UMPSA Logo" class="logo-img"> -->
-        <div class="logo-container logo-left">
-            <div class="logo-placeholder">
-                [LOGO UMPSA]
-                <small>Letak logo di sini</small>
-            </div>
+        <!-- ========== NAMA UMPSA - KIRI ATAS ========== -->
+        <div class="logo-text-container logo-left">
+            UMPSA
         </div>
         
-        <!-- ========== LOGO VERSAFAC - KANAN ATAS ========== -->
-        <!-- ARAHAN: Gantikan div ini dengan tag <img> yang merujuk kepada logo Versafac -->
-        <!-- CONTOH: <img src="versafac_logo.png" alt="Versafac Logo" class="logo-img"> -->
-        <div class="logo-container logo-right">
-            <div class="logo-placeholder">
-                [LOGO VERSAFAC]
-                <small>Letak logo di sini</small>
-            </div>
+        <!-- ========== NAMA VERSAFAC - KANAN ATAS ========== -->
+        <div class="logo-text-container logo-right">
+            VERSAFAC
         </div>
         
         <!-- Header -->
         <div class="header">
             <div class="header-content">
                 <div class="header-title">
-                    <!-- JUDUL UTAMA: TELAH DIGANTI DARI "PREVENT HIGHWAY" KE "PPE Record Monitoring System" -->
+                    <!-- JUDUL UTAMA: PPE Safety Monitoring System -->
                     <h1>
                         <i class="fas fa-hard-hat"></i>
-                        PPE RECORD MONITORING SYSTEM
+                        PPE SAFETY MONITORING SYSTEM
                     </h1>
-                    <h2>UMPSA Highway Safety Division</h2>
+                    <h2>Industrial Safety Compliance & Monitoring</h2>
                 </div>
                 <div class="header-stats">
                     <div class="header-stat">
@@ -1082,8 +1081,8 @@
                         <span>SAFETY FIRST</span>
                     </div>
                     <div class="header-stat">
-                        <i class="fas fa-bolt"></i>
-                        <span>REAL-TIME MONITORING</span>
+                        <i class="fas fa-industry"></i>
+                        <span>INDUSTRIAL COMPLIANCE</span>
                     </div>
                     <div class="header-stat">
                         <i class="fas fa-clock"></i>
@@ -1100,7 +1099,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-exclamation-triangle"></i>
                     </div>
-                    <div class="stat-title">TOTAL VIOLATIONS</div>
+                    <div class="stat-title">SAFETY VIOLATIONS</div>
                 </div>
                 <div class="stat-value" id="totalViolations">0</div>
                 <div class="stats-details">
@@ -1140,7 +1139,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-chart-pie"></i>
                     </div>
-                    <div class="stat-title">STATUS BREAKDOWN</div>
+                    <div class="stat-title">SAFETY STATUS BREAKDOWN</div>
                 </div>
                 <div class="stat-value" id="totalRecords">0</div>
                 <div class="stats-details">
@@ -1169,26 +1168,26 @@
             <div class="calendar-header">
                 <div class="calendar-title">
                     <i class="fas fa-calendar-alt"></i>
-                    VIOLATION CALENDAR & FILTER
+                    SAFETY COMPLIANCE CALENDAR & FILTER
                 </div>
                 <div class="calendar-controls">
                     <div class="date-picker-container">
                         <input type="text" id="dateFilter" class="date-picker" placeholder="Select date to filter...">
                     </div>
                     <button class="btn btn-primary" onclick="filterByDate()">
-                        <i class="fas fa-filter"></i> Filter
+                        <i class="fas fa-filter"></i> Filter by Date
                     </button>
                     <button class="btn btn-secondary" onclick="clearDateFilter()">
-                        <i class="fas fa-times"></i> Clear
+                        <i class="fas fa-times"></i> Clear Filter
                     </button>
-                    <button class="btn btn-success" onclick="filterViolationsOnly()">
+                    <button class="btn btn-danger" onclick="filterViolationsOnly()">
                         <i class="fas fa-exclamation-triangle"></i> Show Violations Only
                     </button>
                 </div>
             </div>
             <div class="calendar-grid">
                 <div class="calendar-card">
-                    <h4><i class="fas fa-calendar-day"></i> TODAY'S STATS</h4>
+                    <h4><i class="fas fa-calendar-day"></i> TODAY'S SAFETY STATS</h4>
                     <div class="calendar-stats">
                         <div class="calendar-stat">
                             <div class="calendar-stat-value" id="todayViolations">0</div>
@@ -1196,11 +1195,11 @@
                         </div>
                         <div class="calendar-stat">
                             <div class="calendar-stat-value" id="todayCompliance">0</div>
-                            <div class="calendar-stat-label">Today's Compliance</div>
+                            <div class="calendar-stat-label">Compliant Today</div>
                         </div>
                         <div class="calendar-stat">
                             <div class="calendar-stat-value" id="todayTotal">0</div>
-                            <div class="calendar-stat-label">Today's Records</div>
+                            <div class="calendar-stat-label">Total Inspections</div>
                         </div>
                         <div class="calendar-stat">
                             <div class="calendar-stat-value" id="todayComplianceRate">0%</div>
@@ -1209,7 +1208,7 @@
                     </div>
                 </div>
                 <div class="calendar-card">
-                    <h4><i class="fas fa-chart-line"></i> WEEKLY SUMMARY</h4>
+                    <h4><i class="fas fa-chart-line"></i> WEEKLY SAFETY SUMMARY</h4>
                     <div class="calendar-stats">
                         <div class="calendar-stat">
                             <div class="calendar-stat-value" id="weeklyViolations">0</div>
@@ -1225,7 +1224,7 @@
                         </div>
                         <div class="calendar-stat">
                             <div class="calendar-stat-value" id="weeklyTrend">-</div>
-                            <div class="calendar-stat-label">Trend</div>
+                            <div class="calendar-stat-label">Safety Trend</div>
                         </div>
                     </div>
                 </div>
@@ -1243,13 +1242,13 @@
                 </button>
                 <div class="status-indicator">
                     <div class="status-dot" id="statusDot"></div>
-                    <span id="statusText">Connected</span>
+                    <span id="statusText">Connected to Safety System</span>
                 </div>
             </div>
             <div class="controls-right">
                 <div class="datetime">
-                    <i class="fas fa-database"></i> Showing: 
-                    <span id="showingRange">0-0</span> of <span id="totalFiltered">0</span> records
+                    <i class="fas fa-database"></i> Displaying: 
+                    <span id="showingRange">0-0</span> of <span id="totalFiltered">0</span> safety records
                 </div>
             </div>
         </div>
@@ -1259,11 +1258,11 @@
             <div class="table-header">
                 <h3>
                     <i class="fas fa-history"></i>
-                    RECENT ACTIVITY
+                    SAFETY COMPLIANCE ACTIVITY
                 </h3>
                 <div class="datetime">
                     <i class="fas fa-filter"></i> Filtered: 
-                    <span id="filterStatus">All Records</span>
+                    <span id="filterStatus">All Safety Records</span>
                 </div>
             </div>
             <div class="table-wrapper">
@@ -1272,11 +1271,11 @@
                         <tr>
                             <th><i class="fas fa-hashtag"></i> #</th>
                             <th><i class="far fa-calendar-alt"></i> DATE & TIME</th>
-                            <th><i class="fas fa-search"></i> DETAILS</th>
+                            <th><i class="fas fa-search"></i> COMPLIANCE DETAILS</th>
                             <th><i class="fas fa-hard-hat"></i> HELMET STATUS</th>
                             <th><i class="fas fa-hand-paper"></i> GLOVE STATUS</th>
                             <th><i class="fas fa-id-card"></i> COMPLIANCE STATUS</th>
-                            <th><i class="fas fa-user"></i> WORKER ID</th>
+                            <th><i class="fas fa-user-tie"></i> EMPLOYEE ID</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -1284,7 +1283,7 @@
                             <td colspan="7">
                                 <div class="loading">
                                     <div class="spinner"></div>
-                                    <div>Loading PPE data...</div>
+                                    <div>Loading safety compliance data...</div>
                                 </div>
                             </td>
                         </tr>
@@ -1296,8 +1295,8 @@
             <div class="pagination">
                 <div class="pagination-info">
                     Page <span id="currentPage">1</span> of <span id="totalPages">1</span> 
-                    | Showing <span id="pageStart">1</span>-<span id="pageEnd">15</span> of 
-                    <span id="totalRecordsCount">0</span> records
+                    | Displaying <span id="pageStart">1</span>-<span id="pageEnd">15</span> of 
+                    <span id="totalRecordsCount">0</span> safety records
                 </div>
                 <div class="pagination-controls">
                     <button class="page-btn" id="firstPage" onclick="goToPage(1)" disabled>
@@ -1324,12 +1323,12 @@
         <!-- Footer -->
         <div class="footer">
             <div>
-                PPE Record Monitoring System &copy; 2025 | UMPSA Highway Safety Division
+                PPE Safety Monitoring System &copy; 2025 | UMPSA Industrial Safety Division
             </div>
             <div class="footer-stats">
                 <div class="footer-stat">
                     <i class="fas fa-server"></i>
-                    API Status: <span id="apiStatus">Connected</span>
+                    System Status: <span id="apiStatus">Connected</span>
                 </div>
                 <div class="footer-stat">
                     <i class="fas fa-sync-alt"></i>
@@ -1343,57 +1342,57 @@
         </div>
     </div>
     
-    <!-- Violation Details Modal -->
+    <!-- Safety Violation Details Modal -->
     <div class="modal" id="detailsModal">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">
                     <i class="fas fa-info-circle"></i>
-                    VIOLATION DETAILS
+                    SAFETY COMPLIANCE DETAILS
                 </div>
                 <button class="close-modal" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
                 <div class="modal-info">
                     <div class="info-item">
-                        <div class="info-label">TIMESTAMP</div>
+                        <div class="info-label">INSPECTION TIME</div>
                         <div class="info-value" id="modalTime">-</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">HELMET STATUS</div>
+                        <div class="info-label">HELMET COMPLIANCE</div>
                         <div class="info-value">
                             <span id="modalHelmetStatus" class="status-badge badge-danger">NO HELMET</span>
                         </div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">GLOVE STATUS</div>
+                        <div class="info-label">GLOVE COMPLIANCE</div>
                         <div class="info-value">
                             <span id="modalGloveStatus" class="status-badge badge-danger">NO GLOVES</span>
                         </div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">COMPLIANCE STATUS</div>
+                        <div class="info-label">OVERALL COMPLIANCE</div>
                         <div class="info-value">
                             <span id="modalCompliance" class="status-badge badge-danger">NON-COMPLIANT</span>
                         </div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">WORKER ID</div>
+                        <div class="info-label">EMPLOYEE ID</div>
                         <div class="info-value" id="modalWorkerId">-</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">DATE</div>
+                        <div class="info-label">INSPECTION DATE</div>
                         <div class="info-value" id="modalDate">-</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">TIME</div>
+                        <div class="info-label">INSPECTION TIME</div>
                         <div class="info-value" id="modalTimeOnly">-</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">IMAGE</div>
+                        <div class="info-label">EVIDENCE IMAGE</div>
                         <div class="info-value">
                             <a href="#" id="modalImageLink" target="_blank" style="color: var(--primary); word-break: break-all; font-size: 0.9rem;">
-                                <i class="fas fa-external-link-alt"></i> VIEW IMAGE
+                                <i class="fas fa-external-link-alt"></i> VIEW SAFETY IMAGE
                             </a>
                         </div>
                     </div>
@@ -1523,7 +1522,7 @@
                 elements.refreshBtn.disabled = true;
                 
                 // Update status indicator
-                updateStatus('loading', 'Loading data...');
+                updateStatus('loading', 'Loading safety data...');
                 
                 // Fetch data
                 const response = await fetch(`${API_URL}?action=getData&t=${Date.now()}`);
@@ -1535,7 +1534,7 @@
                 const data = await response.json();
                 
                 if (!data.success) {
-                    throw new Error(data.error || 'Failed to load data');
+                    throw new Error(data.error || 'Failed to load safety data');
                 }
                 
                 // Process and store data
@@ -1563,10 +1562,10 @@
                 });
                 
                 // Update status
-                updateStatus('success', 'Connected');
+                updateStatus('success', 'Connected to Safety System');
                 
             } catch (error) {
-                console.error('Error loading data:', error);
+                console.error('Error loading safety data:', error);
                 
                 // Show error in table
                 elements.tableBody.innerHTML = `
@@ -1574,10 +1573,10 @@
                         <td colspan="7">
                             <div class="empty-state">
                                 <i class="fas fa-exclamation-triangle"></i>
-                                <h4>Failed to Load Data</h4>
+                                <h4>Failed to Load Safety Data</h4>
                                 <p>${error.message}</p>
                                 <button class="btn btn-primary" onclick="loadData()" style="margin-top: 20px;">
-                                    <i class="fas fa-redo"></i> Retry
+                                    <i class="fas fa-redo"></i> Retry Connection
                                 </button>
                             </div>
                         </td>
@@ -1585,7 +1584,7 @@
                 `;
                 
                 // Update status
-                updateStatus('error', 'Connection Error');
+                updateStatus('error', 'Safety System Connection Error');
                 
             } finally {
                 // Restore button state
@@ -1759,7 +1758,7 @@
             if (selectedDate) {
                 elements.filterStatus.textContent = `Date: ${selectedDate}`;
             } else {
-                elements.filterStatus.textContent = 'All Records';
+                elements.filterStatus.textContent = 'All Safety Records';
             }
             
             // Update table content
@@ -1777,8 +1776,8 @@
                         <td colspan="7">
                             <div class="empty-state">
                                 <i class="fas fa-database"></i>
-                                <h4>No Data Available</h4>
-                                <p>No records found for the selected filter.</p>
+                                <h4>No Safety Data Available</h4>
+                                <p>No safety compliance records found for the selected filter.</p>
                             </div>
                         </td>
                     </tr>
@@ -1793,9 +1792,9 @@
                 
                 // Determine status and badge classes
                 const isCompliant = (item.helmetStatus === 'helmet' && item.gloveStatus === 'glove');
-                const helmetText = item.helmetStatus === 'helmet' ? 'HELMET' : 'NO_HELMET';
-                const gloveText = item.gloveStatus === 'glove' ? 'GLOVE' : 'NO_GLOVE';
-                const complianceText = isCompliant ? 'COMPLIANT' : 'NON-COMPLIANT';
+                const helmetText = item.helmetStatus === 'helmet' ? 'HELMET OK' : 'NO HELMET';
+                const gloveText = item.gloveStatus === 'glove' ? 'GLOVES OK' : 'NO GLOVES';
+                const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
                 
                 const helmetBadgeClass = item.helmetStatus === 'helmet' ? 'badge-success' : 'badge-danger';
                 const gloveBadgeClass = item.gloveStatus === 'glove' ? 'badge-success' : 'badge-danger';
@@ -1826,7 +1825,7 @@
                     <button class="ppe-icon-btn ${iconButtonClass}" 
                             onclick="openDetailsModal('${item.imageUrl || ''}', '${formattedTime}', 
                                     '${item.helmetStatus}', '${item.gloveStatus}', '${item.id}')"
-                            title="Click to view details">
+                            title="Click to view safety compliance details">
                         <i class="fas ${iconType}"></i>
                         <span>${buttonText}</span>
                     </button>
@@ -1840,7 +1839,7 @@
                         <td><span class="status-badge ${helmetBadgeClass}">${helmetText}</span></td>
                         <td><span class="status-badge ${gloveBadgeClass}">${gloveText}</span></td>
                         <td><span class="status-badge ${complianceBadgeClass}">${complianceText}</span></td>
-                        <td>${item.id || 'N/A'}</td>
+                        <td>${item.id || 'EMPLOYEE ID N/A'}</td>
                     </tr>
                 `;
             });
@@ -1937,7 +1936,7 @@
             if (!selectedDate) {
                 selectedDate = elements.dateFilter.value;
                 if (!selectedDate) {
-                    alert('Please select a date first');
+                    alert('Please select a date to filter safety records');
                     return;
                 }
             }
@@ -2001,26 +2000,26 @@
             elements.modalTime.textContent = time;
             elements.modalDate.textContent = dateOnly;
             elements.modalTimeOnly.textContent = timeOnly;
-            elements.modalWorkerId.textContent = workerId || 'N/A';
+            elements.modalWorkerId.textContent = workerId || 'EMPLOYEE ID N/A';
             
             // Set helmet status
             const isHelmetOK = helmetStatus === 'helmet';
             const helmetBadgeClass = isHelmetOK ? 'badge-success' : 'badge-danger';
-            const helmetText = isHelmetOK ? 'HELMET DETECTED' : 'NO HELMET';
+            const helmetText = isHelmetOK ? 'HELMET DETECTED' : 'NO HELMET - SAFETY VIOLATION';
             elements.modalHelmetStatus.className = `status-badge ${helmetBadgeClass}`;
             elements.modalHelmetStatus.textContent = helmetText;
             
             // Set glove status
             const isGloveOK = gloveStatus === 'glove';
             const gloveBadgeClass = isGloveOK ? 'badge-success' : 'badge-danger';
-            const gloveText = isGloveOK ? 'GLOVES DETECTED' : 'NO GLOVES';
+            const gloveText = isGloveOK ? 'GLOVES DETECTED' : 'NO GLOVES - SAFETY VIOLATION';
             elements.modalGloveStatus.className = `status-badge ${gloveBadgeClass}`;
             elements.modalGloveStatus.textContent = gloveText;
             
             // Set compliance status
             const isCompliant = isHelmetOK && isGloveOK;
             const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
-            const complianceText = isCompliant ? 'COMPLIANT' : 'NON-COMPLIANT';
+            const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
             elements.modalCompliance.className = `status-badge ${complianceBadgeClass}`;
             elements.modalCompliance.textContent = complianceText;
             
