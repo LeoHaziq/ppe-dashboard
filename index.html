@@ -4,39 +4,79 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PPE Monitoring Dashboard - UMPSA Prevent Highway</title>
+    
+    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Favicon -->
     <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/96/000000/helmet.png">
+    
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Inline Loading CSS -->
     <style>
-        /* Inline minimal CSS untuk loading awal */
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
         body { 
-            font-family: 'Segoe UI', sans-serif; 
+            font-family: 'Poppins', 'Segoe UI', sans-serif; 
             background: #0a0a1a; 
             color: white; 
-            padding: 20px;
             min-height: 100vh;
+            overflow-x: hidden;
         }
-        .loading { 
-            text-align: center; 
-            margin-top: 100px; 
-            font-size: 20px;
+        
+        .loading-screen { 
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: #0a0a1a;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.5s ease;
         }
-        .loading i { 
-            color: #3498db; 
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 5px solid rgba(52, 152, 219, 0.3);
+            border-radius: 50%;
+            border-top-color: #3498db;
+            animation: spin 1s linear infinite;
             margin-bottom: 20px;
-            font-size: 48px;
         }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            font-size: 18px;
+            color: #3498db;
+            text-align: center;
+        }
+        
+        .hidden { display: none !important; }
     </style>
 </head>
 <body>
-    <!-- Loading screen (akan diganti saat CSS dimuat) -->
-    <div class="loading" id="loadingScreen">
-        <i class="fas fa-spinner fa-spin"></i>
-        <p>Loading PPE Dashboard...</p>
+    <!-- Loading Screen -->
+    <div class="loading-screen" id="loadingScreen">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">
+            <p>Loading PPE Monitoring Dashboard...</p>
+            <p style="font-size: 14px; margin-top: 10px; color: #7f8c8d;">Connecting to Google Sheets</p>
+        </div>
     </div>
 
-    <!-- Main Dashboard Container (akan ditampilkan setelah loading) -->
-    <div class="container" id="mainContent" style="display: none;">
+    <!-- Main Dashboard -->
+    <div class="container hidden" id="mainContent">
         <!-- HEADER SECTION -->
         <header class="header">
             <div class="logo-box">
@@ -53,6 +93,7 @@
 
         <!-- STATISTICS SECTION -->
         <div class="stats-container">
+            <!-- Violations Card -->
             <div class="stats-card violations">
                 <h3 class="stats-title"><i class="fas fa-exclamation-triangle"></i> TOTAL VIOLATIONS</h3>
                 <div class="stats-main-number" id="totalViolations">0</div>
@@ -68,6 +109,7 @@
                 </div>
             </div>
             
+            <!-- Compliance Card -->
             <div class="stats-card compliance">
                 <h3 class="stats-title"><i class="fas fa-check-circle"></i> FULL PPE COMPLIANCE</h3>
                 <div class="stats-main-number" id="fullPPE">0</div>
@@ -96,9 +138,11 @@
                         <option value="week">Last 7 Days</option>
                         <option value="month">Last 30 Days</option>
                     </select>
-                    <button class="refresh-btn">
+                    
+                    <button class="refresh-btn" id="refreshBtn">
                         <i class="fas fa-redo"></i> Refresh Data
                     </button>
+                    
                     <a href="https://drive.google.com/drive/folders/1oUFpxplD2EjtlrjG7pof62F06ffgYaJD" 
                        target="_blank" class="folder-btn">
                         <i class="fas fa-folder-open"></i> Image Folder
@@ -106,25 +150,32 @@
                 </div>
             </div>
             
-            <table>
-                <thead>
-                    <tr>
-                        <th width="5%">#</th>
-                        <th width="25%">DATE & TIME</th>
-                        <th width="25%">IMAGE SNAPSHOT</th>
-                        <th width="22%">HELMET STATUS</th>
-                        <th width="23%">GLOVE STATUS</th>
-                    </tr>
-                </thead>
-                <tbody id="tableBody">
-                    <tr>
-                        <td colspan="5" class="loading-container">
-                            <i class="fas fa-spinner fa-spin"></i>
-                            <p>Loading PPE records from Google Sheet...</p>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th width="5%">#</th>
+                            <th width="25%">DATE & TIME</th>
+                            <th width="25%">IMAGE SNAPSHOT</th>
+                            <th width="22%">HELMET STATUS</th>
+                            <th width="23%">GLOVE STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <!-- Data will be loaded here -->
+                    </tbody>
+                </table>
+            </div>
+            
+            <div class="table-footer">
+                <div class="records-count">
+                    <i class="fas fa-database"></i>
+                    <span id="recordsCount">0</span> records loaded
+                </div>
+                <div class="api-status" id="apiStatus">
+                    <i class="fas fa-circle"></i> Connecting...
+                </div>
+            </div>
         </div>
 
         <!-- FOOTER -->
@@ -135,123 +186,75 @@
                     <i class="fas fa-folder-open"></i> View Image Folder
                 </a>
                 |
-                <a href="#" onclick="showAppState()">
+                <a href="#" id="systemInfoBtn">
                     <i class="fas fa-info-circle"></i> System Info
                 </a>
                 |
-                <span id="lastUpdate">Loading...</span>
+                <span id="lastUpdate">Never updated</span>
+                |
+                <span id="dataSource">
+                    <i class="fas fa-database"></i> Google Sheets
+                </span>
             </div>
         </div>
     </div>
 
-    <!-- Image Actions Styles -->
-    <style>
-        .image-actions {
-            position: absolute;
-            bottom: 5px;
-            right: 5px;
-            display: flex;
-            gap: 5px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-        
-        .image-wrapper:hover .image-actions {
-            opacity: 1;
-        }
-        
-        .btn-view, .btn-download {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            border: none;
-            background: rgba(0, 0, 0, 0.7);
-            color: white;
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: all 0.3s ease;
-        }
-        
-        .btn-view:hover {
-            background: #3498db;
-            transform: scale(1.1);
-        }
-        
-        .btn-download:hover {
-            background: #2ecc71;
-            transform: scale(1.1);
-        }
-        
-        .notification {
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            z-index: 10000;
-            animation: slideIn 0.3s ease;
-        }
-        
-        @keyframes slideIn {
-            from {
-                transform: translateX(100%);
-                opacity: 0;
-            }
-            to {
-                transform: translateX(0);
-                opacity: 1;
-            }
-        }
-        
-        .notification-content {
-            background: linear-gradient(135deg, #2c3e50, #34495e);
-            padding: 15px 20px;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            min-width: 300px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
-            border-left: 4px solid;
-        }
-        
-        .notification-success {
-            border-left-color: #2ecc71;
-        }
-        
-        .notification-error {
-            border-left-color: #e74c3c;
-        }
-        
-        .notification-warning {
-            border-left-color: #f39c12;
-        }
-        
-        .notification-info {
-            border-left-color: #3498db;
-        }
-        
-        .notification-close {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.5);
-            cursor: pointer;
-            margin-left: auto;
-        }
-    </style>
+    <!-- Notification Container -->
+    <div id="notificationContainer"></div>
 
-    <script>
-        // Sembunyikan loading screen dan tampilkan konten utama saat CSS dimuat
-        window.addEventListener('load', function() {
-            document.getElementById('loadingScreen').style.display = 'none';
-            document.getElementById('mainContent').style.display = 'block';
-        });
-    </script>
-    
-    <!-- Link ke CSS eksternal -->
+    <!-- Modal for Image View -->
+    <div class="image-modal hidden" id="imageModal">
+        <div class="modal-overlay"></div>
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3><i class="fas fa-image"></i> Image Preview</h3>
+                <button class="modal-close" id="modalClose">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <img id="modalImage" src="" alt="Preview">
+                <div class="image-info">
+                    <p id="imageInfo"></p>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn-download" id="downloadImageBtn">
+                    <i class="fas fa-download"></i> Download Image
+                </button>
+                <button class="btn-view-drive" id="viewInDriveBtn">
+                    <i class="fas fa-external-link-alt"></i> View in Drive
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Link to External CSS -->
     <link rel="stylesheet" href="style.css">
     
-    <!-- Link ke JavaScript eksternal -->
+    <!-- JavaScript -->
+    <script>
+        // Initial loading handler
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Dashboard starting...');
+            
+            // Load data after 1 second (let CSS load)
+            setTimeout(function() {
+                loadDashboard();
+            }, 1000);
+        });
+        
+        function loadDashboard() {
+            // Hide loading screen
+            document.getElementById('loadingScreen').classList.add('hidden');
+            document.getElementById('mainContent').classList.remove('hidden');
+            
+            // Initialize dashboard
+            initializeDashboard();
+        }
+    </script>
+    
+    <!-- Main JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
