@@ -1,6 +1,6 @@
 // Configuration
 const CONFIG = {
-  API_URL: "https://script.google.com/macros/s/AKfycbyCM2X0EWLbddbWC-wI3fHhQt7Zaj3-pxWr-Rm6t49ybzAaMNKDZNSJg7Kh2ioaacgr/exec",
+  API_URL: "https://script.google.com/macros/s/AKfycbydxsfDfPpRjEJPqlQmkpP64IsyO6R9pau96hZpSg9ahQfhKMmAeKLbg6kOVrh46dEm/exec",
   CACHE_DURATION: 30000 // 30 seconds
 };
 
@@ -53,7 +53,7 @@ async function loadData() {
     
     // Add timestamp to avoid caching
     const timestamp = new Date().getTime();
-    const url = `${CONFIG.API_URL}?t=${timestamp}`;
+    const url = `${CONFIG.API_URL}?t=${timestamp}&action=getData`;
     
     const response = await fetch(url);
     
@@ -191,12 +191,29 @@ function populateTable(records) {
       }
     }
     
-    // Image URL handling
-    let imageUrl = 'https://via.placeholder.com/180x120?text=No+Image';
+    // **FIXED: IMAGE HANDLING - Extract image URL properly**
+    let imageUrl = 'https://via.placeholder.com/160x100/2c3e50/ffffff?text=No+Image';
+    let imageAlt = 'No Image Available';
+    
+    // Check for image in various possible fields
     if (record.imageUrl) {
       imageUrl = record.imageUrl;
+      imageAlt = 'PPE Snapshot';
     } else if (record.imageId) {
+      // Convert Google Drive ID to direct image URL
       imageUrl = `https://drive.google.com/uc?id=${record.imageId}`;
+      imageAlt = 'PPE Snapshot';
+    } else if (record.image) {
+      imageUrl = record.image;
+      imageAlt = 'PPE Snapshot';
+    }
+    
+    // Check if it's a Google Drive share link and convert it
+    if (imageUrl.includes('drive.google.com/file/d/')) {
+      const match = imageUrl.match(/\/d\/(.*?)\//);
+      if (match && match[1]) {
+        imageUrl = `https://drive.google.com/uc?id=${match[1]}`;
+      }
     }
     
     html += `
@@ -204,14 +221,22 @@ function populateTable(records) {
         <td class="row-number">${index + 1}</td>
         <td class="datetime-cell">
           <div class="datetime-primary">${displayDateTime}</div>
-          ${record.timestamp ? `<div class="datetime-secondary">ID: ${record.id || 'N/A'}</div>` : ''}
+          ${record.id ? `<div class="datetime-secondary">ID: ${record.id}</div>` : ''}
         </td>
         <td class="image-cell">
           <div class="image-wrapper">
             <img src="${imageUrl}" 
-                 alt="PPE Snapshot" 
+                 alt="${imageAlt}" 
                  class="camera-image"
-                 onerror="this.src='https://via.placeholder.com/180x120?text=Image+Error'">
+                 onerror="this.onerror=null; this.src='https://via.placeholder.com/160x100/2c3e50/ffffff?text=Image+Error'">
+            <div class="image-actions">
+              <button class="btn-view" onclick="viewImage('${imageUrl}')" title="View Image">
+                <i class="fas fa-eye"></i>
+              </button>
+              <button class="btn-download" onclick="downloadImage('${imageUrl}')" title="Download">
+                <i class="fas fa-download"></i>
+              </button>
+            </div>
           </div>
         </td>
         <td class="status-cell">
@@ -310,7 +335,7 @@ function getSampleData() {
         id: 1,
         datetime: "Nov 4, 2025, 09:55:42 AM",
         timestamp: "2025-11-04T09:55:42",
-        imageUrl: "https://via.placeholder.com/180x120?text=Helmet+Missing",
+        imageId: "1kaqbrGBlIDoGqj", // Direct Google Drive ID
         helmetStatus: "no_helmet",
         gloveStatus: "glove"
       },
@@ -318,7 +343,7 @@ function getSampleData() {
         id: 2,
         datetime: "Nov 4, 2025, 09:56:09 AM",
         timestamp: "2025-11-04T09:56:09",
-        imageUrl: "https://via.placeholder.com/180x120?text=Both+OK",
+        imageUrl: "https://drive.google.com/uc?id=1nOxycdenBHwUJ", // Direct image URL
         helmetStatus: "helmet",
         gloveStatus: "glove"
       },
@@ -326,7 +351,7 @@ function getSampleData() {
         id: 3,
         datetime: "Nov 4, 2025, 10:15:33 AM",
         timestamp: "2025-11-04T10:15:33",
-        imageUrl: "https://via.placeholder.com/180x120?text=Glove+Missing",
+        image: "https://drive.google.com/file/d/1abc123def456/view", // Share link
         helmetStatus: "helmet",
         gloveStatus: "no_glove"
       }
@@ -373,6 +398,16 @@ function viewImage(url) {
   window.open(url, '_blank');
 }
 
+// Download image
+function downloadImage(url) {
+  const link = document.createElement('a');
+  link.href = url;
+  link.download = `ppe_image_${new Date().getTime()}.jpg`;
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 // Show app state info
 function showAppState() {
   const info = `
@@ -384,4 +419,3 @@ function showAppState() {
   
   alert(info);
 }
-
