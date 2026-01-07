@@ -1,6 +1,6 @@
 // Configuration
 const CONFIG = {
-  API_URL: "https://script.google.com/macros/s/AKfycbzesZiENZHVqVKovL3ws0-uGr4l6Q8HzZFF1YtbitRwWuVieVqOayjR-pH4_gqBc8-W/exec",
+  API_URL: "https://script.google.com/macros/s/AKfycbyCM2X0EWLbddbWC-wI3fHhQt7Zaj3-pxWr-Rm6t49ybzAaMNKDZNSJg7Kh2ioaacgr/exec",
   CACHE_DURATION: 30000 // 30 seconds
 };
 
@@ -384,3 +384,4 @@ function showAppState() {
   
   alert(info);
 }
+
