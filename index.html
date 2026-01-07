@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPE Dashboard - UMPSA</title>
+    <title>PPE Dashboard - UMPSA Prevent Highway</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -24,6 +24,7 @@
             text-align: center;
             margin-bottom: 30px;
             border: 2px solid #00bcd4;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
         .header h1 { 
             color: #00bcd4; 
@@ -45,7 +46,6 @@
             border-radius: 15px;
             text-align: center;
             border: 2px solid;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
         }
         .violations { border-color: #ff6b6b; }
         .compliance { border-color: #2ecc71; }
@@ -53,6 +53,9 @@
             font-size: 60px;
             font-weight: bold;
             margin: 20px 0;
+            padding: 20px;
+            background: rgba(0,0,0,0.3);
+            border-radius: 12px;
         }
         .violations .big-number { color: #ff6b6b; }
         .compliance .big-number { color: #2ecc71; }
@@ -66,6 +69,16 @@
             background: rgba(255,255,255,0.05);
             padding: 15px;
             border-radius: 10px;
+        }
+        .stat-item h4 {
+            font-size: 14px;
+            color: #aaa;
+            margin-bottom: 5px;
+        }
+        .stat-item .number {
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
         }
         
         /* CONTROLS */
@@ -93,8 +106,21 @@
             border: 1px solid #555;
             min-width: 200px;
         }
-        .refresh-btn { background: #3498db; color: white; }
-        .folder-btn { background: #9b59b6; color: white; text-decoration: none; }
+        .refresh-btn {
+            background: #3498db;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .folder-btn {
+            background: #9b59b6;
+            color: white;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
         
         /* TABLE */
         .table-container {
@@ -111,6 +137,7 @@
         thead { background: #ff9800; }
         th { padding: 18px 15px; text-align: left; font-weight: bold; }
         tbody tr { border-bottom: 1px solid #333; }
+        tbody tr:nth-child(even) { background: rgba(255,255,255,0.06); }
         td { padding: 20px 15px; vertical-align: middle; }
         .row-no { font-weight: bold; color: #3498db; text-align: center; }
         .image-box {
@@ -266,93 +293,106 @@
         </div>
     </div>
     
-    <!-- JAVASCRIPT -->
     <script>
-        // CONFIG
-        const API_URL = "https://script.google.com/macros/s/AKfycbylKpIXGs-CAg3iIKU0s90PMk2KA75Ivy-NN5oKQ9-UcKj4Jfh4hYBLNArVHLkO67q5/exec";
+        // =============================================
+        // CONFIGURATION
+        // =============================================
+        // GANTI INI DENGAN URL APPS SCRIPT BARU ANDA
+        const API_URL = "https://script.google.com/macros/s/AKfycbx_OmuGtWQimtcafyZxsBdemZRqZNacAzhujrrmP7Ia_6YlVDIp5cfkkTh_hZnIZqRZ/exec";
         
-        // Initialize
+        let currentData = [];
+        
+        // =============================================
+        // INITIALIZE
+        // =============================================
         document.addEventListener('DOMContentLoaded', function() {
-            console.log('Dashboard ready');
-            loadData();
+            console.log('Dashboard initialized');
             
             // Event Listeners
             document.getElementById('refreshBtn').addEventListener('click', loadData);
             document.getElementById('testBtn').addEventListener('click', testConnection);
             document.getElementById('infoBtn').addEventListener('click', showInfo);
+            
+            // Initial load
+            loadData();
         });
         
-        // Load Data
+        // =============================================
+        // LOAD DATA (NO PROXY NEEDED)
+        // =============================================
         async function loadData() {
             try {
                 showLoading();
+                updateStatus('Loading data...', 'loading');
                 
-                // Use CORS proxy untuk bypass CORS
-                const proxyUrl = 'https://corsproxy.io/?';
-                const targetUrl = `${API_URL}?action=getData&t=${Date.now()}`;
-                const url = proxyUrl + encodeURIComponent(targetUrl);
+                // Direct fetch to Apps Script
+                const url = `${API_URL}?action=getData&t=${Date.now()}`;
+                console.log('Fetching from:', url);
                 
-                console.log('Fetching:', url);
+                const response = await fetch(url);
                 
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Accept': 'application/json'
-                    }
-                });
-                
-                if (!response.ok) {
-                    throw new Error(`HTTP ${response.status}`);
+                // Check if response is JSON
+                const contentType = response.headers.get('content-type');
+                if (!contentType || !contentType.includes('application/json')) {
+                    // Get response as text to see what's wrong
+                    const text = await response.text();
+                    console.error('Non-JSON response:', text.substring(0, 200));
+                    throw new Error('Server returned HTML instead of JSON. Check Apps Script deployment.');
                 }
                 
                 const result = await response.json();
                 console.log('Data received:', result);
                 
-                if (result.success) {
-                    displayData(result);
-                    showMessage('Data loaded successfully!', 'success');
-                } else {
+                if (!result.success) {
                     throw new Error(result.error || 'Failed to load data');
                 }
                 
+                // Update dashboard
+                updateStats(result.stats);
+                displayTable(result.data);
+                updateStatus('Connected', 'connected');
+                updateLastUpdate();
+                
+                showMessage(`Loaded ${result.data.length} records successfully!`, 'success');
+                
             } catch (error) {
                 console.error('Error:', error);
-                showMessage('Using sample data: ' + error.message, 'warning');
+                updateStatus('Connection failed', 'error');
+                showMessage('Error: ' + error.message, 'error');
+                
+                // Fallback to sample data
                 useSampleData();
             }
         }
         
-        // Display Data
-        function displayData(result) {
-            // Update Stats
-            const stats = result.stats || {};
-            document.getElementById('totalViolations').textContent = 
-                (stats.helmetViolations || 0) + (stats.gloveViolations || 0);
+        // =============================================
+        // UPDATE STATISTICS
+        // =============================================
+        function updateStats(stats) {
+            if (!stats) return;
+            
+            const totalViolations = (stats.helmetViolations || 0) + (stats.gloveViolations || 0);
+            
+            document.getElementById('totalViolations').textContent = totalViolations;
             document.getElementById('helmetViolations').textContent = stats.helmetViolations || 0;
             document.getElementById('gloveViolations').textContent = stats.gloveViolations || 0;
             document.getElementById('fullPPE').textContent = stats.fullPPE || 0;
-            document.getElementById('helmetOK').textContent = stats.helmetOk || 0;
-            document.getElementById('gloveOK').textContent = stats.gloveOk || 0;
-            
-            // Update Table
-            const records = result.data || [];
-            updateTable(records);
-            
-            // Update timestamp
-            document.getElementById('lastUpdate').textContent = 
-                'Last updated: ' + new Date().toLocaleTimeString();
+            document.getElementById('helmetOK').textContent = stats.helmetOK || 0;
+            document.getElementById('gloveOK').textContent = stats.gloveOK || 0;
         }
         
-        // Update Table
-        function updateTable(records) {
+        // =============================================
+        // DISPLAY TABLE
+        // =============================================
+        function displayTable(records) {
             const tbody = document.getElementById('tableBody');
             
-            if (!records.length) {
+            if (!records || records.length === 0) {
                 tbody.innerHTML = `
                     <tr>
                         <td colspan="6" style="text-align: center; padding: 40px; color: #95a5a6;">
                             <i class="fas fa-database"></i>
-                            <p>No records found</p>
+                            <p>No PPE records found</p>
                         </td>
                     </tr>
                 `;
@@ -362,7 +402,7 @@
             let html = '';
             
             records.forEach((record, index) => {
-                // Status
+                // Determine status
                 const helmetStatus = record.helmetStatus || '';
                 const gloveStatus = record.gloveStatus || '';
                 
@@ -380,12 +420,15 @@
                     imageUrl = `https://drive.google.com/uc?id=${record.imageId}&export=view`;
                 }
                 
+                // Date to display
+                const displayDate = record.datetime || record.displayDate || 'N/A';
+                
                 html += `
                     <tr>
                         <td class="row-no">${index + 1}</td>
                         <td>
-                            <div style="font-weight: 600;">${record.datetime || 'N/A'}</div>
-                            <div style="font-size: 12px; color: #95a5a6;">ID: ${record.id || index + 1}</div>
+                            <div style="font-weight: 600; margin-bottom: 5px;">${displayDate}</div>
+                            <div style="font-size: 12px; color: #95a5a6;">ID: ${record.id}</div>
                         </td>
                         <td>
                             <div class="image-box">
@@ -416,42 +459,41 @@
             tbody.innerHTML = html;
         }
         
-        // Test Connection
+        // =============================================
+        // TEST CONNECTION
+        // =============================================
         async function testConnection() {
             try {
-                const proxyUrl = 'https://corsproxy.io/?';
-                const targetUrl = `${API_URL}?action=test&t=${Date.now()}`;
-                const url = proxyUrl + encodeURIComponent(targetUrl);
+                updateStatus('Testing connection...', 'loading');
                 
+                const url = `${API_URL}?action=test&t=${Date.now()}`;
                 const response = await fetch(url);
-                const data = await response.json();
                 
-                if (data.success) {
-                    showMessage('✅ API Connection Successful!', 'success');
-                } else {
-                    showMessage('❌ API Error: ' + data.error, 'error');
+                const text = await response.text();
+                console.log('Test response:', text);
+                
+                // Try to parse as JSON
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success) {
+                        showMessage('✅ API Connection Successful!', 'success');
+                        updateStatus('Connected', 'connected');
+                    } else {
+                        throw new Error(data.error || 'API test failed');
+                    }
+                } catch (parseError) {
+                    throw new Error('Not a valid JSON response: ' + text.substring(0, 100));
                 }
+                
             } catch (error) {
                 showMessage('❌ Connection Failed: ' + error.message, 'error');
+                updateStatus('Connection failed', 'error');
             }
         }
         
-        // Show Info
-        function showInfo() {
-            const info = `
-PPE MONITORING DASHBOARD
-========================
-API URL: ${API_URL}
-Last Update: ${new Date().toLocaleString()}
-Browser: ${navigator.userAgent}
-========================
-UMPSA Safety Department
-            `.trim();
-            
-            alert(info);
-        }
-        
-        // Show Loading
+        // =============================================
+        // UTILITY FUNCTIONS
+        // =============================================
         function showLoading() {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = `
@@ -464,7 +506,49 @@ UMPSA Safety Department
             `;
         }
         
-        // Show Message
+        function updateStatus(text, type) {
+            const element = document.getElementById('apiStatus');
+            const textElement = document.getElementById('statusText');
+            
+            if (textElement) textElement.textContent = text;
+            
+            const colors = {
+                'loading': '#f39c12',
+                'connected': '#2ecc71',
+                'error': '#e74c3c',
+                'ready': '#3498db'
+            };
+            
+            element.innerHTML = `<i class="fas fa-circle" style="color:${colors[type] || '#95a5a6'}"></i> <span id="statusText">${text}</span>`;
+        }
+        
+        function updateLastUpdate() {
+            const element = document.getElementById('lastUpdate');
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString([], {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+            element.textContent = `Last updated: ${timeStr}`;
+        }
+        
+        function showInfo() {
+            const info = `
+PPE MONITORING DASHBOARD
+========================
+API URL: ${API_URL}
+Last Update: ${new Date().toLocaleString()}
+Records: ${currentData.length}
+Browser: ${navigator.userAgent}
+========================
+UMPSA Safety Department
+Contact: safety@umpsa.edu.my
+            `.trim();
+            
+            alert(info);
+        }
+        
         function showMessage(message, type) {
             // Create notification
             const notification = document.createElement('div');
@@ -503,44 +587,6 @@ UMPSA Safety Department
             }, 5000);
         }
         
-        // Sample Data Fallback
-        function useSampleData() {
-            const sampleData = {
-                data: [
-                    {
-                        id: 1,
-                        datetime: "Nov 4, 2025, 09:55:42 AM",
-                        helmetStatus: "no_helmet",
-                        gloveStatus: "no_glove",
-                        imageUrl: "https://drive.google.com/uc?id=1kaqbrGBlIDoGqj&export=view"
-                    },
-                    {
-                        id: 2,
-                        datetime: "Nov 4, 2025, 09:56:09 AM",
-                        helmetStatus: "helmet",
-                        gloveStatus: "glove",
-                        imageUrl: "https://drive.google.com/uc?id=1nOxycdenBHwUJ&export=view"
-                    },
-                    {
-                        id: 3,
-                        datetime: "Nov 4, 2025, 10:15:33 AM",
-                        helmetStatus: "helmet",
-                        gloveStatus: "no_glove",
-                        imageUrl: "https://drive.google.com/uc?id=1SGXLtiMDJkABI&export=view"
-                    }
-                ],
-                stats: {
-                    helmetViolations: 23,
-                    gloveViolations: 24,
-                    helmetOk: 56,
-                    gloveOk: 55,
-                    fullPPE: 53
-                }
-            };
-            
-            displayData(sampleData);
-        }
-        
         // Add CSS for animation
         const style = document.createElement('style');
         style.textContent = `
@@ -550,6 +596,53 @@ UMPSA Safety Department
             }
         `;
         document.head.appendChild(style);
+        
+        // =============================================
+        // SAMPLE DATA (FALLBACK)
+        // =============================================
+        function useSampleData() {
+            console.log('Using sample data');
+            
+            const sampleData = [
+                {
+                    id: 1,
+                    datetime: "Nov 4, 2025, 09:55:42 AM",
+                    helmetStatus: "no_helmet",
+                    gloveStatus: "no_glove",
+                    imageUrl: "https://drive.google.com/uc?id=1kaqbrGBlIDoGqj&export=view"
+                },
+                {
+                    id: 2,
+                    datetime: "Nov 4, 2025, 09:56:09 AM",
+                    helmetStatus: "helmet",
+                    gloveStatus: "glove",
+                    imageUrl: "https://drive.google.com/uc?id=1nOxycdenBHwUJ&export=view"
+                },
+                {
+                    id: 3,
+                    datetime: "Nov 4, 2025, 10:15:33 AM",
+                    helmetStatus: "helmet",
+                    gloveStatus: "no_glove",
+                    imageUrl: "https://drive.google.com/uc?id=1SGXLtiMDJkABI&export=view"
+                }
+            ];
+            
+            const sampleStats = {
+                helmetViolations: 23,
+                gloveViolations: 24,
+                helmetOK: 56,
+                gloveOK: 55,
+                fullPPE: 53
+            };
+            
+            currentData = sampleData;
+            updateStats(sampleStats);
+            displayTable(sampleData);
+            updateLastUpdate();
+            updateStatus('Using sample data', 'ready');
+            
+            showMessage('Using sample data (Google Sheets unavailable)', 'info');
+        }
     </script>
 </body>
 </html>
