@@ -4,79 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PPE Monitoring Dashboard - UMPSA Prevent Highway</title>
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Favicon -->
-    <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/96/000000/helmet.png">
-    
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    
-    <!-- Inline Loading CSS -->
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body { 
-            font-family: 'Poppins', 'Segoe UI', sans-serif; 
-            background: #0a0a1a; 
-            color: white; 
-            min-height: 100vh;
-            overflow-x: hidden;
-        }
-        
-        .loading-screen { 
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: #0a0a1a;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.5s ease;
-        }
-        
-        .loading-spinner {
-            width: 60px;
-            height: 60px;
-            border: 5px solid rgba(52, 152, 219, 0.3);
-            border-radius: 50%;
-            border-top-color: #3498db;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-        }
-        
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        
-        .loading-text {
-            font-size: 18px;
-            color: #3498db;
-            text-align: center;
-        }
-        
-        .hidden { display: none !important; }
-    </style>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/x-icon" href="https://img.icons8.com/color/96/000000/helmet.png">
 </head>
 <body>
-    <!-- Loading Screen -->
-    <div class="loading-screen" id="loadingScreen">
-        <div class="loading-spinner"></div>
-        <div class="loading-text">
-            <p>Loading PPE Monitoring Dashboard...</p>
-            <p style="font-size: 14px; margin-top: 10px; color: #7f8c8d;">Connecting to Google Sheets</p>
-        </div>
-    </div>
-
-    <!-- Main Dashboard -->
-    <div class="container hidden" id="mainContent">
+    <div class="container">
         <!-- HEADER SECTION -->
         <header class="header">
             <div class="logo-box">
@@ -93,7 +27,6 @@
 
         <!-- STATISTICS SECTION -->
         <div class="stats-container">
-            <!-- Violations Card -->
             <div class="stats-card violations">
                 <h3 class="stats-title"><i class="fas fa-exclamation-triangle"></i> TOTAL VIOLATIONS</h3>
                 <div class="stats-main-number" id="totalViolations">0</div>
@@ -109,7 +42,6 @@
                 </div>
             </div>
             
-            <!-- Compliance Card -->
             <div class="stats-card compliance">
                 <h3 class="stats-title"><i class="fas fa-check-circle"></i> FULL PPE COMPLIANCE</h3>
                 <div class="stats-main-number" id="fullPPE">0</div>
@@ -191,70 +123,11 @@
                 </a>
                 |
                 <span id="lastUpdate">Never updated</span>
-                |
-                <span id="dataSource">
-                    <i class="fas fa-database"></i> Google Sheets
-                </span>
             </div>
         </div>
     </div>
 
-    <!-- Notification Container -->
-    <div id="notificationContainer"></div>
-
-    <!-- Modal for Image View -->
-    <div class="image-modal hidden" id="imageModal">
-        <div class="modal-overlay"></div>
-        <div class="modal-content">
-            <div class="modal-header">
-                <h3><i class="fas fa-image"></i> Image Preview</h3>
-                <button class="modal-close" id="modalClose">
-                    <i class="fas fa-times"></i>
-                </button>
-            </div>
-            <div class="modal-body">
-                <img id="modalImage" src="" alt="Preview">
-                <div class="image-info">
-                    <p id="imageInfo"></p>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-download" id="downloadImageBtn">
-                    <i class="fas fa-download"></i> Download Image
-                </button>
-                <button class="btn-view-drive" id="viewInDriveBtn">
-                    <i class="fas fa-external-link-alt"></i> View in Drive
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Link to External CSS -->
-    <link rel="stylesheet" href="style.css">
-    
     <!-- JavaScript -->
-    <script>
-        // Initial loading handler
-        document.addEventListener('DOMContentLoaded', function() {
-            console.log('Dashboard starting...');
-            
-            // Load data after 1 second (let CSS load)
-            setTimeout(function() {
-                loadDashboard();
-            }, 1000);
-        });
-        
-        function loadDashboard() {
-            // Hide loading screen
-            document.getElementById('loadingScreen').classList.add('hidden');
-            document.getElementById('mainContent').classList.remove('hidden');
-            
-            // Initialize dashboard
-            initializeDashboard();
-        }
-    </script>
-    
-    <!-- Main JavaScript -->
     <script src="script.js"></script>
 </body>
 </html>
