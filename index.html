@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>PPE Compliance Dashboard | UMPSA</title>
+    <title>PPE Record Monitoring System | UMPSA</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -38,10 +38,38 @@
             margin: 0 auto;
         }
         
+        /* ========== LOGO CONTAINERS ========== */
+        .logo-container {
+            display: flex;
+            align-items: center;
+            height: 70px;
+        }
+        
+        .logo-left {
+            position: absolute;
+            left: 30px;
+            top: 20px;
+            z-index: 100;
+        }
+        
+        .logo-right {
+            position: absolute;
+            right: 30px;
+            top: 20px;
+            z-index: 100;
+        }
+        
+        .logo-img {
+            max-height: 70px;
+            max-width: 200px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        
         /* Header */
         .header {
             background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-            padding: 25px 30px;
+            padding: 25px 30px 25px 200px; /* Extra left padding for logo */
             border-radius: 20px;
             margin-bottom: 25px;
             text-align: center;
@@ -49,6 +77,7 @@
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             position: relative;
             overflow: hidden;
+            min-height: 120px;
         }
         
         .header::before {
@@ -70,7 +99,8 @@
         }
         
         .header-title {
-            text-align: left;
+            text-align: center;
+            flex-grow: 1;
         }
         
         .header h1 {
@@ -80,6 +110,7 @@
             font-weight: 700;
             display: flex;
             align-items: center;
+            justify-content: center;
             gap: 15px;
         }
         
@@ -93,6 +124,8 @@
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
+            justify-content: center;
+            margin-top: 10px;
         }
         
         .header-stat {
@@ -107,6 +140,23 @@
         
         .header-stat i {
             color: var(--warning);
+        }
+        
+        /* ========== TAMBAHAN STYLE UNTUK LOGO ========== */
+        .logo-placeholder {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            width: 200px;
+            height: 70px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
         }
         
         /* Stats Grid */
@@ -866,15 +916,62 @@
             }
         }
         
+        @media (max-width: 992px) {
+            .header {
+                padding: 25px 30px 25px 150px;
+            }
+            
+            .logo-left, .logo-right {
+                position: relative;
+                left: auto;
+                right: auto;
+                top: auto;
+                margin-bottom: 15px;
+            }
+            
+            .logo-left {
+                order: 1;
+                margin-right: auto;
+            }
+            
+            .logo-right {
+                order: 3;
+                margin-left: auto;
+            }
+            
+            .header-title {
+                order: 2;
+                width: 100%;
+            }
+        }
+        
         @media (max-width: 768px) {
             .container {
                 padding: 10px;
+            }
+            
+            .header {
+                padding: 25px 20px;
             }
             
             .header h1 {
                 font-size: 1.8rem;
                 flex-direction: column;
                 gap: 10px;
+            }
+            
+            .logo-left, .logo-right {
+                position: relative;
+                left: auto;
+                right: auto;
+                top: auto;
+                margin: 0 auto 15px;
+            }
+            
+            .logo-placeholder {
+                width: 150px;
+                height: 60px;
+                font-size: 0.8rem;
             }
             
             .controls {
@@ -948,15 +1045,36 @@
 </head>
 <body>
     <div class="container">
+        <!-- ========== LOGO UMPSA - KIRI ATAS ========== -->
+        <!-- ARAHAN: Gantikan div ini dengan tag <img> yang merujuk kepada logo UMPSA -->
+        <!-- CONTOH: <img src="umpsa_logo.png" alt="UMPSA Logo" class="logo-img"> -->
+        <div class="logo-container logo-left">
+            <div class="logo-placeholder">
+                [LOGO UMPSA]
+                <small>Letak logo di sini</small>
+            </div>
+        </div>
+        
+        <!-- ========== LOGO VERSAFAC - KANAN ATAS ========== -->
+        <!-- ARAHAN: Gantikan div ini dengan tag <img> yang merujuk kepada logo Versafac -->
+        <!-- CONTOH: <img src="versafac_logo.png" alt="Versafac Logo" class="logo-img"> -->
+        <div class="logo-container logo-right">
+            <div class="logo-placeholder">
+                [LOGO VERSAFAC]
+                <small>Letak logo di sini</small>
+            </div>
+        </div>
+        
         <!-- Header -->
         <div class="header">
             <div class="header-content">
                 <div class="header-title">
+                    <!-- JUDUL UTAMA: TELAH DIGANTI DARI "PREVENT HIGHWAY" KE "PPE Record Monitoring System" -->
                     <h1>
                         <i class="fas fa-hard-hat"></i>
-                        PREVENT HIGHWAY
+                        PPE RECORD MONITORING SYSTEM
                     </h1>
-                    <h2>PPE RECORD MONITORING SYSTEM</h2>
+                    <h2>UMPSA Highway Safety Division</h2>
                 </div>
                 <div class="header-stats">
                     <div class="header-stat">
@@ -1206,7 +1324,7 @@
         <!-- Footer -->
         <div class="footer">
             <div>
-                PPE Compliance Dashboard &copy; 2025 | UMPSA Highway Safety Division
+                PPE Record Monitoring System &copy; 2025 | UMPSA Highway Safety Division
             </div>
             <div class="footer-stats">
                 <div class="footer-stat">
