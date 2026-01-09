@@ -2274,7 +2274,8 @@
                 
                 updateStatus('loading', 'Loading safety data...');
                 
-                const response = await fetch(`${API_URL}?action=getData&t=${Date.now()}`);
+                // TAMBAHKAN PARAMETER UNTUK MENGAMBIL SEMUA DATA TERMASUK GAMBAR
+                const response = await fetch(`${API_URL}?action=getAllData&includeImages=true&t=${Date.now()}`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -2286,7 +2287,8 @@
                     throw new Error(data.error || 'Failed to load safety data');
                 }
                 
-                allData = processData(data.data);
+                // PROSES DATA DENGAN MENAMBAHKAN IMAGE URL
+                allData = processDataWithImages(data.data);
                 filteredData = [...allData];
                 
                 updateStatistics(data.stats);
@@ -2304,6 +2306,8 @@
                 });
                 
                 updateStatus('success', 'Connected to Safety System');
+                
+                showNotification('Safety data loaded successfully', 'success');
                 
             } catch (error) {
                 console.error('Error loading safety data:', error);
@@ -2324,6 +2328,7 @@
                 `;
                 
                 updateStatus('error', 'Safety System Connection Error');
+                showNotification('Failed to load safety data: ' + error.message, 'error');
                 
             } finally {
                 elements.refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
@@ -2331,10 +2336,10 @@
             }
         }
         
-        // Process data to ensure proper formatting
-        function processData(data) {
+        // Process data with images from Google Sheets
+        function processDataWithImages(data) {
             return data.map(item => {
-                let datetime = item.datetime;
+                let datetime = item.datetime || item.timestamp;
                 if (!datetime && item.timestamp) {
                     try {
                         const date = new Date(item.timestamp);
@@ -2368,8 +2373,24 @@
                 // Generate random employee ID if not exists
                 const employeeId = item.employeeId || Math.floor(100 + Math.random() * 900).toString();
                 
-                // Check if image URL exists in data
-                const imageUrl = item.imageUrl || item.photoUrl || item.evidenceUrl || '';
+                // MENGAMBIL URL GAMBAR DARI GOOGLE SHEETS
+                // Periksa berbagai kemungkinan field yang mungkin berisi URL gambar
+                const imageUrl = item.imageUrl || item.photoUrl || item.evidenceUrl || 
+                                item.image_link || item.photo_link || item.drive_url || 
+                                item.gdrive_link || item.image || '';
+                
+                // Jika imageUrl adalah ID Google Drive, konversi ke URL yang dapat diakses
+                let processedImageUrl = imageUrl;
+                if (imageUrl && imageUrl.startsWith('http')) {
+                    // URL sudah valid
+                    processedImageUrl = imageUrl;
+                } else if (imageUrl && imageUrl.includes('google.com') || imageUrl.includes('drive.google.com')) {
+                    // URL Google Drive
+                    processedImageUrl = imageUrl;
+                } else if (imageUrl && imageUrl.length > 10) {
+                    // Mungkin ID file Google Drive
+                    processedImageUrl = `https://drive.google.com/uc?id=${imageUrl}`;
+                }
                 
                 return {
                     ...item,
@@ -2377,7 +2398,8 @@
                     dateOnly: dateOnly,
                     timeOnly: timeOnly,
                     employeeId: employeeId,
-                    imageUrl: imageUrl,
+                    imageUrl: processedImageUrl, // Simpan URL gambar yang sudah diproses
+                    originalImageUrl: imageUrl, // Simpan URL asli untuk referensi
                     helmetStatus: (item.helmetStatus || '').toLowerCase().trim(),
                     gloveStatus: (item.gloveStatus || '').toLowerCase().trim()
                 };
@@ -2565,13 +2587,14 @@
                 const iconType = isCompliant ? 'fa-check-circle' : 'fa-exclamation-triangle';
                 const buttonText = isCompliant ? 'COMPLIANT' : 'VIOLATION';
                 
+                // Simpan semua data item dalam atribut data-* untuk akses mudah
                 tableHTML += `
                     <tr>
                         <td class="row-number">${globalIndex + 1}</td>
                         <td class="datetime-cell">${formattedTime}</td>
                         <td class="image-cell">
                             <button class="ppe-icon-btn ${iconButtonClass}" 
-                                    onclick="openDetailsModal(
+                                    onclick="openDetailsModalWithData(
                                         '${item.dateOnly || ''}',
                                         '${item.timeOnly || ''}',
                                         '${item.helmetStatus}',
@@ -2579,7 +2602,8 @@
                                         '${item.employeeId || 'N/A'}',
                                         '${item.imageUrl || ''}'
                                     )"
-                                    title="Click to view safety compliance details">
+                                    title="Click to view safety compliance details"
+                                    data-item='${JSON.stringify(item).replace(/'/g, "\\'")}'>
                                 <i class="fas ${iconType}"></i>
                                 <span>${buttonText}</span>
                             </button>
@@ -2592,6 +2616,195 @@
             });
             
             elements.tableBody.innerHTML = tableHTML;
+        }
+        
+        // Open details modal with complete data
+        function openDetailsModalWithData(date, time, helmetStatus, gloveStatus, employeeId, imageUrl) {
+            // Simpan data item yang dipilih secara global
+            currentSelectedItem = {
+                date: date,
+                time: time,
+                helmetStatus: helmetStatus,
+                gloveStatus: gloveStatus,
+                employeeId: employeeId,
+                imageUrl: imageUrl
+            };
+            
+            // Isi modal dengan data
+            elements.modalDate.textContent = date || 'N/A';
+            elements.modalTime.textContent = time || 'N/A';
+            elements.modalEmployeeId.textContent = employeeId || 'N/A';
+            
+            const isHelmetOK = helmetStatus === 'helmet';
+            const helmetBadgeClass = isHelmetOK ? 'badge-success' : 'badge-danger';
+            const helmetText = isHelmetOK ? 'HELMET DETECTED' : 'NO HELMET - SAFETY VIOLATION';
+            elements.modalHelmetStatus.className = `status-badge ${helmetBadgeClass}`;
+            elements.modalHelmetStatus.textContent = helmetText;
+            
+            const isGloveOK = gloveStatus === 'glove';
+            const gloveBadgeClass = isGloveOK ? 'badge-success' : 'badge-danger';
+            const gloveText = isGloveOK ? 'GLOVES DETECTED' : 'NO GLOVES - SAFETY VIOLATION';
+            elements.modalGloveStatus.className = `status-badge ${gloveBadgeClass}`;
+            elements.modalGloveStatus.textContent = gloveText;
+            
+            const isCompliant = isHelmetOK && isGloveOK;
+            const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
+            const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
+            elements.modalCompliance.className = `status-badge ${complianceBadgeClass}`;
+            elements.modalCompliance.textContent = complianceText;
+            
+            elements.detailsModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            showNotification('Safety details loaded', 'info');
+        }
+        
+        // View evidence image - mengambil gambar dari Google Sheets
+        async function viewEvidenceImage() {
+            if (!currentSelectedItem) {
+                showNotification('No evidence image available', 'warning');
+                return;
+            }
+            
+            // Open evidence modal
+            elements.evidenceModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            // Clear previous image and show loading
+            elements.evidenceImageContainer.innerHTML = `
+                <div class="evidence-loading">
+                    <div class="spinner"></div>
+                    <div>Loading evidence image from Google Sheets...</div>
+                </div>
+            `;
+            
+            try {
+                // If there's a direct image URL in the data
+                if (currentSelectedItem.imageUrl && currentSelectedItem.imageUrl.trim() !== '') {
+                    // Coba muat gambar
+                    const img = new Image();
+                    img.onload = function() {
+                        elements.evidenceImageContainer.innerHTML = `
+                            <img src="${currentSelectedItem.imageUrl}" alt="Evidence Image" class="evidence-image">
+                            <div class="evidence-info">
+                                <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
+                                <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
+                                <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
+                                <p><i class="fas fa-database"></i> Source: Google Sheets</p>
+                            </div>
+                        `;
+                        showNotification('Evidence image loaded from Google Sheets', 'success');
+                    };
+                    
+                    img.onerror = function() {
+                        // Jika gagal memuat, coba ambil dari API
+                        fetchImageFromAPI();
+                    };
+                    
+                    img.src = currentSelectedItem.imageUrl;
+                    
+                    // Timeout jika gambar terlalu lama dimuat
+                    setTimeout(() => {
+                        if (elements.evidenceImageContainer.innerHTML.includes('spinner')) {
+                            fetchImageFromAPI();
+                        }
+                    }, 5000);
+                    
+                } else {
+                    // Jika tidak ada URL gambar, coba ambil dari API
+                    fetchImageFromAPI();
+                }
+            } catch (error) {
+                console.error('Error loading evidence image:', error);
+                createPlaceholderImage();
+            }
+        }
+        
+        // Fetch image from API
+        async function fetchImageFromAPI() {
+            try {
+                // Coba ambil gambar dari Google Sheets melalui API
+                const response = await fetch(`${API_URL}?action=getImage&employeeId=${encodeURIComponent(currentSelectedItem.employeeId)}&date=${encodeURIComponent(currentSelectedItem.date)}&time=${encodeURIComponent(currentSelectedItem.time)}&t=${Date.now()}`);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    if (data.success && data.imageUrl) {
+                        elements.evidenceImageContainer.innerHTML = `
+                            <img src="${data.imageUrl}" alt="Evidence Image" class="evidence-image">
+                            <div class="evidence-info">
+                                <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
+                                <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
+                                <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
+                                <p><i class="fas fa-database"></i> Source: Google Sheets Database</p>
+                            </div>
+                        `;
+                        showNotification('Evidence image loaded from Google Sheets API', 'success');
+                    } else if (data.success && data.imageData) {
+                        // Jika API mengembalikan data gambar base64
+                        elements.evidenceImageContainer.innerHTML = `
+                            <img src="data:image/jpeg;base64,${data.imageData}" alt="Evidence Image" class="evidence-image">
+                            <div class="evidence-info">
+                                <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
+                                <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
+                                <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
+                                <p><i class="fas fa-database"></i> Source: Google Sheets Database</p>
+                            </div>
+                        `;
+                        showNotification('Evidence image loaded from Google Sheets', 'success');
+                    } else {
+                        createPlaceholderImage();
+                    }
+                } else {
+                    createPlaceholderImage();
+                }
+            } catch (error) {
+                console.error('Error fetching image from API:', error);
+                createPlaceholderImage();
+            }
+        }
+        
+        // Create placeholder image when no image is available
+        function createPlaceholderImage() {
+            const svgContent = `
+                <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="100%" height="100%" fill="#1a237e"/>
+                    <rect x="100" y="150" width="600" height="300" rx="20" fill="#283593" stroke="#3949ab" stroke-width="2"/>
+                    <circle cx="400" cy="200" r="60" fill="#5c6bc0"/>
+                    <rect x="200" y="280" width="400" height="60" rx="10" fill="#7986cb"/>
+                    <text x="400" y="220" text-anchor="middle" fill="white" font-family="Arial" font-size="24" font-weight="bold">SAFETY EVIDENCE</text>
+                    <text x="400" y="320" text-anchor="middle" fill="white" font-family="Arial" font-size="16">PPE Compliance Image</text>
+                    <text x="400" y="350" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Date: ${currentSelectedItem.date || 'N/A'}</text>
+                    <text x="400" y="370" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Time: ${currentSelectedItem.time || 'N/A'}</text>
+                    <text x="400" y="390" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Employee: ${currentSelectedItem.employeeId || 'N/A'}</text>
+                    <text x="400" y="450" text-anchor="middle" fill="#ff6b6b" font-family="Arial" font-size="20" font-weight="bold">IMAGE NOT AVAILABLE</text>
+                    <text x="400" y="480" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Check Google Sheets for evidence image</text>
+                </svg>
+            `;
+            
+            const svgBlob = new Blob([svgContent], {type: 'image/svg+xml;charset=utf-8'});
+            const svgUrl = URL.createObjectURL(svgBlob);
+            
+            elements.evidenceImageContainer.innerHTML = `
+                <img src="${svgUrl}" alt="Evidence Image" class="evidence-image">
+                <div class="evidence-info">
+                    <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
+                    <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
+                    <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
+                    <p><i class="fas fa-exclamation-triangle"></i> No image found in Google Sheets database</p>
+                    <p><i class="fas fa-info-circle"></i> Please ensure images are uploaded to Google Sheets</p>
+                </div>
+            `;
+            
+            showNotification('No evidence image found in database', 'warning');
+            
+            // Clean up URL after image loads
+            setTimeout(() => {
+                const img = elements.evidenceImageContainer.querySelector('img');
+                if (img) {
+                    img.onload = () => URL.revokeObjectURL(svgUrl);
+                }
+            }, 1000);
         }
         
         // Update pagination controls
@@ -2705,147 +2918,6 @@
             updateCalendarStats();
             updateWeeklyStats();
             showNotification('Date filter cleared', 'info');
-        }
-        
-        // Open details modal with enhanced information
-        function openDetailsModal(date, time, helmetStatus, gloveStatus, employeeId, imageUrl) {
-            elements.modalDate.textContent = date || 'N/A';
-            elements.modalTime.textContent = time || 'N/A';
-            elements.modalEmployeeId.textContent = employeeId || 'N/A';
-            
-            const isHelmetOK = helmetStatus === 'helmet';
-            const helmetBadgeClass = isHelmetOK ? 'badge-success' : 'badge-danger';
-            const helmetText = isHelmetOK ? 'HELMET DETECTED' : 'NO HELMET - SAFETY VIOLATION';
-            elements.modalHelmetStatus.className = `status-badge ${helmetBadgeClass}`;
-            elements.modalHelmetStatus.textContent = helmetText;
-            
-            const isGloveOK = gloveStatus === 'glove';
-            const gloveBadgeClass = isGloveOK ? 'badge-success' : 'badge-danger';
-            const gloveText = isGloveOK ? 'GLOVES DETECTED' : 'NO GLOVES - SAFETY VIOLATION';
-            elements.modalGloveStatus.className = `status-badge ${gloveBadgeClass}`;
-            elements.modalGloveStatus.textContent = gloveText;
-            
-            const isCompliant = isHelmetOK && isGloveOK;
-            const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
-            const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
-            elements.modalCompliance.className = `status-badge ${complianceBadgeClass}`;
-            elements.modalCompliance.textContent = complianceText;
-            
-            // Store current item data for evidence image
-            currentSelectedItem = {
-                date: date,
-                time: time,
-                employeeId: employeeId,
-                imageUrl: imageUrl
-            };
-            
-            elements.detailsModal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-        
-        // View evidence image - mengambil gambar dari Google Sheets
-        async function viewEvidenceImage() {
-            if (!currentSelectedItem) {
-                showNotification('No evidence image available', 'warning');
-                return;
-            }
-            
-            // Open evidence modal
-            elements.evidenceModal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-            
-            // Clear previous image
-            elements.evidenceImageContainer.innerHTML = `
-                <div class="evidence-loading">
-                    <div class="spinner"></div>
-                    <div>Loading evidence image...</div>
-                </div>
-            `;
-            
-            try {
-                // If there's a direct image URL in the data
-                if (currentSelectedItem.imageUrl) {
-                    elements.evidenceImageContainer.innerHTML = `
-                        <img src="${currentSelectedItem.imageUrl}" alt="Evidence Image" class="evidence-image">
-                        <div class="evidence-info">
-                            <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
-                            <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
-                            <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
-                        </div>
-                    `;
-                    showNotification('Evidence image loaded from Google Sheets', 'success');
-                } else {
-                    // Try to get image from Google Sheets via API
-                    const response = await fetch(`${API_URL}?action=getImage&employeeId=${currentSelectedItem.employeeId}&date=${currentSelectedItem.date}&t=${Date.now()}`);
-                    
-                    if (response.ok) {
-                        const data = await response.json();
-                        
-                        if (data.success && data.imageUrl) {
-                            elements.evidenceImageContainer.innerHTML = `
-                                <img src="${data.imageUrl}" alt="Evidence Image" class="evidence-image">
-                                <div class="evidence-info">
-                                    <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
-                                    <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
-                                    <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
-                                    <p><i class="fas fa-database"></i> Source: Google Sheets Database</p>
-                                </div>
-                            `;
-                            showNotification('Evidence image loaded from Google Sheets', 'success');
-                        } else {
-                            showNoImageAvailable();
-                        }
-                    } else {
-                        showNoImageAvailable();
-                    }
-                }
-            } catch (error) {
-                console.error('Error loading evidence image:', error);
-                showNoImageAvailable();
-            }
-        }
-        
-        // Show placeholder when no image is available
-        function showNoImageAvailable() {
-            // Create a placeholder image with data
-            const svgContent = `
-                <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
-                    <rect width="100%" height="100%" fill="#1a237e"/>
-                    <rect x="100" y="150" width="600" height="300" rx="20" fill="#283593" stroke="#3949ab" stroke-width="2"/>
-                    <circle cx="400" cy="200" r="60" fill="#5c6bc0"/>
-                    <rect x="200" y="280" width="400" height="60" rx="10" fill="#7986cb"/>
-                    <text x="400" y="220" text-anchor="middle" fill="white" font-family="Arial" font-size="24" font-weight="bold">SAFETY EVIDENCE</text>
-                    <text x="400" y="320" text-anchor="middle" fill="white" font-family="Arial" font-size="16">PPE Compliance Image</text>
-                    <text x="400" y="350" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Date: ${currentSelectedItem.date || 'N/A'}</text>
-                    <text x="400" y="370" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Time: ${currentSelectedItem.time || 'N/A'}</text>
-                    <text x="400" y="390" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Employee: ${currentSelectedItem.employeeId || 'N/A'}</text>
-                    <text x="400" y="450" text-anchor="middle" fill="#ff6b6b" font-family="Arial" font-size="20" font-weight="bold">IMAGE NOT AVAILABLE</text>
-                    <text x="400" y="480" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Check Google Sheets for evidence image</text>
-                </svg>
-            `;
-            
-            const svgBlob = new Blob([svgContent], {type: 'image/svg+xml;charset=utf-8'});
-            const svgUrl = URL.createObjectURL(svgBlob);
-            
-            elements.evidenceImageContainer.innerHTML = `
-                <img src="${svgUrl}" alt="Evidence Image" class="evidence-image">
-                <div class="evidence-info">
-                    <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
-                    <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
-                    <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
-                    <p><i class="fas fa-exclamation-triangle"></i> No image found in Google Sheets database</p>
-                </div>
-            `;
-            
-            showNotification('No evidence image found in database', 'warning');
-            
-            // Clean up URL after image loads
-            setTimeout(() => {
-                const img = elements.evidenceImageContainer.querySelector('img');
-                if (img) {
-                    img.onload = () => URL.revokeObjectURL(svgUrl);
-                }
-            }, 1000);
         }
         
         // Close details modal
