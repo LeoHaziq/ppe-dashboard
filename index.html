@@ -8,16 +8,6 @@
     <!-- ========== FAVICON / BROWSER ICONS ========== -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
     
-    <!-- Apple Touch Icon (untuk iOS Home Screen) -->
-    <link rel="apple-touch-icon" sizes="180x180" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%231a73e8' stroke='white' stroke-width='2'/><path fill='white' d='M30 35L70 35L75 50L65 50L65 65L35 65L35 50L25 50Z'/><rect fill='white' x='45' y='25' width='10' height='10'/></svg>">
-    
-    <!-- Windows Tile Icon -->
-    <meta name="msapplication-TileColor" content="#1a73e8">
-    <meta name="msapplication-TileImage" content="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><circle cx='50' cy='50' r='48' fill='%231a73e8' stroke='white' stroke-width='2'/><path fill='white' d='M30 35L70 35L75 50L65 50L65 65L35 65L35 50L25 50Z'/><rect fill='white' x='45' y='25' width='10' height='10'/></svg>">
-    
-    <!-- Theme Color untuk browser mobile -->
-    <meta name="theme-color" content="#1a73e8">
-    
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -54,7 +44,7 @@
             margin: 0 auto;
         }
         
-        /* ========== HEADER BARU YANG LEBIH KEMAS ========== */
+        /* ========== HEADER ========== */
         .header-container {
             display: flex;
             justify-content: space-between;
@@ -80,7 +70,6 @@
             background: linear-gradient(90deg, var(--primary), var(--success), var(--warning));
         }
         
-        /* Logo/Institution Section */
         .institution-section {
             display: flex;
             flex-direction: column;
@@ -118,7 +107,6 @@
             color: white;
         }
         
-        /* Main Title Section */
         .title-section {
             flex-grow: 1;
             text-align: center;
@@ -146,7 +134,6 @@
             margin: 0;
         }
         
-        /* Header Stats Section */
         .header-stats-container {
             display: flex;
             flex-direction: column;
@@ -183,7 +170,7 @@
             width: 100%;
         }
         
-        /* Responsive Design for Header */
+        /* Responsive Header */
         @media (max-width: 1200px) {
             .header-container {
                 flex-direction: column;
@@ -202,10 +189,6 @@
                 justify-content: space-between;
                 flex-wrap: wrap;
                 gap: 15px;
-            }
-            
-            .header-stats-container {
-                align-items: center;
             }
             
             .main-title {
@@ -227,36 +210,8 @@
             .subtitle {
                 font-size: 1rem;
             }
-            
-            .header-stat {
-                padding: 8px 15px;
-                font-size: 0.9rem;
-            }
-            
-            .datetime-display {
-                font-size: 0.9rem;
-            }
         }
         
-        @media (max-width: 480px) {
-            .institution-section {
-                flex-direction: column;
-                gap: 10px;
-            }
-            
-            .main-title {
-                font-size: 1.4rem;
-            }
-            
-            .institution-name {
-                font-size: 1.3rem;
-            }
-            
-            .header-container {
-                padding: 20px 15px;
-            }
-        }
-
         /* ========== LIVE STREAM SECTION ========== */
         .live-stream-section {
             background: var(--dark-secondary);
@@ -361,12 +316,6 @@
             display: flex;
             justify-content: center;
             gap: 15px;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-
-        .video-container:hover .video-controls {
-            opacity: 1;
         }
 
         .stream-info {
@@ -440,8 +389,6 @@
             box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s, box-shadow 0.3s;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            position: relative;
-            overflow: hidden;
         }
         
         .stat-card:hover {
@@ -531,11 +478,6 @@
             padding: 15px;
             border-radius: 12px;
             text-align: center;
-            transition: background 0.3s;
-        }
-        
-        .stat-detail:hover {
-            background: rgba(255, 255, 255, 0.1);
         }
         
         .stat-detail-label {
@@ -743,7 +685,6 @@
         .btn-primary:hover {
             background: #0d62d9;
             transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(26, 115, 232, 0.4);
         }
         
         .btn-secondary {
@@ -815,7 +756,6 @@
         .ppe-icon-btn:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
-            background: linear-gradient(135deg, #283593 0%, #1a237e 100%);
         }
         
         .ppe-icon-btn i {
@@ -828,7 +768,6 @@
         
         .ppe-icon-btn.violation-btn:hover {
             background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
-            box-shadow: 0 8px 20px rgba(234, 67, 53, 0.4);
         }
         
         .ppe-icon-btn.compliant-btn {
@@ -837,7 +776,6 @@
         
         .ppe-icon-btn.compliant-btn:hover {
             background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
-            box-shadow: 0 8px 20px rgba(52, 168, 83, 0.4);
         }
         
         /* Table */
@@ -901,7 +839,6 @@
         
         tbody tr {
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            transition: background 0.3s;
         }
         
         tbody tr:hover {
@@ -1181,67 +1118,6 @@
             to { transform: rotate(360deg); }
         }
         
-        /* Responsive for other sections */
-        @media (max-width: 1200px) {
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .container {
-                padding: 10px;
-            }
-            
-            .controls {
-                flex-direction: column;
-                text-align: center;
-            }
-            
-            .controls-left, .controls-right {
-                width: 100%;
-                justify-content: center;
-            }
-            
-            .stat-value {
-                font-size: 3rem;
-            }
-            
-            .stats-details {
-                grid-template-columns: 1fr;
-            }
-            
-            .table-container {
-                padding: 15px;
-            }
-            
-            th, td {
-                padding: 12px 8px;
-            }
-            
-            .ppe-icon-btn {
-                width: 50px;
-                height: 50px;
-                font-size: 9px;
-            }
-            
-            .ppe-icon-btn i {
-                font-size: 18px;
-            }
-            
-            .modal-content {
-                max-width: 95%;
-            }
-            
-            .modal-info {
-                grid-template-columns: 1fr;
-            }
-            
-            .pagination {
-                flex-direction: column;
-            }
-        }
-        
         /* Empty state */
         .empty-state {
             padding: 50px 15px;
@@ -1264,9 +1140,8 @@
 </head>
 <body>
     <div class="container">
-        <!-- ========== HEADER BARU YANG LEBIH KEMAS ========== -->
+        <!-- ========== HEADER ========== -->
         <div class="header-container">
-            <!-- Kiri: UMPSA -->
             <div class="institution-section">
                 <div class="institution-name">
                     <i class="fas fa-university"></i>
@@ -1275,7 +1150,6 @@
                 <span class="institution-badge umpsa-badge">UNIVERSITY</span>
             </div>
             
-            <!-- Tengah: Judul Utama -->
             <div class="title-section">
                 <h1 class="main-title">
                     <i class="fas fa-hard-hat"></i>
@@ -1284,7 +1158,6 @@
                 <p class="subtitle">Industrial Safety Compliance & Monitoring</p>
             </div>
             
-            <!-- Kanan: VERSAFAC & Stats -->
             <div class="header-stats-container">
                 <div class="institution-name">
                     <i class="fas fa-bolt"></i>
@@ -1295,10 +1168,6 @@
                 <div class="header-stat">
                     <i class="fas fa-shield-alt"></i>
                     <span>SAFETY FIRST</span>
-                </div>
-                <div class="header-stat">
-                    <i class="fas fa-industry"></i>
-                    <span>INDUSTRIAL COMPLIANCE</span>
                 </div>
                 <div class="datetime-display" id="currentDateTimeHeader">
                     Loading...
@@ -1338,9 +1207,6 @@
                         <div class="video-status">
                             <div class="status-indicator-stream" id="videoStatusIndicator"></div>
                             <span id="videoStatusText">Initializing...</span>
-                        </div>
-                        <div class="video-info">
-                            <span id="cameraInfo">RTSP Camera</span>
                         </div>
                     </div>
                     <div class="video-controls">
@@ -1511,9 +1377,6 @@
                     <button class="btn btn-secondary" onclick="clearDateFilter()">
                         <i class="fas fa-times"></i> Clear Filter
                     </button>
-                    <button class="btn btn-danger" onclick="filterViolationsOnly()">
-                        <i class="fas fa-exclamation-triangle"></i> Show Violations Only
-                    </button>
                 </div>
             </div>
             <div class="calendar-grid">
@@ -1531,31 +1394,6 @@
                         <div class="calendar-stat">
                             <div class="calendar-stat-value" id="todayTotal">0</div>
                             <div class="calendar-stat-label">Total Inspections</div>
-                        </div>
-                        <div class="calendar-stat">
-                            <div class="calendar-stat-value" id="todayComplianceRate">0%</div>
-                            <div class="calendar-stat-label">Compliance Rate</div>
-                        </div>
-                    </div>
-                </div>
-                <div class="calendar-card">
-                    <h4><i class="fas fa-chart-line"></i> WEEKLY SAFETY SUMMARY</h4>
-                    <div class="calendar-stats">
-                        <div class="calendar-stat">
-                            <div class="calendar-stat-value" id="weeklyViolations">0</div>
-                            <div class="calendar-stat-label">Weekly Violations</div>
-                        </div>
-                        <div class="calendar-stat">
-                            <div class="calendar-stat-value" id="weeklyCompliance">0</div>
-                            <div class="calendar-stat-label">Weekly Compliance</div>
-                        </div>
-                        <div class="calendar-stat">
-                            <div class="calendar-stat-value" id="weeklyAvg">0%</div>
-                            <div class="calendar-stat-label">Avg Compliance</div>
-                        </div>
-                        <div class="calendar-stat">
-                            <div class="calendar-stat-value" id="weeklyTrend">-</div>
-                            <div class="calendar-stat-label">Safety Trend</div>
                         </div>
                     </div>
                 </div>
@@ -1606,12 +1444,11 @@
                             <th><i class="fas fa-hard-hat"></i> HELMET STATUS</th>
                             <th><i class="fas fa-hand-paper"></i> GLOVE STATUS</th>
                             <th><i class="fas fa-id-card"></i> COMPLIANCE STATUS</th>
-                            <th><i class="fas fa-user-tie"></i> EMPLOYEE ID</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
                         <tr>
-                            <td colspan="7">
+                            <td colspan="6">
                                 <div class="loading">
                                     <div class="spinner"></div>
                                     <div>Loading safety compliance data...</div>
@@ -1707,26 +1544,6 @@
                             <span id="modalCompliance" class="status-badge badge-danger">NON-COMPLIANT</span>
                         </div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">EMPLOYEE ID</div>
-                        <div class="info-value" id="modalWorkerId">-</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">INSPECTION DATE</div>
-                        <div class="info-value" id="modalDate">-</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">INSPECTION TIME</div>
-                        <div class="info-value" id="modalTimeOnly">-</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">EVIDENCE IMAGE</div>
-                        <div class="info-value">
-                            <a href="#" id="modalImageLink" target="_blank" style="color: var(--primary); word-break: break-all; font-size: 0.9rem;">
-                                <i class="fas fa-external-link-alt"></i> VIEW SAFETY IMAGE
-                            </a>
-                        </div>
-                    </div>
                 </div>
             </div>
         </div>
@@ -1734,9 +1551,19 @@
     
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        // Configuration
+        // Configuration - GANTI INI DENGAN URL ANDA SENDIRI
         const API_URL = "https://script.google.com/macros/s/AKfycbw7aHL6T0GiigMT0h-s0je-uHiHElh0KXxRI4nd_BuKVo7N4lOYn7lNsBo7o4983PAm/exec";
-        const FLASK_URL = "http://localhost:5000"; // Pastikan Flask berjalan di port 5000
+        
+        // AMBIL FLASK URL DARI PARAMETER URL ATAU GUNAKAN DEFAULT
+        const urlParams = new URLSearchParams(window.location.search);
+        const flaskUrlParam = urlParams.get('flask_url');
+        const FLASK_URL = flaskUrlParam || "http://192.168.1.64:5000"; // Ganti dengan IP public anda jika ada
+        
+        // Atau gunakan ngrok URL jika ada
+        // const FLASK_URL = "https://abcd-123-456-789.ngrok-free.app"; // Contoh ngrok URL
+        
+        console.log("Using Flask URL:", FLASK_URL);
+        
         let autoRefreshInterval = null;
         let autoRefreshEnabled = false;
         let allData = [];
@@ -1754,7 +1581,6 @@
         
         // DOM Elements
         const elements = {
-            // CCTV Elements
             liveVideo: document.getElementById('liveVideo'),
             videoStatusIndicator: document.getElementById('videoStatusIndicator'),
             videoStatusText: document.getElementById('videoStatusText'),
@@ -1768,8 +1594,6 @@
             lastDetectionInfo: document.getElementById('lastDetectionInfo'),
             detectionCount: document.getElementById('detectionCount'),
             serverIP: document.getElementById('serverIP'),
-            
-            // Existing elements
             totalViolations: document.getElementById('totalViolations'),
             helmetViolations: document.getElementById('helmetViolations'),
             gloveViolations: document.getElementById('gloveViolations'),
@@ -1791,17 +1615,10 @@
             autoRefreshBtn: document.getElementById('autoRefreshBtn'),
             autoRefreshStatus: document.getElementById('autoRefreshStatus'),
             autoRefreshFooter: document.getElementById('autoRefreshFooter'),
-            // Calendar elements
             dateFilter: document.getElementById('dateFilter'),
             todayViolations: document.getElementById('todayViolations'),
             todayCompliance: document.getElementById('todayCompliance'),
             todayTotal: document.getElementById('todayTotal'),
-            todayComplianceRate: document.getElementById('todayComplianceRate'),
-            weeklyViolations: document.getElementById('weeklyViolations'),
-            weeklyCompliance: document.getElementById('weeklyCompliance'),
-            weeklyAvg: document.getElementById('weeklyAvg'),
-            weeklyTrend: document.getElementById('weeklyTrend'),
-            // Pagination elements
             currentPage: document.getElementById('currentPage'),
             totalPages: document.getElementById('totalPages'),
             pageStart: document.getElementById('pageStart'),
@@ -1815,16 +1632,11 @@
             nextPage: document.getElementById('nextPage'),
             lastPage: document.getElementById('lastPage'),
             pageNumbers: document.getElementById('pageNumbers'),
-            // Modal elements
             detailsModal: document.getElementById('detailsModal'),
             modalTime: document.getElementById('modalTime'),
             modalHelmetStatus: document.getElementById('modalHelmetStatus'),
             modalGloveStatus: document.getElementById('modalGloveStatus'),
-            modalCompliance: document.getElementById('modalCompliance'),
-            modalImageLink: document.getElementById('modalImageLink'),
-            modalWorkerId: document.getElementById('modalWorkerId'),
-            modalDate: document.getElementById('modalDate'),
-            modalTimeOnly: document.getElementById('modalTimeOnly')
+            modalCompliance: document.getElementById('modalCompliance')
         };
         
         // Initialize Flatpickr Calendar
@@ -1847,7 +1659,7 @@
             initCalendar();
             loadData();
             testFlaskConnection();
-            startAutoRefresh(30000); // 30 seconds
+            startAutoRefresh(30000);
         });
         
         // Initialize date time display
@@ -1866,22 +1678,28 @@
                 elements.currentDateTimeHeader.textContent = now.toLocaleDateString('en-US', options);
             }
             updateDateTime();
-            setInterval(updateDateTime, 1000); // Update every second
+            setInterval(updateDateTime, 1000);
         }
         
-        // Test Flask connection secara sederhana
+        // Test Flask connection dengan CORS handling
         async function testFlaskConnection() {
             try {
                 updateCCTVStatus('loading', 'Testing Flask connection...');
                 
-                // Coba akses endpoint /status
+                // Cuba akses endpoint /status dengan timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
                 const response = await fetch(`${FLASK_URL}/status`, {
                     method: 'GET',
-                    mode: 'cors', // Mode cors
+                    mode: 'cors',
+                    signal: controller.signal,
                     headers: {
                         'Accept': 'application/json'
                     }
                 });
+                
+                clearTimeout(timeoutId);
                 
                 if (response.ok) {
                     const data = await response.json();
@@ -1890,7 +1708,11 @@
                     isCCTVRunning = data.cctv_running || false;
                     updateCCTVButtons();
                     
-                    // Jika CCTV sedang berjalan, mulai stream
+                    // Update IP display dengan IP yang betul
+                    const url = new URL(FLASK_URL);
+                    elements.serverIP.textContent = `${url.hostname}:${url.port || '5000'}`;
+                    
+                    // Jika CCTV sedang berjalan, mula stream
                     if (isCCTVRunning) {
                         startVideoStream();
                     }
@@ -1898,34 +1720,17 @@
                     throw new Error(`HTTP ${response.status}`);
                 }
             } catch (error) {
-                console.warn('Flask connection test failed, trying fallback...', error);
-                // Coba metode fallback
-                testFlaskFallback();
-            }
-        }
-        
-        // Fallback method untuk test connection
-        async function testFlaskFallback() {
-            try {
-                // Coba langsung akses video stream
-                const videoTest = new Image();
-                videoTest.onload = function() {
-                    isFlaskConnected = true;
-                    updateCCTVStatus('connected', 'Flask Connected (Fallback)');
-                    elements.startCCTVBtn.disabled = false;
-                    elements.streamStatusDetail.textContent = 'READY';
-                    elements.streamStatusDetail.style.color = '#34a853';
-                };
-                videoTest.onerror = function() {
-                    updateCCTVStatus('error', 'Flask Server Not Found');
-                    elements.startCCTVBtn.disabled = true;
-                    elements.stopCCTVBtn.disabled = true;
-                    elements.streamStatusDetail.textContent = 'OFFLINE';
-                    elements.streamStatusDetail.style.color = '#ea4335';
-                };
-                videoTest.src = `${FLASK_URL}/video?t=${Date.now()}`;
-            } catch (error) {
-                updateCCTVStatus('error', 'Cannot connect to Flask');
+                console.warn('Flask connection test failed:', error);
+                updateCCTVStatus('error', 'Flask Server Not Found');
+                elements.startCCTVBtn.disabled = true;
+                elements.stopCCTVBtn.disabled = true;
+                elements.streamStatusDetail.textContent = 'OFFLINE';
+                elements.streamStatusDetail.style.color = '#ea4335';
+                
+                // Tunjukkan cara connect dalam alert
+                setTimeout(() => {
+                    alert(`Cannot connect to Flask server at ${FLASK_URL}\n\nTo fix this:\n1. Make sure Flask is running\n2. Use ngrok for public access\n3. Update the flask_url parameter in URL\n\nExample: ?flask_url=https://your-ngrok-url.ngrok-free.app`);
+                }, 1000);
             }
         }
         
@@ -1965,7 +1770,7 @@
             }
         }
         
-        // Start CCTV - Modified to handle CORS
+        // Start CCTV dengan CORS handling
         async function startCCTV() {
             try {
                 updateCCTVStatus('loading', 'Starting CCTV...');
@@ -1975,7 +1780,8 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ command: 'on' })
+                    body: JSON.stringify({ command: 'on' }),
+                    mode: 'cors'
                 });
                 
                 if (response.ok) {
@@ -1985,25 +1791,19 @@
                         updateCCTVButtons();
                         updateCCTVStatus('connected', 'CCTV Running');
                         startVideoStream();
+                        showNotification('CCTV started successfully!', 'success');
                         return;
                     }
                 }
                 throw new Error('Invalid response');
             } catch (error) {
                 console.error('Error starting CCTV:', error);
-                
-                // Fallback: Coba langsung start tanpa API
-                isCCTVRunning = true;
-                updateCCTVButtons();
-                updateCCTVStatus('connected', 'CCTV Started (Direct)');
-                startVideoStream();
-                
-                // Tampilkan warning
-                alert('CCTV started in direct mode. Some controls may not work.');
+                updateCCTVStatus('error', 'Failed to start CCTV');
+                showNotification('Failed to start CCTV: ' + error.message, 'error');
             }
         }
         
-        // Stop CCTV - Modified to handle CORS
+        // Stop CCTV dengan CORS handling
         async function stopCCTV() {
             try {
                 updateCCTVStatus('loading', 'Stopping CCTV...');
@@ -2013,7 +1813,8 @@
                     headers: {
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ command: 'off' })
+                    body: JSON.stringify({ command: 'off' }),
+                    mode: 'cors'
                 });
                 
                 if (response.ok) {
@@ -2023,72 +1824,54 @@
                         updateCCTVButtons();
                         updateCCTVStatus('connected', 'CCTV Stopped');
                         stopVideoStream();
+                        showNotification('CCTV stopped successfully!', 'success');
                         return;
                     }
                 }
                 throw new Error('Invalid response');
             } catch (error) {
                 console.error('Error stopping CCTV:', error);
-                
-                // Fallback: Stop langsung
-                isCCTVRunning = false;
-                updateCCTVButtons();
-                updateCCTVStatus('connected', 'CCTV Stopped (Direct)');
-                stopVideoStream();
+                updateCCTVStatus('error', 'Failed to stop CCTV');
+                showNotification('Failed to stop CCTV: ' + error.message, 'error');
             }
         }
         
-        // Start video stream dengan error handling
+        // Start video stream dengan fallback untuk HTTPS
         function startVideoStream() {
-            // Clear any existing interval
             if (videoStreamInterval) {
                 clearInterval(videoStreamInterval);
             }
             
-            // Reset frame counter
             frameCount = 0;
             lastFrameTime = Date.now();
             
-            // Set video source dengan cache busting
-            const timestamp = Date.now();
-            const videoSrc = `${FLASK_URL}/video?t=${timestamp}`;
+            // Gunakan URL yang sesuai (HTTP atau HTTPS)
+            const videoSrc = `${FLASK_URL}/video?t=${Date.now()}`;
             
-            // Coba gunakan fetch untuk test koneksi dulu
-            fetch(videoSrc, { method: 'HEAD', mode: 'no-cors' })
-                .then(() => {
-                    // Jika berhasil, set src ke video
-                    elements.liveVideo.src = videoSrc;
-                    elements.videoStatusText.textContent = 'Live Stream Active';
-                    
-                    // Start frame rate calculation
-                    videoStreamInterval = setInterval(calculateFrameRate, 1000);
-                    
-                    // Listen for image load events
-                    elements.liveVideo.onload = function() {
-                        frameCount++;
-                        // Simulasi deteksi
-                        if (Math.random() > 0.8) {
-                            detectionCount++;
-                            elements.detectionCount.textContent = detectionCount;
-                            elements.lastDetectionInfo.textContent = new Date().toLocaleTimeString();
-                        }
-                    };
-                    
-                    // Handle image errors
-                    elements.liveVideo.onerror = function() {
-                        console.warn('Stream error, retrying...');
-                        setTimeout(() => {
-                            if (isCCTVRunning) {
-                                const newTimestamp = Date.now();
-                                elements.liveVideo.src = `${FLASK_URL}/video?t=${newTimestamp}`;
-                            }
-                        }, 2000);
-                    };
-                })
-                .catch(() => {
-                    updateCCTVStatus('error', 'Cannot start video stream');
-                    elements.liveVideo.src = '';
-                });
+            // Set video source
+            elements.liveVideo.src = videoSrc;
+            elements.videoStatusText.textContent = 'Live Stream Active';
+            
+            // Start frame rate calculation
+            videoStreamInterval = setInterval(calculateFrameRate, 1000);
+            
+            // Handle image errors
+            elements.liveVideo.onerror = function() {
+                console.warn('Stream error, retrying...');
+                elements.videoStatusText.textContent = 'Stream Error - Retrying...';
+                setTimeout(() => {
+                    if (isCCTVRunning) {
+                        const newTimestamp = Date.now();
+                        elements.liveVideo.src = `${FLASK_URL}/video?t=${newTimestamp}`;
+                    }
+                }, 2000);
+            };
+            
+            // Handle image load
+            elements.liveVideo.onload = function() {
+                frameCount++;
+                elements.videoStatusText.textContent = 'Live Stream Active';
+            };
         }
         
         // Stop video stream
@@ -2109,6 +1892,9 @@
                 const timestamp = Date.now();
                 elements.liveVideo.src = `${FLASK_URL}/video?t=${timestamp}`;
                 updateCCTVStatus('connected', 'Stream Refreshed');
+                showNotification('Stream refreshed!', 'info');
+            } else {
+                showNotification('Please start CCTV first!', 'warning');
             }
         }
         
@@ -2120,7 +1906,13 @@
             
             elements.frameRateInfo.textContent = `${fps} FPS`;
             
-            // Reset counters
+            // Simulate detections for demo
+            if (fps > 0 && Math.random() > 0.7) {
+                detectionCount++;
+                elements.detectionCount.textContent = detectionCount;
+                elements.lastDetectionInfo.textContent = new Date().toLocaleTimeString();
+            }
+            
             frameCount = 0;
             lastFrameTime = currentTime;
         }
@@ -2128,39 +1920,29 @@
         // Take snapshot
         function takeSnapshot() {
             if (!isCCTVRunning || !elements.liveVideo.src) {
-                alert('Please start CCTV first!');
+                showNotification('Please start CCTV first!', 'warning');
                 return;
             }
             
             try {
                 const canvas = document.createElement('canvas');
                 const video = elements.liveVideo;
+                const context = canvas.getContext('2d');
                 
-                // Set canvas dimensions
                 canvas.width = video.videoWidth || 1280;
                 canvas.height = video.videoHeight || 720;
                 
-                const ctx = canvas.getContext('2d');
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
                 
-                // Draw current frame
-                ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                
-                // Create download link
                 const link = document.createElement('a');
                 const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
                 link.download = `ppe-snapshot-${timestamp}.png`;
                 link.href = canvas.toDataURL('image/png');
                 link.click();
                 
-                // Show notification
-                updateCCTVStatus('connected', 'Snapshot Saved!');
-                setTimeout(() => {
-                    if (isCCTVRunning) {
-                        updateCCTVStatus('connected', 'Live Stream Active');
-                    }
-                }, 2000);
+                showNotification('Snapshot saved!', 'success');
             } catch (error) {
-                alert('Error taking snapshot: ' + error.message);
+                showNotification('Error taking snapshot: ' + error.message, 'error');
             }
         }
         
@@ -2173,33 +1955,62 @@
                     videoContainer.requestFullscreen();
                 } else if (videoContainer.webkitRequestFullscreen) {
                     videoContainer.webkitRequestFullscreen();
-                } else if (videoContainer.msRequestFullscreen) {
-                    videoContainer.msRequestFullscreen();
                 }
             } else {
                 if (document.exitFullscreen) {
                     document.exitFullscreen();
                 } else if (document.webkitExitFullscreen) {
                     document.webkitExitFullscreen();
-                } else if (document.msExitFullscreen) {
-                    document.msExitFullscreen();
                 }
             }
         }
         
-        // ========== FUNGSI LAINNYA (Google Sheets) ==========
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const colors = {
+                'success': '#34a853',
+                'error': '#ea4335',
+                'warning': '#fbbc05',
+                'info': '#1a73e8'
+            };
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${colors[type] || '#1a73e8'};
+                color: white;
+                border-radius: 10px;
+                z-index: 10000;
+                font-weight: 500;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease;
+            `;
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
         // Load data from API
         async function loadData() {
             try {
-                // Update button state
                 const originalText = elements.refreshBtn.innerHTML;
                 elements.refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
                 elements.refreshBtn.disabled = true;
                 
-                // Update status indicator
                 updateStatus('loading', 'Loading safety data...');
                 
-                // Fetch data
                 const response = await fetch(`${API_URL}?action=getData&t=${Date.now()}`);
                 
                 if (!response.ok) {
@@ -2212,23 +2023,15 @@
                     throw new Error(data.error || 'Failed to load safety data');
                 }
                 
-                // Process and store data
                 allData = processData(data.data);
                 filteredData = [...allData];
                 
-                // Update statistics
                 updateStatistics(data.stats);
-                
-                // Update calendar stats
                 updateCalendarStats();
                 
-                // Reset to first page
                 currentPage = 1;
-                
-                // Update table with pagination
                 updateTableWithPagination();
                 
-                // Update last updated time
                 const now = new Date();
                 elements.lastUpdate.textContent = now.toLocaleTimeString('en-US', {
                     hour: '2-digit',
@@ -2236,16 +2039,14 @@
                     second: '2-digit'
                 });
                 
-                // Update status
                 updateStatus('success', 'Connected to Safety System');
                 
             } catch (error) {
                 console.error('Error loading safety data:', error);
                 
-                // Show error in table
                 elements.tableBody.innerHTML = `
                     <tr>
-                        <td colspan="7">
+                        <td colspan="6">
                             <div class="empty-state">
                                 <i class="fas fa-exclamation-triangle"></i>
                                 <h4>Failed to Load Safety Data</h4>
@@ -2258,11 +2059,9 @@
                     </tr>
                 `;
                 
-                // Update status
                 updateStatus('error', 'Safety System Connection Error');
                 
             } finally {
-                // Restore button state
                 elements.refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
                 elements.refreshBtn.disabled = false;
             }
@@ -2271,7 +2070,6 @@
         // Process data to ensure proper formatting
         function processData(data) {
             return data.map(item => {
-                // Ensure datetime is properly formatted
                 let datetime = item.datetime;
                 if (!datetime && item.timestamp) {
                     try {
@@ -2292,9 +2090,7 @@
                 return {
                     ...item,
                     datetime: datetime,
-                    // Extract date for filtering
                     dateOnly: datetime ? datetime.split(',')[0] : '',
-                    // Normalize status values
                     helmetStatus: (item.helmetStatus || '').toLowerCase().trim(),
                     gloveStatus: (item.gloveStatus || '').toLowerCase().trim()
                 };
@@ -2303,7 +2099,6 @@
         
         // Update statistics display
         function updateStatistics(stats) {
-            // Main stats
             elements.totalViolations.textContent = stats.totalViolations || 0;
             elements.helmetViolations.textContent = stats.helmetViolations || 0;
             elements.gloveViolations.textContent = stats.gloveViolations || 0;
@@ -2312,7 +2107,6 @@
             elements.gloveOK.textContent = stats.gloveOK || 0;
             elements.totalRecords.textContent = stats.total || 0;
             
-            // Calculate breakdown
             elements.withHelmet.textContent = stats.helmetOK || 0;
             elements.withoutHelmet.textContent = stats.helmetViolations || 0;
             elements.withGloves.textContent = stats.gloveOK || 0;
@@ -2324,7 +2118,6 @@
             const today = new Date();
             const todayStr = today.toISOString().split('T')[0];
             
-            // Get today's data
             const todayData = allData.filter(item => {
                 try {
                     const itemDate = new Date(item.datetime);
@@ -2334,7 +2127,6 @@
                 }
             });
             
-            // Calculate today's stats
             const todayViolations = todayData.filter(item => 
                 item.helmetStatus.includes('no') || item.gloveStatus.includes('no')
             ).length;
@@ -2343,62 +2135,19 @@
                 item.helmetStatus === 'helmet' && item.gloveStatus === 'glove'
             ).length;
             
-            const todayTotal = todayData.length;
-            const todayRate = todayTotal > 0 ? Math.round((todayCompliance / todayTotal) * 100) : 0;
-            
-            // Update today's stats
             elements.todayViolations.textContent = todayViolations;
             elements.todayCompliance.textContent = todayCompliance;
-            elements.todayTotal.textContent = todayTotal;
-            elements.todayComplianceRate.textContent = `${todayRate}%`;
-            
-            // Calculate weekly stats (last 7 days)
-            const weekAgo = new Date();
-            weekAgo.setDate(weekAgo.getDate() - 7);
-            
-            const weeklyData = allData.filter(item => {
-                try {
-                    const itemDate = new Date(item.datetime);
-                    return itemDate >= weekAgo;
-                } catch (e) {
-                    return false;
-                }
-            });
-            
-            const weeklyViolations = weeklyData.filter(item => 
-                item.helmetStatus.includes('no') || item.gloveStatus.includes('no')
-            ).length;
-            
-            const weeklyCompliance = weeklyData.filter(item => 
-                item.helmetStatus === 'helmet' && item.gloveStatus === 'glove'
-            ).length;
-            
-            const weeklyTotal = weeklyData.length;
-            const weeklyRate = weeklyTotal > 0 ? Math.round((weeklyCompliance / weeklyTotal) * 100) : 0;
-            
-            // Calculate trend
-            let trend = '→';
-            if (weeklyRate > 50) trend = '↑';
-            else if (weeklyRate < 30) trend = '↓';
-            
-            // Update weekly stats
-            elements.weeklyViolations.textContent = weeklyViolations;
-            elements.weeklyCompliance.textContent = weeklyCompliance;
-            elements.weeklyAvg.textContent = `${weeklyRate}%`;
-            elements.weeklyTrend.textContent = trend;
-            elements.weeklyTrend.style.color = trend === '↑' ? '#34a853' : trend === '↓' ? '#ea4335' : '#fbbc05';
+            elements.todayTotal.textContent = todayData.length;
         }
         
         // Update table with pagination
         function updateTableWithPagination() {
-            // Calculate pagination values
             const totalItems = filteredData.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage);
             const startIndex = (currentPage - 1) * itemsPerPage;
             const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
             const currentData = filteredData.slice(startIndex, endIndex);
             
-            // Update pagination info
             elements.currentPage.textContent = currentPage;
             elements.totalPages.textContent = totalPages;
             elements.pageStart.textContent = totalItems > 0 ? startIndex + 1 : 0;
@@ -2407,17 +2156,13 @@
             elements.showingRange.textContent = `${startIndex + 1}-${endIndex}`;
             elements.totalFiltered.textContent = totalItems;
             
-            // Update filter status
             if (selectedDate) {
                 elements.filterStatus.textContent = `Date: ${selectedDate}`;
             } else {
                 elements.filterStatus.textContent = 'All Safety Records';
             }
             
-            // Update table content
             updateTableContent(currentData, startIndex);
-            
-            // Update pagination controls
             updatePaginationControls(totalPages);
         }
         
@@ -2426,7 +2171,7 @@
             if (!data || data.length === 0) {
                 elements.tableBody.innerHTML = `
                     <tr>
-                        <td colspan="7">
+                        <td colspan="6">
                             <div class="empty-state">
                                 <i class="fas fa-database"></i>
                                 <h4>No Safety Data Available</h4>
@@ -2443,7 +2188,6 @@
             data.forEach((item, index) => {
                 const globalIndex = startIndex + index;
                 
-                // Determine status and badge classes
                 const isCompliant = (item.helmetStatus === 'helmet' && item.gloveStatus === 'glove');
                 const helmetText = item.helmetStatus === 'helmet' ? 'HELMET OK' : 'NO HELMET';
                 const gloveText = item.gloveStatus === 'glove' ? 'GLOVES OK' : 'NO GLOVES';
@@ -2453,7 +2197,6 @@
                 const gloveBadgeClass = item.gloveStatus === 'glove' ? 'badge-success' : 'badge-danger';
                 const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
                 
-                // Format date time
                 let formattedTime = item.datetime;
                 try {
                     const date = new Date(item.datetime);
@@ -2465,19 +2208,16 @@
                         minute: '2-digit',
                         second: '2-digit'
                     });
-                } catch (e) {
-                    // Keep original format if parsing fails
-                }
+                } catch (e) {}
                 
-                // Create PPE icon button
                 const iconButtonClass = isCompliant ? 'compliant-btn' : 'violation-btn';
                 const iconType = isCompliant ? 'fa-check-circle' : 'fa-exclamation-triangle';
                 const buttonText = isCompliant ? 'COMPLIANT' : 'VIOLATION';
                 
                 const iconButtonHTML = `
                     <button class="ppe-icon-btn ${iconButtonClass}" 
-                            onclick="openDetailsModal('${item.imageUrl || ''}', '${formattedTime.replace(/'/g, "\\'")}', 
-                                    '${item.helmetStatus}', '${item.gloveStatus}', '${item.id || ''}')"
+                            onclick="openDetailsModal('${formattedTime.replace(/'/g, "\\'")}', 
+                                    '${item.helmetStatus}', '${item.gloveStatus}')"
                             title="Click to view safety compliance details">
                         <i class="fas ${iconType}"></i>
                         <span>${buttonText}</span>
@@ -2492,7 +2232,6 @@
                         <td><span class="status-badge ${helmetBadgeClass}">${helmetText}</span></td>
                         <td><span class="status-badge ${gloveBadgeClass}">${gloveText}</span></td>
                         <td><span class="status-badge ${complianceBadgeClass}">${complianceText}</span></td>
-                        <td>${item.id || 'EMPLOYEE ID N/A'}</td>
                     </tr>
                 `;
             });
@@ -2502,18 +2241,15 @@
         
         // Update pagination controls
         function updatePaginationControls(totalPages) {
-            // Enable/disable buttons
             elements.firstPage.disabled = currentPage === 1;
             elements.prevPage.disabled = currentPage === 1;
             elements.nextPage.disabled = currentPage === totalPages || totalPages === 0;
             elements.lastPage.disabled = currentPage === totalPages || totalPages === 0;
             
-            // Generate page numbers
             let pageNumbersHTML = '';
             const maxPagesToShow = 5;
             
             if (totalPages <= maxPagesToShow) {
-                // Show all pages
                 for (let i = 1; i <= totalPages; i++) {
                     pageNumbersHTML += `
                         <div class="page-number ${i === currentPage ? 'active' : ''}" 
@@ -2521,7 +2257,6 @@
                     `;
                 }
             } else {
-                // Show limited pages with ellipsis
                 let startPage = Math.max(1, currentPage - 2);
                 let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
                 
@@ -2529,7 +2264,6 @@
                     startPage = Math.max(1, endPage - maxPagesToShow + 1);
                 }
                 
-                // First page
                 if (startPage > 1) {
                     pageNumbersHTML += `
                         <div class="page-number" onclick="goToPage(1)">1</div>
@@ -2537,7 +2271,6 @@
                     `;
                 }
                 
-                // Middle pages
                 for (let i = startPage; i <= endPage; i++) {
                     pageNumbersHTML += `
                         <div class="page-number ${i === currentPage ? 'active' : ''}" 
@@ -2545,7 +2278,6 @@
                     `;
                 }
                 
-                // Last page
                 if (endPage < totalPages) {
                     pageNumbersHTML += `
                         <div class="page-number" style="pointer-events: none;">...</div>
@@ -2585,7 +2317,7 @@
             if (!selectedDate) {
                 selectedDate = elements.dateFilter.value;
                 if (!selectedDate) {
-                    alert('Please select a date to filter safety records');
+                    showNotification('Please select a date to filter safety records', 'warning');
                     return;
                 }
             }
@@ -2604,6 +2336,7 @@
             currentPage = 1;
             updateTableWithPagination();
             updateCalendarStats();
+            showNotification(`Filtered by date: ${selectedDate}`, 'info');
         }
         
         // Clear date filter
@@ -2614,74 +2347,31 @@
             currentPage = 1;
             updateTableWithPagination();
             updateCalendarStats();
-        }
-        
-        // Filter violations only
-        function filterViolationsOnly() {
-            filteredData = allData.filter(item => 
-                item.helmetStatus.includes('no') || item.gloveStatus.includes('no')
-            );
-            
-            selectedDate = null;
-            elements.dateFilter.value = '';
-            currentPage = 1;
-            updateTableWithPagination();
-            updateCalendarStats();
+            showNotification('Date filter cleared', 'info');
         }
         
         // Open details modal
-        function openDetailsModal(imageUrl, time, helmetStatus, gloveStatus, workerId) {
-            // Parse date and time separately
-            const dateObj = new Date(time);
-            const dateOnly = dateObj.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: '2-digit',
-                day: '2-digit'
-            });
-            const timeOnly = dateObj.toLocaleTimeString('en-US', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit',
-                hour12: true
-            });
-            
-            // Set modal content
+        function openDetailsModal(time, helmetStatus, gloveStatus) {
             elements.modalTime.textContent = time;
-            elements.modalDate.textContent = dateOnly;
-            elements.modalTimeOnly.textContent = timeOnly;
-            elements.modalWorkerId.textContent = workerId || 'EMPLOYEE ID N/A';
             
-            // Set helmet status
             const isHelmetOK = helmetStatus === 'helmet';
             const helmetBadgeClass = isHelmetOK ? 'badge-success' : 'badge-danger';
             const helmetText = isHelmetOK ? 'HELMET DETECTED' : 'NO HELMET - SAFETY VIOLATION';
             elements.modalHelmetStatus.className = `status-badge ${helmetBadgeClass}`;
             elements.modalHelmetStatus.textContent = helmetText;
             
-            // Set glove status
             const isGloveOK = gloveStatus === 'glove';
             const gloveBadgeClass = isGloveOK ? 'badge-success' : 'badge-danger';
             const gloveText = isGloveOK ? 'GLOVES DETECTED' : 'NO GLOVES - SAFETY VIOLATION';
             elements.modalGloveStatus.className = `status-badge ${gloveBadgeClass}`;
             elements.modalGloveStatus.textContent = gloveText;
             
-            // Set compliance status
             const isCompliant = isHelmetOK && isGloveOK;
             const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
             const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
             elements.modalCompliance.className = `status-badge ${complianceBadgeClass}`;
             elements.modalCompliance.textContent = complianceText;
             
-            // Set image link
-            if (imageUrl && imageUrl.trim() !== '' && !imageUrl.includes('undefined')) {
-                elements.modalImageLink.href = imageUrl;
-                elements.modalImageLink.style.display = 'block';
-                elements.modalImageLink.textContent = 'View Evidence Image';
-            } else {
-                elements.modalImageLink.style.display = 'none';
-            }
-            
-            // Show modal
             elements.detailsModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
@@ -2718,12 +2408,13 @@
             autoRefreshEnabled = !autoRefreshEnabled;
             
             if (autoRefreshEnabled) {
-                startAutoRefresh(30000); // 30 seconds
+                startAutoRefresh(30000);
                 elements.autoRefreshStatus.textContent = 'ON';
                 elements.autoRefreshFooter.textContent = 'ON (30s)';
                 elements.autoRefreshBtn.innerHTML = '<i class="fas fa-clock"></i> Auto Refresh: ON';
                 elements.autoRefreshBtn.style.background = 'rgba(52, 168, 83, 0.2)';
                 elements.autoRefreshBtn.style.borderColor = 'rgba(52, 168, 83, 0.3)';
+                showNotification('Auto refresh enabled (30 seconds)', 'success');
             } else {
                 stopAutoRefresh();
                 elements.autoRefreshStatus.textContent = 'OFF';
@@ -2731,12 +2422,13 @@
                 elements.autoRefreshBtn.innerHTML = '<i class="fas fa-clock"></i> Auto Refresh: OFF';
                 elements.autoRefreshBtn.style.background = '';
                 elements.autoRefreshBtn.style.borderColor = '';
+                showNotification('Auto refresh disabled', 'info');
             }
         }
         
         // Start auto refresh
         function startAutoRefresh(interval) {
-            stopAutoRefresh(); // Clear any existing interval
+            stopAutoRefresh();
             autoRefreshInterval = setInterval(loadData, interval);
         }
         
@@ -2747,6 +2439,20 @@
                 autoRefreshInterval = null;
             }
         }
+        
+        // Add CSS for notifications
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from { transform: translateX(100%); opacity: 0; }
+                to { transform: translateX(0); opacity: 1; }
+            }
+            @keyframes slideOut {
+                from { transform: translateX(0); opacity: 1; }
+                to { transform: translateX(100%); opacity: 0; }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
