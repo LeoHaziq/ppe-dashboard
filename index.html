@@ -1329,6 +1329,35 @@
             background: linear-gradient(135deg, #0d62d9, #283593);
             transform: translateY(-2px);
         }
+
+        /* Evidence Image Modal */
+        .evidence-modal .modal-content {
+            max-width: 1000px;
+        }
+
+        .evidence-image-container {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .evidence-image {
+            max-width: 100%;
+            max-height: 600px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .evidence-info {
+            margin-top: 20px;
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 0.95rem;
+        }
+
+        .evidence-loading {
+            padding: 50px;
+            text-align: center;
+        }
         
         /* Loading */
         .loading {
@@ -1925,6 +1954,30 @@
             </div>
         </div>
     </div>
+
+    <!-- Evidence Image Modal -->
+    <div class="modal evidence-modal" id="evidenceModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-image"></i>
+                    EVIDENCE IMAGE
+                </div>
+                <button class="close-modal" onclick="closeEvidenceModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div id="evidenceImageContainer" class="evidence-image-container">
+                    <div class="evidence-loading">
+                        <div class="spinner"></div>
+                        <div>Loading evidence image...</div>
+                    </div>
+                </div>
+                <div class="evidence-info">
+                    <p><i class="fas fa-info-circle"></i> This image is retrieved from Google Sheets database.</p>
+                </div>
+            </div>
+        </div>
+    </div>
     
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
@@ -1947,6 +2000,7 @@
         let selectedDate = null;
         let dateFilter = null;
         let isFlaskConnected = false;
+        let currentSelectedItem = null;
         
         // DOM Elements
         const elements = {
@@ -2018,6 +2072,8 @@
             
             // Modal elements
             detailsModal: document.getElementById('detailsModal'),
+            evidenceModal: document.getElementById('evidenceModal'),
+            evidenceImageContainer: document.getElementById('evidenceImageContainer'),
             modalDate: document.getElementById('modalDate'),
             modalTime: document.getElementById('modalTime'),
             modalEmployeeId: document.getElementById('modalEmployeeId'),
@@ -2312,12 +2368,16 @@
                 // Generate random employee ID if not exists
                 const employeeId = item.employeeId || Math.floor(100 + Math.random() * 900).toString();
                 
+                // Check if image URL exists in data
+                const imageUrl = item.imageUrl || item.photoUrl || item.evidenceUrl || '';
+                
                 return {
                     ...item,
                     datetime: datetime,
                     dateOnly: dateOnly,
                     timeOnly: timeOnly,
                     employeeId: employeeId,
+                    imageUrl: imageUrl,
                     helmetStatus: (item.helmetStatus || '').toLowerCase().trim(),
                     gloveStatus: (item.gloveStatus || '').toLowerCase().trim()
                 };
@@ -2399,7 +2459,6 @@
             // Determine safety trend
             let safetyTrend = 'Stable';
             if (weeklyData.length > 0) {
-                // Simple trend calculation (could be more sophisticated)
                 const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
                 const yesterdayStr = yesterday.toISOString().split('T')[0];
                 
@@ -2517,7 +2576,8 @@
                                         '${item.timeOnly || ''}',
                                         '${item.helmetStatus}',
                                         '${item.gloveStatus}',
-                                        '${item.employeeId || 'N/A'}'
+                                        '${item.employeeId || 'N/A'}',
+                                        '${item.imageUrl || ''}'
                                     )"
                                     title="Click to view safety compliance details">
                                 <i class="fas ${iconType}"></i>
@@ -2648,7 +2708,7 @@
         }
         
         // Open details modal with enhanced information
-        function openDetailsModal(date, time, helmetStatus, gloveStatus, employeeId) {
+        function openDetailsModal(date, time, helmetStatus, gloveStatus, employeeId, imageUrl) {
             elements.modalDate.textContent = date || 'N/A';
             elements.modalTime.textContent = time || 'N/A';
             elements.modalEmployeeId.textContent = employeeId || 'N/A';
@@ -2671,22 +2731,132 @@
             elements.modalCompliance.className = `status-badge ${complianceBadgeClass}`;
             elements.modalCompliance.textContent = complianceText;
             
+            // Store current item data for evidence image
+            currentSelectedItem = {
+                date: date,
+                time: time,
+                employeeId: employeeId,
+                imageUrl: imageUrl
+            };
+            
             elements.detailsModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
         }
         
-        // View evidence image
-        function viewEvidenceImage() {
-            // In a real system, this would open the actual evidence image
-            // For demo, we'll open a placeholder
-            const placeholderUrl = 'https://via.placeholder.com/800x600/1a237e/ffffff?text=PPE+Safety+Evidence+Image';
-            window.open(placeholderUrl, '_blank');
-            showNotification('Opening evidence image...', 'info');
+        // View evidence image - mengambil gambar dari Google Sheets
+        async function viewEvidenceImage() {
+            if (!currentSelectedItem) {
+                showNotification('No evidence image available', 'warning');
+                return;
+            }
+            
+            // Open evidence modal
+            elements.evidenceModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+            
+            // Clear previous image
+            elements.evidenceImageContainer.innerHTML = `
+                <div class="evidence-loading">
+                    <div class="spinner"></div>
+                    <div>Loading evidence image...</div>
+                </div>
+            `;
+            
+            try {
+                // If there's a direct image URL in the data
+                if (currentSelectedItem.imageUrl) {
+                    elements.evidenceImageContainer.innerHTML = `
+                        <img src="${currentSelectedItem.imageUrl}" alt="Evidence Image" class="evidence-image">
+                        <div class="evidence-info">
+                            <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
+                            <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
+                            <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
+                        </div>
+                    `;
+                    showNotification('Evidence image loaded from Google Sheets', 'success');
+                } else {
+                    // Try to get image from Google Sheets via API
+                    const response = await fetch(`${API_URL}?action=getImage&employeeId=${currentSelectedItem.employeeId}&date=${currentSelectedItem.date}&t=${Date.now()}`);
+                    
+                    if (response.ok) {
+                        const data = await response.json();
+                        
+                        if (data.success && data.imageUrl) {
+                            elements.evidenceImageContainer.innerHTML = `
+                                <img src="${data.imageUrl}" alt="Evidence Image" class="evidence-image">
+                                <div class="evidence-info">
+                                    <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
+                                    <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
+                                    <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
+                                    <p><i class="fas fa-database"></i> Source: Google Sheets Database</p>
+                                </div>
+                            `;
+                            showNotification('Evidence image loaded from Google Sheets', 'success');
+                        } else {
+                            showNoImageAvailable();
+                        }
+                    } else {
+                        showNoImageAvailable();
+                    }
+                }
+            } catch (error) {
+                console.error('Error loading evidence image:', error);
+                showNoImageAvailable();
+            }
         }
         
-        // Close modal
+        // Show placeholder when no image is available
+        function showNoImageAvailable() {
+            // Create a placeholder image with data
+            const svgContent = `
+                <svg width="800" height="600" xmlns="http://www.w3.org/2000/svg">
+                    <rect width="100%" height="100%" fill="#1a237e"/>
+                    <rect x="100" y="150" width="600" height="300" rx="20" fill="#283593" stroke="#3949ab" stroke-width="2"/>
+                    <circle cx="400" cy="200" r="60" fill="#5c6bc0"/>
+                    <rect x="200" y="280" width="400" height="60" rx="10" fill="#7986cb"/>
+                    <text x="400" y="220" text-anchor="middle" fill="white" font-family="Arial" font-size="24" font-weight="bold">SAFETY EVIDENCE</text>
+                    <text x="400" y="320" text-anchor="middle" fill="white" font-family="Arial" font-size="16">PPE Compliance Image</text>
+                    <text x="400" y="350" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Date: ${currentSelectedItem.date || 'N/A'}</text>
+                    <text x="400" y="370" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Time: ${currentSelectedItem.time || 'N/A'}</text>
+                    <text x="400" y="390" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Employee: ${currentSelectedItem.employeeId || 'N/A'}</text>
+                    <text x="400" y="450" text-anchor="middle" fill="#ff6b6b" font-family="Arial" font-size="20" font-weight="bold">IMAGE NOT AVAILABLE</text>
+                    <text x="400" y="480" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Check Google Sheets for evidence image</text>
+                </svg>
+            `;
+            
+            const svgBlob = new Blob([svgContent], {type: 'image/svg+xml;charset=utf-8'});
+            const svgUrl = URL.createObjectURL(svgBlob);
+            
+            elements.evidenceImageContainer.innerHTML = `
+                <img src="${svgUrl}" alt="Evidence Image" class="evidence-image">
+                <div class="evidence-info">
+                    <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
+                    <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
+                    <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
+                    <p><i class="fas fa-exclamation-triangle"></i> No image found in Google Sheets database</p>
+                </div>
+            `;
+            
+            showNotification('No evidence image found in database', 'warning');
+            
+            // Clean up URL after image loads
+            setTimeout(() => {
+                const img = elements.evidenceImageContainer.querySelector('img');
+                if (img) {
+                    img.onload = () => URL.revokeObjectURL(svgUrl);
+                }
+            }, 1000);
+        }
+        
+        // Close details modal
         function closeModal() {
             elements.detailsModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close evidence modal
+        function closeEvidenceModal() {
+            elements.evidenceModal.style.display = 'none';
             document.body.style.overflow = 'auto';
         }
         
@@ -2694,6 +2864,12 @@
         elements.detailsModal.addEventListener('click', function(event) {
             if (event.target === elements.detailsModal) {
                 closeModal();
+            }
+        });
+        
+        elements.evidenceModal.addEventListener('click', function(event) {
+            if (event.target === elements.evidenceModal) {
+                closeEvidenceModal();
             }
         });
         
