@@ -315,6 +315,9 @@
             justify-content: center;
             padding: 30px;
             text-align: center;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            border: 2px dashed rgba(255, 255, 255, 0.1);
         }
 
         .stream-link-title {
@@ -356,6 +359,127 @@
             font-size: 1.2rem;
         }
         
+        /* ========== QUICK ACCESS SECTION ========== */
+        .quick-access-section {
+            background: var(--dark-secondary);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .quick-access-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .quick-access-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .access-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .access-card {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .access-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3);
+        }
+
+        .access-card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .access-card-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--primary);
+        }
+
+        .access-card-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+        }
+
+        .access-card-description {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+            line-height: 1.6;
+            font-size: 0.95rem;
+        }
+
+        .access-card-link {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.05);
+            padding: 12px 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .access-card-url {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.85rem;
+            color: rgba(255, 255, 255, 0.7);
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+            flex: 1;
+        }
+
+        .access-card-button {
+            padding: 8px 15px;
+            background: linear-gradient(135deg, var(--primary), #3f51b5);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: all 0.3s;
+            text-decoration: none;
+        }
+
+        .access-card-button:hover {
+            background: linear-gradient(135deg, #0d62d9, #283593);
+            transform: translateY(-2px);
+        }
+
         /* Stats Grid */
         .stats-grid {
             display: grid;
@@ -483,7 +607,7 @@
             color: var(--success) !important;
         }
         
-        /* Calendar & Filters */
+        /* ========== CALENDAR & FILTER SECTION ========== */
         .calendar-section {
             background: var(--dark-secondary);
             border-radius: 20px;
@@ -586,6 +710,76 @@
             font-size: 0.9rem;
             color: var(--gray);
             margin-top: 5px;
+        }
+
+        /* Weekly Summary */
+        .weekly-summary {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 20px;
+        }
+
+        .weekly-summary h4 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .weekly-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .weekly-stat {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+
+        .weekly-stat-title {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .weekly-stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+        }
+
+        .weekly-stat-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .weekly-detail {
+            text-align: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .weekly-detail-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 5px;
+        }
+
+        .weekly-detail-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
         }
         
         /* Controls */
@@ -971,7 +1165,7 @@
             color: var(--primary);
         }
         
-        /* Modal */
+        /* ========== MODAL UPDATES ========== */
         .modal {
             display: none;
             position: fixed;
@@ -989,11 +1183,13 @@
         .modal-content {
             background: var(--dark-secondary);
             border-radius: 20px;
-            max-width: 600px;
+            max-width: 800px;
             width: 100%;
             overflow: hidden;
             position: relative;
             animation: modalFadeIn 0.3s ease;
+            max-height: 90vh;
+            overflow-y: auto;
         }
         
         @keyframes modalFadeIn {
@@ -1049,31 +1245,89 @@
             padding: 25px;
         }
         
-        .modal-info {
+        .modal-info-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 25px;
         }
         
-        .info-item {
+        .modal-info-item {
             background: rgba(255, 255, 255, 0.05);
-            padding: 18px;
+            padding: 20px;
             border-radius: 12px;
         }
         
-        .info-label {
+        .modal-info-label {
             font-size: 0.85rem;
             color: var(--gray);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 500;
             text-transform: uppercase;
             letter-spacing: 0.5px;
         }
         
-        .info-value {
-            font-size: 1.1rem;
+        .modal-info-value {
+            font-size: 1.2rem;
             color: white;
             font-weight: 600;
+        }
+
+        .modal-compliance-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+
+        .modal-compliance-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .modal-compliance-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+
+        .modal-evidence {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 20px;
+        }
+
+        .modal-evidence-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+
+        .modal-evidence-button {
+            padding: 12px 25px;
+            background: linear-gradient(135deg, var(--primary), #3f51b5);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            width: 100%;
+        }
+
+        .modal-evidence-button:hover {
+            background: linear-gradient(135deg, #0d62d9, #283593);
+            transform: translateY(-2px);
         }
         
         /* Loading */
@@ -1118,6 +1372,33 @@
             margin-bottom: 10px;
             color: rgba(255, 255, 255, 0.7);
         }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .access-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-info-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-compliance-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .calendar-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .weekly-stats {
+                grid-template-columns: 1fr;
+            }
+
+            .weekly-stat-details {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1157,7 +1438,7 @@
             </div>
         </div>
         
-        <!-- LIVE STREAM SECTION - DIPERMUDAH -->
+        <!-- LIVE STREAM SECTION -->
         <div class="live-stream-section">
             <div class="live-stream-header">
                 <div class="live-stream-title">
@@ -1257,6 +1538,84 @@
                 </div>
             </div>
         </div>
+
+        <!-- QUICK CCTV ACCESS SECTION -->
+        <div class="quick-access-section">
+            <div class="quick-access-header">
+                <div class="quick-access-title">
+                    <i class="fas fa-rocket"></i>
+                    QUICK CCTV ACCESS
+                </div>
+            </div>
+            
+            <div class="access-cards">
+                <!-- Mobile Access -->
+                <div class="access-card">
+                    <div class="access-card-header">
+                        <div class="access-card-icon">
+                            <i class="fas fa-mobile-alt"></i>
+                        </div>
+                        <div class="access-card-title">Mobile CCTV Access</div>
+                    </div>
+                    <div class="access-card-description">
+                        Access CCTV stream directly on your mobile device. Optimized for smartphones and tablets.
+                    </div>
+                    <div class="access-card-link">
+                        <div class="access-card-url" id="mobileUrl">https://your-domain.com/mobile-stream</div>
+                        <button class="access-card-button" onclick="copyToClipboard('mobileUrl')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <a href="#" class="access-card-button" id="mobileLink" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Open in New Tab
+                    </a>
+                </div>
+                
+                <!-- Desktop Access -->
+                <div class="access-card">
+                    <div class="access-card-header">
+                        <div class="access-card-icon">
+                            <i class="fas fa-desktop"></i>
+                        </div>
+                        <div class="access-card-title">Desktop CCTV Access</div>
+                    </div>
+                    <div class="access-card-description">
+                        Full-featured CCTV interface for desktop computers with advanced controls and monitoring.
+                    </div>
+                    <div class="access-card-link">
+                        <div class="access-card-url" id="desktopUrl">https://your-domain.com/desktop-stream</div>
+                        <button class="access-card-button" onclick="copyToClipboard('desktopUrl')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <a href="#" class="access-card-button" id="desktopLink" target="_blank">
+                        <i class="fas fa-external-link-alt"></i> Open in New Tab
+                    </a>
+                </div>
+                
+                <!-- Direct Stream -->
+                <div class="access-card">
+                    <div class="access-card-header">
+                        <div class="access-card-icon">
+                            <i class="fas fa-stream"></i>
+                        </div>
+                        <div class="access-card-title">Direct Video Stream</div>
+                    </div>
+                    <div class="access-card-description">
+                        Direct MJPEG video stream URL for integration with other applications or media players.
+                    </div>
+                    <div class="access-card-link">
+                        <div class="access-card-url" id="directUrl">https://your-domain.com/video-stream</div>
+                        <button class="access-card-button" onclick="copyToClipboard('directUrl')">
+                            <i class="fas fa-copy"></i> Copy
+                        </button>
+                    </div>
+                    <a href="#" class="access-card-button" id="directLink" target="_blank">
+                        <i class="fas fa-play-circle"></i> Open Stream
+                    </a>
+                </div>
+            </div>
+        </div>
         
         <!-- Stats Grid -->
         <div class="stats-grid">
@@ -1348,7 +1707,9 @@
                     </button>
                 </div>
             </div>
+            
             <div class="calendar-grid">
+                <!-- Today's Safety Stats -->
                 <div class="calendar-card">
                     <h4><i class="fas fa-calendar-day"></i> TODAY'S SAFETY STATS</h4>
                     <div class="calendar-stats">
@@ -1357,12 +1718,41 @@
                             <div class="calendar-stat-label">Today's Violations</div>
                         </div>
                         <div class="calendar-stat">
+                            <div class="calendar-stat-value" id="todayTotal">0</div>
+                            <div class="calendar-stat-label">Total Inspections</div>
+                        </div>
+                        <div class="calendar-stat">
                             <div class="calendar-stat-value" id="todayCompliance">0</div>
                             <div class="calendar-stat-label">Compliant Today</div>
                         </div>
                         <div class="calendar-stat">
-                            <div class="calendar-stat-value" id="todayTotal">0</div>
-                            <div class="calendar-stat-label">Total Inspections</div>
+                            <div class="calendar-stat-value" id="todayComplianceRate">0%</div>
+                            <div class="calendar-stat-label">Compliance Rate</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Weekly Safety Summary -->
+                <div class="calendar-card">
+                    <h4><i class="fas fa-chart-line"></i> WEEKLY SAFETY SUMMARY</h4>
+                    <div class="weekly-stats">
+                        <div class="weekly-stat">
+                            <div class="weekly-stat-title">Weekly Violations</div>
+                            <div class="weekly-stat-value" id="weeklyViolations">0</div>
+                        </div>
+                        <div class="weekly-stat">
+                            <div class="weekly-stat-title">Weekly Compliances</div>
+                            <div class="weekly-stat-value" id="weeklyCompliances">0</div>
+                        </div>
+                    </div>
+                    <div class="weekly-stat-details">
+                        <div class="weekly-detail">
+                            <div class="weekly-detail-label">Avg Compliance</div>
+                            <div class="weekly-detail-value" id="avgCompliance">0%</div>
+                        </div>
+                        <div class="weekly-detail">
+                            <div class="weekly-detail-label">Safety Trend</div>
+                            <div class="weekly-detail-value" id="safetyTrend">-</div>
                         </div>
                     </div>
                 </div>
@@ -1479,7 +1869,7 @@
         </div>
     </div>
     
-    <!-- Safety Violation Details Modal -->
+    <!-- Safety Compliance Details Modal -->
     <div class="modal" id="detailsModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1490,29 +1880,47 @@
                 <button class="close-modal" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="modal-info">
-                    <div class="info-item">
-                        <div class="info-label">INSPECTION TIME</div>
-                        <div class="info-value" id="modalTime">-</div>
+                <div class="modal-info-grid">
+                    <div class="modal-info-item">
+                        <div class="modal-info-label">INSPECTION DATE</div>
+                        <div class="modal-info-value" id="modalDate">01/09/2026</div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">HELMET COMPLIANCE</div>
-                        <div class="info-value">
-                            <span id="modalHelmetStatus" class="status-badge badge-danger">NO HELMET</span>
+                    <div class="modal-info-item">
+                        <div class="modal-info-label">INSPECTION TIME</div>
+                        <div class="modal-info-value" id="modalTime">03:01:21 PM</div>
+                    </div>
+                    <div class="modal-info-item">
+                        <div class="modal-info-label">EMPLOYEE ID</div>
+                        <div class="modal-info-value" id="modalEmployeeId">112</div>
+                    </div>
+                </div>
+                
+                <div class="modal-compliance-grid">
+                    <div class="modal-compliance-item">
+                        <div class="modal-compliance-label">HELMET COMPLIANCE</div>
+                        <div class="modal-info-value">
+                            <span id="modalHelmetStatus" class="status-badge badge-danger">NO HELMET - SAFETY VIOLATION</span>
                         </div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">GLOVE COMPLIANCE</div>
-                        <div class="info-value">
-                            <span id="modalGloveStatus" class="status-badge badge-danger">NO GLOVES</span>
+                    <div class="modal-compliance-item">
+                        <div class="modal-compliance-label">GLOVE COMPLIANCE</div>
+                        <div class="modal-info-value">
+                            <span id="modalGloveStatus" class="status-badge badge-success">GLOVES DETECTED</span>
                         </div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">OVERALL COMPLIANCE</div>
-                        <div class="info-value">
-                            <span id="modalCompliance" class="status-badge badge-danger">NON-COMPLIANT</span>
+                    <div class="modal-compliance-item">
+                        <div class="modal-compliance-label">OVERALL COMPLIANCE</div>
+                        <div class="modal-info-value">
+                            <span id="modalCompliance" class="status-badge badge-danger">SAFETY VIOLATION</span>
                         </div>
                     </div>
+                </div>
+                
+                <div class="modal-evidence">
+                    <div class="modal-evidence-label">EVIDENCE IMAGE</div>
+                    <button class="modal-evidence-button" onclick="viewEvidenceImage()">
+                        <i class="fas fa-image"></i> VIEW SAFETY IMAGE
+                    </button>
                 </div>
             </div>
         </div>
@@ -1523,10 +1931,10 @@
         // Configuration - GANTI INI DENGAN URL ANDA SENDIRI
         const API_URL = "https://script.google.com/macros/s/AKfycbw7aHL6T0GiigMT0h-s0je-uHiHElh0KXxRI4nd_BuKVo7N4lOYn7lNsBo7o4983PAm/exec";
         
-        // AMBIL FLASK URL DARI PARAMETER URL ATAU GUNAKAN DEFAULT UNTUK IP ANDA 192.168.1.10
+        // AMBIL FLASK URL DARI PARAMETER URL ATAU GUNAKAN DEFAULT
         const urlParams = new URLSearchParams(window.location.search);
         const flaskUrlParam = urlParams.get('flask_url');
-        const FLASK_URL = flaskUrlParam || "http://192.168.1.10:5000"; // GANTI DENGAN IP BENAR ANDA
+        const FLASK_URL = flaskUrlParam || "http://192.168.1.10:5000";
         
         console.log("Using Flask URL:", FLASK_URL);
         
@@ -1542,6 +1950,7 @@
         
         // DOM Elements
         const elements = {
+            // Stream elements
             openStreamLink: document.getElementById('openStreamLink'),
             streamStatusDot: document.getElementById('streamStatusDot'),
             streamStatusText: document.getElementById('streamStatusText'),
@@ -1549,6 +1958,16 @@
             serverConnection: document.getElementById('serverConnection'),
             lastChecked: document.getElementById('lastChecked'),
             serverIP: document.getElementById('serverIP'),
+            
+            // Quick access elements
+            mobileUrl: document.getElementById('mobileUrl'),
+            desktopUrl: document.getElementById('desktopUrl'),
+            directUrl: document.getElementById('directUrl'),
+            mobileLink: document.getElementById('mobileLink'),
+            desktopLink: document.getElementById('desktopLink'),
+            directLink: document.getElementById('directLink'),
+            
+            // Stats elements
             totalViolations: document.getElementById('totalViolations'),
             helmetViolations: document.getElementById('helmetViolations'),
             gloveViolations: document.getElementById('gloveViolations'),
@@ -1560,6 +1979,18 @@
             withGloves: document.getElementById('withGloves'),
             withoutGloves: document.getElementById('withoutGloves'),
             totalRecords: document.getElementById('totalRecords'),
+            
+            // Calendar elements
+            todayViolations: document.getElementById('todayViolations'),
+            todayTotal: document.getElementById('todayTotal'),
+            todayCompliance: document.getElementById('todayCompliance'),
+            todayComplianceRate: document.getElementById('todayComplianceRate'),
+            weeklyViolations: document.getElementById('weeklyViolations'),
+            weeklyCompliances: document.getElementById('weeklyCompliances'),
+            avgCompliance: document.getElementById('avgCompliance'),
+            safetyTrend: document.getElementById('safetyTrend'),
+            
+            // Table elements
             tableBody: document.getElementById('tableBody'),
             currentDateTimeHeader: document.getElementById('currentDateTimeHeader'),
             lastUpdate: document.getElementById('lastUpdate'),
@@ -1571,9 +2002,6 @@
             autoRefreshStatus: document.getElementById('autoRefreshStatus'),
             autoRefreshFooter: document.getElementById('autoRefreshFooter'),
             dateFilter: document.getElementById('dateFilter'),
-            todayViolations: document.getElementById('todayViolations'),
-            todayCompliance: document.getElementById('todayCompliance'),
-            todayTotal: document.getElementById('todayTotal'),
             currentPage: document.getElementById('currentPage'),
             totalPages: document.getElementById('totalPages'),
             pageStart: document.getElementById('pageStart'),
@@ -1587,8 +2015,12 @@
             nextPage: document.getElementById('nextPage'),
             lastPage: document.getElementById('lastPage'),
             pageNumbers: document.getElementById('pageNumbers'),
+            
+            // Modal elements
             detailsModal: document.getElementById('detailsModal'),
+            modalDate: document.getElementById('modalDate'),
             modalTime: document.getElementById('modalTime'),
+            modalEmployeeId: document.getElementById('modalEmployeeId'),
             modalHelmetStatus: document.getElementById('modalHelmetStatus'),
             modalGloveStatus: document.getElementById('modalGloveStatus'),
             modalCompliance: document.getElementById('modalCompliance')
@@ -1612,9 +2044,9 @@
         document.addEventListener('DOMContentLoaded', function() {
             initDateTime();
             initCalendar();
+            setupStreamLinks();
             loadData();
             testFlaskConnection();
-            setupStreamLink();
             startAutoRefresh(30000);
         });
         
@@ -1637,18 +2069,51 @@
             setInterval(updateDateTime, 1000);
         }
         
-        // Setup stream link
-        function setupStreamLink() {
+        // Setup all stream links
+        function setupStreamLinks() {
             const streamUrl = `${FLASK_URL}/video`;
+            
+            // Main stream link
             elements.openStreamLink.href = streamUrl;
             elements.openStreamLink.addEventListener('click', function(e) {
                 e.preventDefault();
                 window.open(streamUrl, '_blank', 'noopener,noreferrer');
                 showNotification('Opening live stream in new tab...', 'info');
             });
+            
+            // Quick access links
+            elements.mobileUrl.textContent = streamUrl;
+            elements.desktopUrl.textContent = streamUrl;
+            elements.directUrl.textContent = streamUrl;
+            
+            elements.mobileLink.href = streamUrl;
+            elements.desktopLink.href = streamUrl;
+            elements.directLink.href = streamUrl;
+            
+            // Add click handlers for quick access links
+            [elements.mobileLink, elements.desktopLink, elements.directLink].forEach(link => {
+                link.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    window.open(streamUrl, '_blank', 'noopener,noreferrer');
+                    showNotification('Opening CCTV stream in new tab...', 'info');
+                });
+            });
         }
         
-        // Test Flask connection dengan CORS handling
+        // Copy URL to clipboard
+        function copyToClipboard(elementId) {
+            const element = document.getElementById(elementId);
+            const text = element.textContent;
+            
+            navigator.clipboard.writeText(text).then(() => {
+                showNotification('URL copied to clipboard!', 'success');
+            }).catch(err => {
+                console.error('Failed to copy: ', err);
+                showNotification('Failed to copy URL', 'error');
+            });
+        }
+        
+        // Test Flask connection
         async function testFlaskConnection() {
             try {
                 updateCCTVStatus('loading', 'Testing Flask connection...');
@@ -1672,10 +2137,11 @@
                     isFlaskConnected = true;
                     updateCCTVStatus('connected', `Flask Connected: ${data.cctv_status || 'OK'}`);
                     
-                    // Update IP display dengan IP yang betul
+                    // Update IP display
                     const url = new URL(FLASK_URL);
                     elements.serverIP.textContent = `${url.hostname}:${url.port || '5000'}`;
                     elements.serverConnection.textContent = 'Connected';
+                    elements.serverConnection.style.color = '#34a853';
                     elements.lastChecked.textContent = new Date().toLocaleTimeString();
                 } else {
                     throw new Error(`HTTP ${response.status}`);
@@ -1688,7 +2154,6 @@
                 elements.serverConnection.textContent = 'Disconnected';
                 elements.serverConnection.style.color = '#ea4335';
                 
-                // Tunjukkan cara connect dalam alert
                 setTimeout(() => {
                     showNotification(`Cannot connect to Flask server at ${FLASK_URL}. Please check if Flask is running.`, 'error');
                 }, 1000);
@@ -1770,6 +2235,7 @@
                 
                 updateStatistics(data.stats);
                 updateCalendarStats();
+                updateWeeklyStats();
                 
                 currentPage = 1;
                 updateTableWithPagination();
@@ -1829,10 +2295,29 @@
                     }
                 }
                 
+                // Split datetime into date and time
+                let dateOnly = '';
+                let timeOnly = '';
+                if (datetime) {
+                    const parts = datetime.split(', ');
+                    if (parts.length === 2) {
+                        dateOnly = parts[0];
+                        timeOnly = parts[1];
+                    } else {
+                        dateOnly = datetime;
+                        timeOnly = '';
+                    }
+                }
+                
+                // Generate random employee ID if not exists
+                const employeeId = item.employeeId || Math.floor(100 + Math.random() * 900).toString();
+                
                 return {
                     ...item,
                     datetime: datetime,
-                    dateOnly: datetime ? datetime.split(',')[0] : '',
+                    dateOnly: dateOnly,
+                    timeOnly: timeOnly,
+                    employeeId: employeeId,
                     helmetStatus: (item.helmetStatus || '').toLowerCase().trim(),
                     gloveStatus: (item.gloveStatus || '').toLowerCase().trim()
                 };
@@ -1877,9 +2362,74 @@
                 item.helmetStatus === 'helmet' && item.gloveStatus === 'glove'
             ).length;
             
+            const totalToday = todayData.length;
+            const complianceRate = totalToday > 0 ? Math.round((todayCompliance / totalToday) * 100) : 0;
+            
             elements.todayViolations.textContent = todayViolations;
             elements.todayCompliance.textContent = todayCompliance;
-            elements.todayTotal.textContent = todayData.length;
+            elements.todayTotal.textContent = totalToday;
+            elements.todayComplianceRate.textContent = `${complianceRate}%`;
+        }
+        
+        // Update weekly statistics
+        function updateWeeklyStats() {
+            const now = new Date();
+            const oneWeekAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000);
+            
+            const weeklyData = allData.filter(item => {
+                try {
+                    const itemDate = new Date(item.datetime);
+                    return itemDate >= oneWeekAgo && itemDate <= now;
+                } catch (e) {
+                    return false;
+                }
+            });
+            
+            const weeklyViolations = weeklyData.filter(item => 
+                item.helmetStatus.includes('no') || item.gloveStatus.includes('no')
+            ).length;
+            
+            const weeklyCompliances = weeklyData.filter(item => 
+                item.helmetStatus === 'helmet' && item.gloveStatus === 'glove'
+            ).length;
+            
+            const totalWeekly = weeklyData.length;
+            const avgCompliance = totalWeekly > 0 ? Math.round((weeklyCompliances / totalWeekly) * 100) : 0;
+            
+            // Determine safety trend
+            let safetyTrend = 'Stable';
+            if (weeklyData.length > 0) {
+                // Simple trend calculation (could be more sophisticated)
+                const yesterday = new Date(now.getTime() - 24 * 60 * 60 * 1000);
+                const yesterdayStr = yesterday.toISOString().split('T')[0];
+                
+                const yesterdayData = allData.filter(item => {
+                    try {
+                        const itemDate = new Date(item.datetime);
+                        return itemDate.toISOString().split('T')[0] === yesterdayStr;
+                    } catch (e) {
+                        return false;
+                    }
+                });
+                
+                const yesterdayCompliance = yesterdayData.filter(item => 
+                    item.helmetStatus === 'helmet' && item.gloveStatus === 'glove'
+                ).length;
+                
+                const yesterdayTotal = yesterdayData.length;
+                const yesterdayRate = yesterdayTotal > 0 ? Math.round((yesterdayCompliance / yesterdayTotal) * 100) : 0;
+                
+                if (avgCompliance > yesterdayRate + 5) safetyTrend = 'Improving ↑';
+                else if (avgCompliance < yesterdayRate - 5) safetyTrend = 'Declining ↓';
+                else safetyTrend = 'Stable →';
+            }
+            
+            elements.weeklyViolations.textContent = weeklyViolations;
+            elements.weeklyCompliances.textContent = weeklyCompliances;
+            elements.avgCompliance.textContent = `${avgCompliance}%`;
+            elements.safetyTrend.textContent = safetyTrend;
+            elements.safetyTrend.style.color = safetyTrend.includes('Improving') ? '#34a853' : 
+                                             safetyTrend.includes('Declining') ? '#ea4335' : '#fbbc05';
         }
         
         // Update table with pagination
@@ -1956,21 +2506,24 @@
                 const iconType = isCompliant ? 'fa-check-circle' : 'fa-exclamation-triangle';
                 const buttonText = isCompliant ? 'COMPLIANT' : 'VIOLATION';
                 
-                const iconButtonHTML = `
-                    <button class="ppe-icon-btn ${iconButtonClass}" 
-                            onclick="openDetailsModal('${formattedTime.replace(/'/g, "\\'")}', 
-                                    '${item.helmetStatus}', '${item.gloveStatus}')"
-                            title="Click to view safety compliance details">
-                        <i class="fas ${iconType}"></i>
-                        <span>${buttonText}</span>
-                    </button>
-                `;
-                
                 tableHTML += `
                     <tr>
                         <td class="row-number">${globalIndex + 1}</td>
                         <td class="datetime-cell">${formattedTime}</td>
-                        <td class="image-cell">${iconButtonHTML}</td>
+                        <td class="image-cell">
+                            <button class="ppe-icon-btn ${iconButtonClass}" 
+                                    onclick="openDetailsModal(
+                                        '${item.dateOnly || ''}',
+                                        '${item.timeOnly || ''}',
+                                        '${item.helmetStatus}',
+                                        '${item.gloveStatus}',
+                                        '${item.employeeId || 'N/A'}'
+                                    )"
+                                    title="Click to view safety compliance details">
+                                <i class="fas ${iconType}"></i>
+                                <span>${buttonText}</span>
+                            </button>
+                        </td>
                         <td><span class="status-badge ${helmetBadgeClass}">${helmetText}</span></td>
                         <td><span class="status-badge ${gloveBadgeClass}">${gloveText}</span></td>
                         <td><span class="status-badge ${complianceBadgeClass}">${complianceText}</span></td>
@@ -2078,6 +2631,7 @@
             currentPage = 1;
             updateTableWithPagination();
             updateCalendarStats();
+            updateWeeklyStats();
             showNotification(`Filtered by date: ${selectedDate}`, 'info');
         }
         
@@ -2089,12 +2643,15 @@
             currentPage = 1;
             updateTableWithPagination();
             updateCalendarStats();
+            updateWeeklyStats();
             showNotification('Date filter cleared', 'info');
         }
         
-        // Open details modal
-        function openDetailsModal(time, helmetStatus, gloveStatus) {
-            elements.modalTime.textContent = time;
+        // Open details modal with enhanced information
+        function openDetailsModal(date, time, helmetStatus, gloveStatus, employeeId) {
+            elements.modalDate.textContent = date || 'N/A';
+            elements.modalTime.textContent = time || 'N/A';
+            elements.modalEmployeeId.textContent = employeeId || 'N/A';
             
             const isHelmetOK = helmetStatus === 'helmet';
             const helmetBadgeClass = isHelmetOK ? 'badge-success' : 'badge-danger';
@@ -2116,6 +2673,15 @@
             
             elements.detailsModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
+        }
+        
+        // View evidence image
+        function viewEvidenceImage() {
+            // In a real system, this would open the actual evidence image
+            // For demo, we'll open a placeholder
+            const placeholderUrl = 'https://via.placeholder.com/800x600/1a237e/ffffff?text=PPE+Safety+Evidence+Image';
+            window.open(placeholderUrl, '_blank');
+            showNotification('Opening evidence image...', 'info');
         }
         
         // Close modal
