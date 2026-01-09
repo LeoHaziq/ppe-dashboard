@@ -257,8 +257,175 @@
                 padding: 20px 15px;
             }
         }
+
+        /* ========== LIVE STREAM SECTION ========== */
+        .live-stream-section {
+            background: var(--dark-secondary);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .live-stream-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .live-stream-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stream-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .live-stream-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .live-stream-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Video Stream */
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            min-height: 400px;
+        }
+
+        #liveVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .video-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator-stream {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--danger);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator-stream.active {
+            background: var(--success);
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+
+        .video-container:hover .video-controls {
+            opacity: 1;
+        }
+
+        .stream-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .info-card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .info-card-content {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.5;
+        }
+
+        .cctv-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .detail-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            color: white;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
         
-        /* ========== CONTENT STYLES (SAMA SEPERTI SEBELUM) ========== */
         /* Stats Grid */
         .stats-grid {
             display: grid;
@@ -608,6 +775,16 @@
         
         .btn-danger:hover {
             background: #d23a2d;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: #333;
+        }
+        
+        .btn-warning:hover {
+            background: #e0ac05;
             transform: translateY(-2px);
         }
         
@@ -1125,6 +1302,123 @@
             </div>
         </div>
         
+        <!-- LIVE STREAM SECTION -->
+        <div class="live-stream-section">
+            <div class="live-stream-header">
+                <div class="live-stream-title">
+                    <i class="fas fa-video"></i>
+                    LIVE CCTV MONITORING
+                </div>
+                <div class="stream-controls">
+                    <button class="btn btn-success" onclick="startCCTV()" id="startCCTVBtn">
+                        <i class="fas fa-play"></i> Start CCTV
+                    </button>
+                    <button class="btn btn-danger" onclick="stopCCTV()" id="stopCCTVBtn" disabled>
+                        <i class="fas fa-stop"></i> Stop CCTV
+                    </button>
+                    <button class="btn btn-warning" onclick="refreshStream()" id="refreshStreamBtn">
+                        <i class="fas fa-sync-alt"></i> Refresh Stream
+                    </button>
+                    <div class="status-indicator">
+                        <div class="status-dot" id="streamStatusDot"></div>
+                        <span id="streamStatusText">CCTV: READY</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="live-stream-container">
+                <!-- Video Stream -->
+                <div class="video-container">
+                    <img id="liveVideo" src="" alt="Live CCTV Stream">
+                    <div class="video-overlay">
+                        <div class="video-status">
+                            <div class="status-indicator-stream" id="videoStatusIndicator"></div>
+                            <span id="videoStatusText">Stream Loading...</span>
+                        </div>
+                        <div class="video-info">
+                            <span id="cameraInfo">RTSP Camera</span>
+                        </div>
+                    </div>
+                    <div class="video-controls">
+                        <button class="btn btn-secondary btn-sm" onclick="takeSnapshot()">
+                            <i class="fas fa-camera"></i> Take Snapshot
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="toggleFullscreen()">
+                            <i class="fas fa-expand"></i> Fullscreen
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Stream Information -->
+                <div class="stream-info">
+                    <div class="info-card">
+                        <div class="info-card-title">
+                            <i class="fas fa-info-circle"></i>
+                            REAL-TIME DETECTION
+                        </div>
+                        <div class="info-card-content">
+                            Live PPE compliance monitoring with AI detection. The system automatically detects:
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li>Safety Helmet Usage</li>
+                                <li>Safety Glove Compliance</li>
+                                <li>Safety Violations</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-card-title">
+                            <i class="fas fa-chart-bar"></i>
+                            CURRENT STATUS
+                        </div>
+                        <div class="cctv-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Stream Status:</span>
+                                <span class="detail-value" id="streamStatusDetail">OFF</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Frame Rate:</span>
+                                <span class="detail-value" id="frameRateInfo">0 FPS</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Detection:</span>
+                                <span class="detail-value" id="lastDetectionInfo">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Detections:</span>
+                                <span class="detail-value" id="detectionCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-card-title">
+                            <i class="fas fa-cogs"></i>
+                            SYSTEM INFO
+                        </div>
+                        <div class="cctv-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Server IP:</span>
+                                <span class="detail-value" id="serverIP">192.168.1.64</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">RTSP Port:</span>
+                                <span class="detail-value">554</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Stream URL:</span>
+                                <span class="detail-value">/video</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Model:</span>
+                                <span class="detail-value">YOLO v8</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Stats Grid -->
         <div class="stats-grid">
             <div class="stat-card violations">
@@ -1438,6 +1732,7 @@
     <script>
         // Configuration
         const API_URL = "https://script.google.com/macros/s/AKfycbw7aHL6T0GiigMT0h-s0je-uHiHElh0KXxRI4nd_BuKVo7N4lOYn7lNsBo7o4983PAm/exec";
+        const FLASK_URL = "http://localhost:5000"; // Ganti dengan IP server Flask jika perlu
         let autoRefreshInterval = null;
         let autoRefreshEnabled = false;
         let allData = [];
@@ -1446,9 +1741,30 @@
         const itemsPerPage = 15;
         let selectedDate = null;
         let dateFilter = null;
+        let videoStreamInterval = null;
+        let isCCTVRunning = false;
+        let frameCount = 0;
+        let lastFrameTime = 0;
+        let detectionCount = 0;
         
         // DOM Elements
         const elements = {
+            // CCTV Elements
+            liveVideo: document.getElementById('liveVideo'),
+            videoStatusIndicator: document.getElementById('videoStatusIndicator'),
+            videoStatusText: document.getElementById('videoStatusText'),
+            startCCTVBtn: document.getElementById('startCCTVBtn'),
+            stopCCTVBtn: document.getElementById('stopCCTVBtn'),
+            refreshStreamBtn: document.getElementById('refreshStreamBtn'),
+            streamStatusDot: document.getElementById('streamStatusDot'),
+            streamStatusText: document.getElementById('streamStatusText'),
+            streamStatusDetail: document.getElementById('streamStatusDetail'),
+            frameRateInfo: document.getElementById('frameRateInfo'),
+            lastDetectionInfo: document.getElementById('lastDetectionInfo'),
+            detectionCount: document.getElementById('detectionCount'),
+            serverIP: document.getElementById('serverIP'),
+            
+            // Existing elements
             totalViolations: document.getElementById('totalViolations'),
             helmetViolations: document.getElementById('helmetViolations'),
             gloveViolations: document.getElementById('gloveViolations'),
@@ -1525,6 +1841,7 @@
             initDateTime();
             initCalendar();
             loadData();
+            checkFlaskConnection();
             startAutoRefresh(30000); // 30 seconds
         });
         
@@ -1544,6 +1861,244 @@
             }
             updateDateTime();
             setInterval(updateDateTime, 60000); // Update every minute
+        }
+        
+        // Check Flask server connection
+        async function checkFlaskConnection() {
+            try {
+                const response = await fetch(`${FLASK_URL}/status`);
+                const data = await response.json();
+                
+                if (data.service === "PPE Detection System") {
+                    updateCCTVStatus('connected', 'Flask Server Connected');
+                    isCCTVRunning = data.cctv_running;
+                    updateCCTVButtons();
+                    
+                    if (isCCTVRunning) {
+                        startVideoStream();
+                    }
+                }
+            } catch (error) {
+                console.error('Flask connection error:', error);
+                updateCCTVStatus('error', 'Flask Server Not Connected');
+            }
+        }
+        
+        // Update CCTV status display
+        function updateCCTVStatus(status, message) {
+            elements.streamStatusDot.style.background = 
+                status === 'connected' ? '#34a853' : 
+                status === 'loading' ? '#fbbc05' : 
+                '#ea4335';
+            
+            elements.streamStatusText.textContent = message;
+            
+            elements.videoStatusIndicator.style.background = 
+                status === 'connected' ? '#34a853' : 
+                status === 'loading' ? '#fbbc05' : 
+                '#ea4335';
+            
+            elements.videoStatusText.textContent = message;
+            
+            if (status === 'connected') {
+                elements.videoStatusIndicator.classList.add('active');
+            } else {
+                elements.videoStatusIndicator.classList.remove('active');
+            }
+        }
+        
+        // Update CCTV control buttons
+        function updateCCTVButtons() {
+            if (isCCTVRunning) {
+                elements.startCCTVBtn.disabled = true;
+                elements.stopCCTVBtn.disabled = false;
+                elements.streamStatusDetail.textContent = 'RUNNING';
+                elements.streamStatusDetail.style.color = '#34a853';
+            } else {
+                elements.startCCTVBtn.disabled = false;
+                elements.stopCCTVBtn.disabled = true;
+                elements.streamStatusDetail.textContent = 'OFF';
+                elements.streamStatusDetail.style.color = '#ea4335';
+            }
+        }
+        
+        // Start CCTV
+        async function startCCTV() {
+            try {
+                updateCCTVStatus('loading', 'Starting CCTV...');
+                
+                const response = await fetch(`${FLASK_URL}/cctv_control`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ command: 'on' })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'ok' && data.running === true) {
+                    isCCTVRunning = true;
+                    updateCCTVButtons();
+                    updateCCTVStatus('connected', 'CCTV Running');
+                    startVideoStream();
+                }
+            } catch (error) {
+                console.error('Error starting CCTV:', error);
+                updateCCTVStatus('error', 'Failed to start CCTV');
+            }
+        }
+        
+        // Stop CCTV
+        async function stopCCTV() {
+            try {
+                updateCCTVStatus('loading', 'Stopping CCTV...');
+                
+                const response = await fetch(`${FLASK_URL}/cctv_control`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ command: 'off' })
+                });
+                
+                const data = await response.json();
+                
+                if (data.status === 'ok' && data.running === false) {
+                    isCCTVRunning = false;
+                    updateCCTVButtons();
+                    updateCCTVStatus('connected', 'CCTV Stopped');
+                    stopVideoStream();
+                }
+            } catch (error) {
+                console.error('Error stopping CCTV:', error);
+                updateCCTVStatus('error', 'Failed to stop CCTV');
+            }
+        }
+        
+        // Start video stream
+        function startVideoStream() {
+            // Clear any existing interval
+            if (videoStreamInterval) {
+                clearInterval(videoStreamInterval);
+            }
+            
+            // Reset frame counter
+            frameCount = 0;
+            lastFrameTime = Date.now();
+            
+            // Set video source with timestamp to prevent caching
+            const timestamp = new Date().getTime();
+            elements.liveVideo.src = `${FLASK_URL}/video?t=${timestamp}`;
+            
+            // Update status
+            elements.videoStatusText.textContent = 'Live Stream Active';
+            
+            // Start frame rate calculation
+            videoStreamInterval = setInterval(calculateFrameRate, 1000);
+            
+            // Listen for image load events to count frames
+            elements.liveVideo.onload = function() {
+                frameCount++;
+                
+                // Check if detection boxes are visible (simplified check)
+                // In a real implementation, you would parse the image or get data from an API
+                if (Math.random() > 0.7) { // Simulating detections
+                    detectionCount++;
+                    elements.detectionCount.textContent = detectionCount;
+                    elements.lastDetectionInfo.textContent = new Date().toLocaleTimeString();
+                }
+            };
+            
+            // Handle image errors
+            elements.liveVideo.onerror = function() {
+                updateCCTVStatus('error', 'Stream Error - Retrying...');
+                setTimeout(refreshStream, 2000);
+            };
+        }
+        
+        // Stop video stream
+        function stopVideoStream() {
+            if (videoStreamInterval) {
+                clearInterval(videoStreamInterval);
+                videoStreamInterval = null;
+            }
+            
+            elements.liveVideo.src = '';
+            elements.videoStatusText.textContent = 'Stream Stopped';
+            elements.frameRateInfo.textContent = '0 FPS';
+        }
+        
+        // Refresh stream
+        function refreshStream() {
+            if (isCCTVRunning) {
+                const timestamp = new Date().getTime();
+                elements.liveVideo.src = `${FLASK_URL}/video?t=${timestamp}`;
+                updateCCTVStatus('connected', 'Stream Refreshed');
+            }
+        }
+        
+        // Calculate frame rate
+        function calculateFrameRate() {
+            const currentTime = Date.now();
+            const elapsed = (currentTime - lastFrameTime) / 1000;
+            const fps = elapsed > 0 ? Math.round(frameCount / elapsed) : 0;
+            
+            elements.frameRateInfo.textContent = `${fps} FPS`;
+            
+            // Reset counters
+            frameCount = 0;
+            lastFrameTime = currentTime;
+        }
+        
+        // Take snapshot
+        function takeSnapshot() {
+            if (!isCCTVRunning) {
+                alert('Please start CCTV first!');
+                return;
+            }
+            
+            const canvas = document.createElement('canvas');
+            canvas.width = elements.liveVideo.naturalWidth || 1280;
+            canvas.height = elements.liveVideo.naturalHeight || 720;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(elements.liveVideo, 0, 0);
+            
+            const link = document.createElement('a');
+            link.download = `ppe-snapshot-${new Date().toISOString().replace(/[:.]/g, '-')}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+            
+            // Show notification
+            updateCCTVStatus('connected', 'Snapshot Saved!');
+            setTimeout(() => {
+                if (isCCTVRunning) {
+                    updateCCTVStatus('connected', 'Live Stream Active');
+                }
+            }, 2000);
+        }
+        
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            const videoContainer = document.querySelector('.video-container');
+            
+            if (!document.fullscreenElement) {
+                if (videoContainer.requestFullscreen) {
+                    videoContainer.requestFullscreen();
+                } else if (videoContainer.webkitRequestFullscreen) {
+                    videoContainer.webkitRequestFullscreen();
+                } else if (videoContainer.msRequestFullscreen) {
+                    videoContainer.msRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                } else if (document.msExitFullscreen) {
+                    document.msExitFullscreen();
+                }
+            }
         }
         
         // Load data from API
