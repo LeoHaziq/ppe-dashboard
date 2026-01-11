@@ -1529,7 +1529,7 @@
                         <div class="cctv-details">
                             <div class="detail-item">
                                 <span class="detail-label">Server IP:</span>
-                                <span class="detail-value" id="serverIP">192.168.1.10:5000</span>
+                                <span class="detail-value" id="serverIP">10.42.0.253:5000</span>
                             </div>
                             <div class="detail-item">
                                 <span class="detail-label">RTSP Port:</span>
@@ -1590,7 +1590,7 @@
                         Access CCTV stream directly on your mobile device. Optimized for smartphones and tablets.
                     </div>
                     <div class="access-card-link">
-                        <div class="access-card-url" id="mobileUrl">https://your-domain.com/mobile-stream</div>
+                        <div class="access-card-url" id="mobileUrl">http://10.42.0.253:5000</div>
                         <button class="access-card-button" onclick="copyToClipboard('mobileUrl')">
                             <i class="fas fa-copy"></i> Copy
                         </button>
@@ -1612,7 +1612,7 @@
                         Full-featured CCTV interface for desktop computers with advanced controls and monitoring.
                     </div>
                     <div class="access-card-link">
-                        <div class="access-card-url" id="desktopUrl">https://your-domain.com/desktop-stream</div>
+                        <div class="access-card-url" id="desktopUrl">http://10.42.0.253:5000</div>
                         <button class="access-card-button" onclick="copyToClipboard('desktopUrl')">
                             <i class="fas fa-copy"></i> Copy
                         </button>
@@ -1634,7 +1634,7 @@
                         Direct MJPEG video stream URL for integration with other applications or media players.
                     </div>
                     <div class="access-card-link">
-                        <div class="access-card-url" id="directUrl">https://your-domain.com/video-stream</div>
+                        <div class="access-card-url" id="directUrl">http://10.42.0.253:5000/video</div>
                         <button class="access-card-button" onclick="copyToClipboard('directUrl')">
                             <i class="fas fa-copy"></i> Copy
                         </button>
@@ -1973,7 +1973,7 @@
                     </div>
                 </div>
                 <div class="evidence-info">
-                    <p><i class="fas fa-info-circle"></i> This image is retrieved from Google Sheets database.</p>
+                    <p><i class="fas fa-info-circle"></i> This image is retrieved from Local Database.</p>
                 </div>
             </div>
         </div>
@@ -1981,13 +1981,8 @@
     
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        // Configuration - GANTI INI DENGAN URL ANDA SENDIRI
-        const API_URL ="https://script.google.com/macros/s/AKfycbzSufvXwwcz_e7M5J8rEqXyUWbPfnlrW7GaB-tpLp2h2_hf2w6ZOwgnWx0IgAmBmmci/exec";
-        
-        // AMBIL FLASK URL DARI PARAMETER URL ATAU GUNAKAN DEFAULT
-        const urlParams = new URLSearchParams(window.location.search);
-        const flaskUrlParam = urlParams.get('flask_url');
-        const FLASK_URL = flaskUrlParam || "http://192.168.1.10:5000";
+        // Configuration - GANTI DENGAN URL FLASK ANDA
+        const FLASK_URL = "http://10.42.0.253:5000";
         
         console.log("Using Flask URL:", FLASK_URL);
         
@@ -2128,32 +2123,38 @@
         // Setup all stream links
         function setupStreamLinks() {
             const streamUrl = `${FLASK_URL}/video`;
+            const mainUrl = `${FLASK_URL}`;
             
             // Main stream link
-            elements.openStreamLink.href = streamUrl;
+            elements.openStreamLink.href = mainUrl;
             elements.openStreamLink.addEventListener('click', function(e) {
                 e.preventDefault();
-                window.open(streamUrl, '_blank', 'noopener,noreferrer');
+                window.open(mainUrl, '_blank', 'noopener,noreferrer');
                 showNotification('Opening live stream in new tab...', 'info');
             });
             
             // Quick access links
-            elements.mobileUrl.textContent = streamUrl;
-            elements.desktopUrl.textContent = streamUrl;
+            elements.mobileUrl.textContent = mainUrl;
+            elements.desktopUrl.textContent = mainUrl;
             elements.directUrl.textContent = streamUrl;
             
-            elements.mobileLink.href = streamUrl;
-            elements.desktopLink.href = streamUrl;
+            elements.mobileLink.href = mainUrl;
+            elements.desktopLink.href = mainUrl;
             elements.directLink.href = streamUrl;
             
             // Add click handlers for quick access links
             [elements.mobileLink, elements.desktopLink, elements.directLink].forEach(link => {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
-                    window.open(streamUrl, '_blank', 'noopener,noreferrer');
+                    const url = link === elements.directLink ? streamUrl : mainUrl;
+                    window.open(url, '_blank', 'noopener,noreferrer');
                     showNotification('Opening CCTV stream in new tab...', 'info');
                 });
             });
+            
+            // Update server IP display
+            const url = new URL(FLASK_URL);
+            elements.serverIP.textContent = `${url.hostname}:${url.port || '5000'}`;
         }
         
         // Copy URL to clipboard
@@ -2199,6 +2200,11 @@
                     elements.serverConnection.textContent = 'Connected';
                     elements.serverConnection.style.color = '#34a853';
                     elements.lastChecked.textContent = new Date().toLocaleTimeString();
+                    
+                    // Update stats from Flask status
+                    if (data.detections !== undefined) {
+                        elements.totalRecords.textContent = data.detections || 0;
+                    }
                 } else {
                     throw new Error(`HTTP ${response.status}`);
                 }
@@ -2265,17 +2271,17 @@
             }, 3000);
         }
         
-        // Load data from API
+        // Load data from Flask API (DATABASE)
         async function loadData() {
             try {
                 const originalText = elements.refreshBtn.innerHTML;
                 elements.refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
                 elements.refreshBtn.disabled = true;
                 
-                updateStatus('loading', 'Loading safety data...');
+                updateStatus('loading', 'Loading safety data from database...');
                 
-                // TAMBAHKAN PARAMETER UNTUK MENGAMBIL SEMUA DATA TERMASUK GAMBAR
-                const response = await fetch(`${API_URL}?action=getAllData&includeImages=true&t=${Date.now()}`);
+                // TAMBAHKAN ENDPOINT BARU DI FLASK UNTUK MENGAMBIL DATA DARI DATABASE
+                const response = await fetch(`${FLASK_URL}/get_detections`);
                 
                 if (!response.ok) {
                     throw new Error(`HTTP error! status: ${response.status}`);
@@ -2287,11 +2293,12 @@
                     throw new Error(data.error || 'Failed to load safety data');
                 }
                 
-                // PROSES DATA DENGAN MENAMBAHKAN IMAGE URL
-                allData = processDataWithImages(data.data);
+                // PROSES DATA DARI DATABASE LOKAL
+                allData = processDataFromDatabase(data.data || []);
                 filteredData = [...allData];
                 
-                updateStatistics(data.stats);
+                // Update statistics
+                updateStatistics();
                 updateCalendarStats();
                 updateWeeklyStats();
                 
@@ -2305,9 +2312,9 @@
                     second: '2-digit'
                 });
                 
-                updateStatus('success', 'Connected to Safety System');
+                updateStatus('success', 'Connected to Local Database');
                 
-                showNotification('Safety data loaded successfully', 'success');
+                showNotification(`Loaded ${allData.length} safety records from database`, 'success');
                 
             } catch (error) {
                 console.error('Error loading safety data:', error);
@@ -2319,6 +2326,7 @@
                                 <i class="fas fa-exclamation-triangle"></i>
                                 <h4>Failed to Load Safety Data</h4>
                                 <p>${error.message}</p>
+                                <p>Please ensure Flask server is running and database is accessible.</p>
                                 <button class="btn btn-primary" onclick="loadData()" style="margin-top: 20px;">
                                     <i class="fas fa-redo"></i> Retry Connection
                                 </button>
@@ -2327,7 +2335,7 @@
                     </tr>
                 `;
                 
-                updateStatus('error', 'Safety System Connection Error');
+                updateStatus('error', 'Database Connection Error');
                 showNotification('Failed to load safety data: ' + error.message, 'error');
                 
             } finally {
@@ -2336,61 +2344,58 @@
             }
         }
         
-        // Process data with images from Google Sheets
-        function processDataWithImages(data) {
+        // Process data from local database
+        function processDataFromDatabase(data) {
             return data.map(item => {
-                let datetime = item.datetime || item.timestamp;
-                if (!datetime && item.timestamp) {
+                // Format datetime
+                let datetime = item.timestamp || item.datetime || '';
+                let dateOnly = '';
+                let timeOnly = '';
+                
+                if (datetime) {
                     try {
-                        const date = new Date(item.timestamp);
-                        datetime = date.toLocaleString('en-US', {
+                        const date = new Date(datetime);
+                        dateOnly = date.toLocaleDateString('en-US', {
                             year: 'numeric',
                             month: '2-digit',
-                            day: '2-digit',
+                            day: '2-digit'
+                        });
+                        timeOnly = date.toLocaleTimeString('en-US', {
                             hour: '2-digit',
                             minute: '2-digit',
                             second: '2-digit'
                         });
                     } catch (e) {
-                        datetime = 'Invalid Date';
-                    }
-                }
-                
-                // Split datetime into date and time
-                let dateOnly = '';
-                let timeOnly = '';
-                if (datetime) {
-                    const parts = datetime.split(', ');
-                    if (parts.length === 2) {
-                        dateOnly = parts[0];
-                        timeOnly = parts[1];
-                    } else {
-                        dateOnly = datetime;
-                        timeOnly = '';
+                        // Try to parse manually if automatic parsing fails
+                        const parts = datetime.split(' ');
+                        if (parts.length >= 2) {
+                            dateOnly = parts[0];
+                            timeOnly = parts[1];
+                        } else {
+                            dateOnly = datetime;
+                            timeOnly = '';
+                        }
                     }
                 }
                 
                 // Generate random employee ID if not exists
-                const employeeId = item.employeeId || Math.floor(100 + Math.random() * 900).toString();
+                const employeeId = item.employeeId || `EMP${Math.floor(100 + Math.random() * 900)}`;
                 
-                // MENGAMBIL URL GAMBAR DARI GOOGLE SHEETS
-                // Periksa berbagai kemungkinan field yang mungkin berisi URL gambar
-                const imageUrl = item.imageUrl || item.photoUrl || item.evidenceUrl || 
-                                item.image_link || item.photo_link || item.drive_url || 
-                                item.gdrive_link || item.image || '';
+                // Get image path from database
+                const imagePath = item.image_path || '';
+                let imageUrl = '';
                 
-                // Jika imageUrl adalah ID Google Drive, konversi ke URL yang dapat diakses
-                let processedImageUrl = imageUrl;
-                if (imageUrl && imageUrl.startsWith('http')) {
-                    // URL sudah valid
-                    processedImageUrl = imageUrl;
-                } else if (imageUrl && imageUrl.includes('google.com') || imageUrl.includes('drive.google.com')) {
-                    // URL Google Drive
-                    processedImageUrl = imageUrl;
-                } else if (imageUrl && imageUrl.length > 10) {
-                    // Mungkin ID file Google Drive
-                    processedImageUrl = `https://drive.google.com/uc?id=${imageUrl}`;
+                // Convert local image path to URL
+                if (imagePath && imagePath !== 'save_failed') {
+                    const filename = imagePath.split('/').pop();
+                    imageUrl = `${FLASK_URL}/view_image/${filename}`;
                 }
+                
+                // Determine helmet and glove status
+                const helmetStatus = (item.helmet_status || '').toLowerCase().trim();
+                const gloveStatus = (item.glove_status || '').toLowerCase().trim();
+                const detectionType = item.detection_type || '';
+                const boxCount = item.box_count || 0;
                 
                 return {
                     ...item,
@@ -2398,28 +2403,43 @@
                     dateOnly: dateOnly,
                     timeOnly: timeOnly,
                     employeeId: employeeId,
-                    imageUrl: processedImageUrl, // Simpan URL gambar yang sudah diproses
-                    originalImageUrl: imageUrl, // Simpan URL asli untuk referensi
-                    helmetStatus: (item.helmetStatus || '').toLowerCase().trim(),
-                    gloveStatus: (item.gloveStatus || '').toLowerCase().trim()
+                    imageUrl: imageUrl,
+                    imagePath: imagePath,
+                    helmetStatus: helmetStatus,
+                    gloveStatus: gloveStatus,
+                    detectionType: detectionType,
+                    boxCount: boxCount
                 };
+            }).sort((a, b) => {
+                // Sort by datetime descending (newest first)
+                return new Date(b.datetime) - new Date(a.datetime);
             });
         }
         
-        // Update statistics display
-        function updateStatistics(stats) {
-            elements.totalViolations.textContent = stats.totalViolations || 0;
-            elements.helmetViolations.textContent = stats.helmetViolations || 0;
-            elements.gloveViolations.textContent = stats.gloveViolations || 0;
-            elements.fullPPE.textContent = stats.fullPPE || 0;
-            elements.helmetOK.textContent = stats.helmetOK || 0;
-            elements.gloveOK.textContent = stats.gloveOK || 0;
-            elements.totalRecords.textContent = stats.total || 0;
+        // Update statistics display from local data
+        function updateStatistics() {
+            const total = allData.length;
+            const helmetViolations = allData.filter(item => item.helmetStatus === 'no_helmet').length;
+            const gloveViolations = allData.filter(item => item.gloveStatus === 'no_glove').length;
+            const fullPPE = allData.filter(item => 
+                item.helmetStatus === 'helmet' && item.gloveStatus === 'glove'
+            ).length;
+            const helmetOK = allData.filter(item => item.helmetStatus === 'helmet').length;
+            const gloveOK = allData.filter(item => item.gloveStatus === 'glove').length;
+            const totalViolations = helmetViolations + gloveViolations;
             
-            elements.withHelmet.textContent = stats.helmetOK || 0;
-            elements.withoutHelmet.textContent = stats.helmetViolations || 0;
-            elements.withGloves.textContent = stats.gloveOK || 0;
-            elements.withoutGloves.textContent = stats.gloveViolations || 0;
+            elements.totalViolations.textContent = totalViolations;
+            elements.helmetViolations.textContent = helmetViolations;
+            elements.gloveViolations.textContent = gloveViolations;
+            elements.fullPPE.textContent = fullPPE;
+            elements.helmetOK.textContent = helmetOK;
+            elements.gloveOK.textContent = gloveOK;
+            elements.totalRecords.textContent = total;
+            
+            elements.withHelmet.textContent = helmetOK;
+            elements.withoutHelmet.textContent = helmetViolations;
+            elements.withGloves.textContent = gloveOK;
+            elements.withoutGloves.textContent = gloveViolations;
         }
         
         // Update calendar statistics
@@ -2437,7 +2457,7 @@
             });
             
             const todayViolations = todayData.filter(item => 
-                item.helmetStatus.includes('no') || item.gloveStatus.includes('no')
+                item.helmetStatus === 'no_helmet' || item.gloveStatus === 'no_glove'
             ).length;
             
             const todayCompliance = todayData.filter(item => 
@@ -2468,7 +2488,7 @@
             });
             
             const weeklyViolations = weeklyData.filter(item => 
-                item.helmetStatus.includes('no') || item.gloveStatus.includes('no')
+                item.helmetStatus === 'no_helmet' || item.gloveStatus === 'no_glove'
             ).length;
             
             const weeklyCompliances = weeklyData.filter(item => 
@@ -2562,13 +2582,19 @@
                 const globalIndex = startIndex + index;
                 
                 const isCompliant = (item.helmetStatus === 'helmet' && item.gloveStatus === 'glove');
-                const helmetText = item.helmetStatus === 'helmet' ? 'HELMET OK' : 'NO HELMET';
-                const gloveText = item.gloveStatus === 'glove' ? 'GLOVES OK' : 'NO GLOVES';
-                const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
+                const helmetText = item.helmetStatus === 'helmet' ? 'HELMET OK' : 
+                                  item.helmetStatus === 'no_helmet' ? 'NO HELMET' : 'NO DETECTION';
+                const gloveText = item.gloveStatus === 'glove' ? 'GLOVES OK' : 
+                                 item.gloveStatus === 'no_glove' ? 'NO GLOVES' : 'NO DETECTION';
+                const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 
+                                      (item.helmetStatus === 'no_helmet' || item.gloveStatus === 'no_glove') ? 'SAFETY VIOLATION' : 'NO DETECTION';
                 
-                const helmetBadgeClass = item.helmetStatus === 'helmet' ? 'badge-success' : 'badge-danger';
-                const gloveBadgeClass = item.gloveStatus === 'glove' ? 'badge-success' : 'badge-danger';
-                const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
+                const helmetBadgeClass = item.helmetStatus === 'helmet' ? 'badge-success' : 
+                                        item.helmetStatus === 'no_helmet' ? 'badge-danger' : 'badge-warning';
+                const gloveBadgeClass = item.gloveStatus === 'glove' ? 'badge-success' : 
+                                       item.gloveStatus === 'no_glove' ? 'badge-danger' : 'badge-warning';
+                const complianceBadgeClass = isCompliant ? 'badge-success' : 
+                                           (item.helmetStatus === 'no_helmet' || item.gloveStatus === 'no_glove') ? 'badge-danger' : 'badge-warning';
                 
                 let formattedTime = item.datetime;
                 try {
@@ -2583,9 +2609,12 @@
                     });
                 } catch (e) {}
                 
-                const iconButtonClass = isCompliant ? 'compliant-btn' : 'violation-btn';
-                const iconType = isCompliant ? 'fa-check-circle' : 'fa-exclamation-triangle';
-                const buttonText = isCompliant ? 'COMPLIANT' : 'VIOLATION';
+                const iconButtonClass = isCompliant ? 'compliant-btn' : 
+                                       (item.helmetStatus === 'no_helmet' || item.gloveStatus === 'no_glove') ? 'violation-btn' : 'info-btn';
+                const iconType = isCompliant ? 'fa-check-circle' : 
+                                (item.helmetStatus === 'no_helmet' || item.gloveStatus === 'no_glove') ? 'fa-exclamation-triangle' : 'fa-question-circle';
+                const buttonText = isCompliant ? 'COMPLIANT' : 
+                                  (item.helmetStatus === 'no_helmet' || item.gloveStatus === 'no_glove') ? 'VIOLATION' : 'UNKNOWN';
                 
                 // Simpan semua data item dalam atribut data-* untuk akses mudah
                 tableHTML += `
@@ -2600,7 +2629,9 @@
                                         '${item.helmetStatus}',
                                         '${item.gloveStatus}',
                                         '${item.employeeId || 'N/A'}',
-                                        '${item.imageUrl || ''}'
+                                        '${item.imageUrl || ''}',
+                                        '${item.boxCount || 0}',
+                                        '${item.detectionType || ''}'
                                     )"
                                     title="Click to view safety compliance details"
                                     data-item='${JSON.stringify(item).replace(/'/g, "\\'")}'>
@@ -2619,7 +2650,7 @@
         }
         
         // Open details modal with complete data
-        function openDetailsModalWithData(date, time, helmetStatus, gloveStatus, employeeId, imageUrl) {
+        function openDetailsModalWithData(date, time, helmetStatus, gloveStatus, employeeId, imageUrl, boxCount, detectionType) {
             // Simpan data item yang dipilih secara global
             currentSelectedItem = {
                 date: date,
@@ -2627,7 +2658,9 @@
                 helmetStatus: helmetStatus,
                 gloveStatus: gloveStatus,
                 employeeId: employeeId,
-                imageUrl: imageUrl
+                imageUrl: imageUrl,
+                boxCount: boxCount,
+                detectionType: detectionType
             };
             
             // Isi modal dengan data
@@ -2636,31 +2669,40 @@
             elements.modalEmployeeId.textContent = employeeId || 'N/A';
             
             const isHelmetOK = helmetStatus === 'helmet';
-            const helmetBadgeClass = isHelmetOK ? 'badge-success' : 'badge-danger';
-            const helmetText = isHelmetOK ? 'HELMET DETECTED' : 'NO HELMET - SAFETY VIOLATION';
+            const isNoHelmet = helmetStatus === 'no_helmet';
+            const helmetBadgeClass = isHelmetOK ? 'badge-success' : 
+                                    isNoHelmet ? 'badge-danger' : 'badge-warning';
+            const helmetText = isHelmetOK ? 'HELMET DETECTED' : 
+                              isNoHelmet ? 'NO HELMET - SAFETY VIOLATION' : 'HELMET NOT DETECTED';
             elements.modalHelmetStatus.className = `status-badge ${helmetBadgeClass}`;
             elements.modalHelmetStatus.textContent = helmetText;
             
             const isGloveOK = gloveStatus === 'glove';
-            const gloveBadgeClass = isGloveOK ? 'badge-success' : 'badge-danger';
-            const gloveText = isGloveOK ? 'GLOVES DETECTED' : 'NO GLOVES - SAFETY VIOLATION';
+            const isNoGlove = gloveStatus === 'no_glove';
+            const gloveBadgeClass = isGloveOK ? 'badge-success' : 
+                                   isNoGlove ? 'badge-danger' : 'badge-warning';
+            const gloveText = isGloveOK ? 'GLOVES DETECTED' : 
+                             isNoGlove ? 'NO GLOVES - SAFETY VIOLATION' : 'GLOVES NOT DETECTED';
             elements.modalGloveStatus.className = `status-badge ${gloveBadgeClass}`;
             elements.modalGloveStatus.textContent = gloveText;
             
             const isCompliant = isHelmetOK && isGloveOK;
-            const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
-            const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
+            const hasViolation = isNoHelmet || isNoGlove;
+            const complianceBadgeClass = isCompliant ? 'badge-success' : 
+                                        hasViolation ? 'badge-danger' : 'badge-warning';
+            const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 
+                                  hasViolation ? 'SAFETY VIOLATION' : 'INCOMPLETE DETECTION';
             elements.modalCompliance.className = `status-badge ${complianceBadgeClass}`;
             elements.modalCompliance.textContent = complianceText;
             
             elements.detailsModal.style.display = 'flex';
             document.body.style.overflow = 'hidden';
             
-            showNotification('Safety details loaded', 'info');
+            showNotification('Safety details loaded from database', 'info');
         }
         
-        // View evidence image - mengambil gambar dari Google Sheets
-        async function viewEvidenceImage() {
+        // View evidence image - mengambil gambar dari database lokal
+        function viewEvidenceImage() {
             if (!currentSelectedItem) {
                 showNotification('No evidence image available', 'warning');
                 return;
@@ -2674,7 +2716,7 @@
             elements.evidenceImageContainer.innerHTML = `
                 <div class="evidence-loading">
                     <div class="spinner"></div>
-                    <div>Loading evidence image from Google Sheets...</div>
+                    <div>Loading evidence image from local database...</div>
                 </div>
             `;
             
@@ -2690,15 +2732,15 @@
                                 <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
                                 <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
                                 <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
-                                <p><i class="fas fa-database"></i> Source: Google Sheets</p>
+                                <p><i class="fas fa-boxes"></i> Boxes Detected: ${currentSelectedItem.boxCount || 0}</p>
+                                <p><i class="fas fa-database"></i> Source: Local Database</p>
                             </div>
                         `;
-                        showNotification('Evidence image loaded from Google Sheets', 'success');
+                        showNotification('Evidence image loaded from local database', 'success');
                     };
                     
                     img.onerror = function() {
-                        // Jika gagal memuat, coba ambil dari API
-                        fetchImageFromAPI();
+                        createPlaceholderImage();
                     };
                     
                     img.src = currentSelectedItem.imageUrl;
@@ -2706,60 +2748,15 @@
                     // Timeout jika gambar terlalu lama dimuat
                     setTimeout(() => {
                         if (elements.evidenceImageContainer.innerHTML.includes('spinner')) {
-                            fetchImageFromAPI();
+                            createPlaceholderImage();
                         }
                     }, 5000);
                     
                 } else {
-                    // Jika tidak ada URL gambar, coba ambil dari API
-                    fetchImageFromAPI();
-                }
-            } catch (error) {
-                console.error('Error loading evidence image:', error);
-                createPlaceholderImage();
-            }
-        }
-        
-        // Fetch image from API
-        async function fetchImageFromAPI() {
-            try {
-                // Coba ambil gambar dari Google Sheets melalui API
-                const response = await fetch(`${API_URL}?action=getImage&employeeId=${encodeURIComponent(currentSelectedItem.employeeId)}&date=${encodeURIComponent(currentSelectedItem.date)}&time=${encodeURIComponent(currentSelectedItem.time)}&t=${Date.now()}`);
-                
-                if (response.ok) {
-                    const data = await response.json();
-                    
-                    if (data.success && data.imageUrl) {
-                        elements.evidenceImageContainer.innerHTML = `
-                            <img src="${data.imageUrl}" alt="Evidence Image" class="evidence-image">
-                            <div class="evidence-info">
-                                <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
-                                <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
-                                <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
-                                <p><i class="fas fa-database"></i> Source: Google Sheets Database</p>
-                            </div>
-                        `;
-                        showNotification('Evidence image loaded from Google Sheets API', 'success');
-                    } else if (data.success && data.imageData) {
-                        // Jika API mengembalikan data gambar base64
-                        elements.evidenceImageContainer.innerHTML = `
-                            <img src="data:image/jpeg;base64,${data.imageData}" alt="Evidence Image" class="evidence-image">
-                            <div class="evidence-info">
-                                <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
-                                <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
-                                <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
-                                <p><i class="fas fa-database"></i> Source: Google Sheets Database</p>
-                            </div>
-                        `;
-                        showNotification('Evidence image loaded from Google Sheets', 'success');
-                    } else {
-                        createPlaceholderImage();
-                    }
-                } else {
                     createPlaceholderImage();
                 }
             } catch (error) {
-                console.error('Error fetching image from API:', error);
+                console.error('Error loading evidence image:', error);
                 createPlaceholderImage();
             }
         }
@@ -2777,8 +2774,9 @@
                     <text x="400" y="350" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Date: ${currentSelectedItem.date || 'N/A'}</text>
                     <text x="400" y="370" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Time: ${currentSelectedItem.time || 'N/A'}</text>
                     <text x="400" y="390" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Employee: ${currentSelectedItem.employeeId || 'N/A'}</text>
+                    <text x="400" y="410" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Boxes: ${currentSelectedItem.boxCount || 0}</text>
                     <text x="400" y="450" text-anchor="middle" fill="#ff6b6b" font-family="Arial" font-size="20" font-weight="bold">IMAGE NOT AVAILABLE</text>
-                    <text x="400" y="480" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Check Google Sheets for evidence image</text>
+                    <text x="400" y="480" text-anchor="middle" fill="white" font-family="Arial" font-size="14">Image not saved or failed to load</text>
                 </svg>
             `;
             
@@ -2791,8 +2789,9 @@
                     <p><i class="fas fa-calendar"></i> Date: ${currentSelectedItem.date}</p>
                     <p><i class="fas fa-clock"></i> Time: ${currentSelectedItem.time}</p>
                     <p><i class="fas fa-id-card"></i> Employee ID: ${currentSelectedItem.employeeId}</p>
-                    <p><i class="fas fa-exclamation-triangle"></i> No image found in Google Sheets database</p>
-                    <p><i class="fas fa-info-circle"></i> Please ensure images are uploaded to Google Sheets</p>
+                    <p><i class="fas fa-boxes"></i> Boxes Detected: ${currentSelectedItem.boxCount || 0}</p>
+                    <p><i class="fas fa-exclamation-triangle"></i> Image not found in database</p>
+                    <p><i class="fas fa-info-circle"></i> Image may have failed to save or was deleted</p>
                 </div>
             `;
             
@@ -3012,5 +3011,3 @@
     </script>
 </body>
 </html>
-
-
