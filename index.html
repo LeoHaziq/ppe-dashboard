@@ -339,7 +339,7 @@
             color: var(--success) !important;
         }
         
-        /* Compliance Details Card (Seperti gambar ke-2) */
+        /* Compliance Details Card */
         .compliance-details-card {
             background: var(--dark-secondary);
             border-radius: 20px;
@@ -903,7 +903,7 @@
             color: var(--primary);
         }
         
-        /* Modal for Safety Compliance Details (Seperti gambar ke-3) */
+        /* Modal for Safety Compliance Details */
         .modal {
             display: none;
             position: fixed;
@@ -1321,7 +1321,7 @@
             </div>
         </div>
         
-        <!-- Compliance Details Card (Seperti gambar ke-2) -->
+        <!-- Compliance Details Card -->
         <div class="compliance-details-card">
             <div class="compliance-details-header">
                 <div class="compliance-details-title">
@@ -1517,7 +1517,7 @@
         </div>
     </div>
     
-    <!-- Safety Violation Details Modal (Seperti gambar ke-3) -->
+    <!-- Safety Violation Details Modal -->
     <div class="modal" id="violationModal">
         <div class="modal-content">
             <div class="modal-header">
@@ -1798,8 +1798,13 @@
                 'info': '#1a73e8'
             };
             
+            // Remove existing notifications
+            const existingNotifs = document.querySelectorAll('.custom-notification');
+            existingNotifs.forEach(notif => notif.remove());
+            
             // Create notification element
             const notification = document.createElement('div');
+            notification.className = 'custom-notification';
             notification.style.cssText = `
                 position: fixed;
                 top: 20px;
@@ -1812,6 +1817,7 @@
                 font-weight: 500;
                 box-shadow: 0 5px 15px rgba(0,0,0,0.2);
                 animation: slideIn 0.3s ease;
+                max-width: 300px;
             `;
             
             notification.textContent = message;
@@ -1821,7 +1827,9 @@
             setTimeout(() => {
                 notification.style.animation = 'slideOut 0.3s ease';
                 setTimeout(() => {
-                    document.body.removeChild(notification);
+                    if (notification.parentNode) {
+                        document.body.removeChild(notification);
+                    }
                 }, 300);
             }, 3000);
         }
@@ -1867,6 +1875,7 @@
                 elements.complianceUpdateTime.textContent = 'Just now';
                 
                 updateStatus('success', 'Connected to Safety System');
+                showNotification('Safety data loaded successfully!', 'success');
                 
             } catch (error) {
                 console.error('Error loading safety data:', error);
@@ -1887,6 +1896,7 @@
                 `;
                 
                 updateStatus('error', 'Safety System Connection Error');
+                showNotification(`Error: ${error.message}`, 'error');
                 
             } finally {
                 elements.refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
@@ -1896,59 +1906,98 @@
         
         // Process data to ensure proper formatting
         function processData(data) {
-            return data.map(item => {
-                let datetime = item.datetime || item.timestamp || new Date().toISOString();
+            if (!Array.isArray(data)) {
+                console.error('Data is not an array:', data);
+                return [];
+            }
+            
+            return data.map((item, index) => {
+                let datetime = item.datetime || item.timestamp || item.Timestamp || new Date().toISOString();
                 let formattedDatetime = '';
                 let formattedDate = '';
                 let formattedTime = '';
                 
                 try {
                     const date = new Date(datetime);
-                    formattedDatetime = date.toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
-                    formattedDate = date.toLocaleDateString('en-US', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit'
-                    });
-                    formattedTime = date.toLocaleTimeString('en-US', {
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
+                    if (isNaN(date.getTime())) {
+                        // If date is invalid, use current date
+                        const now = new Date();
+                        formattedDatetime = now.toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                        formattedDate = now.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                        });
+                        formattedTime = now.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                    } else {
+                        formattedDatetime = date.toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                        formattedDate = date.toLocaleDateString('en-US', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit'
+                        });
+                        formattedTime = date.toLocaleTimeString('en-US', {
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                    }
                 } catch (e) {
-                    formattedDatetime = 'Invalid Date';
-                    formattedDate = 'Invalid Date';
-                    formattedTime = 'Invalid Time';
+                    const now = new Date();
+                    formattedDatetime = now.toLocaleString();
+                    formattedDate = now.toLocaleDateString();
+                    formattedTime = now.toLocaleTimeString();
+                }
+                
+                // Extract helmet and glove status from Google Sheets
+                const helmetStatus = (item.helmetStatus || item['Helmet Status'] || 'no helmet').toString().toLowerCase().trim();
+                const gloveStatus = (item.gloveStatus || item['Glove Status'] || 'no glove').toString().toLowerCase().trim();
+                
+                // Determine if image URL exists
+                let imageUrl = item.imageUrl || item['Image URL'] || '';
+                
+                // Generate a default image URL if none exists
+                if (!imageUrl || imageUrl.trim() === '') {
+                    imageUrl = generateDefaultImageUrl(helmetStatus, gloveStatus);
                 }
                 
                 return {
                     ...item,
-                    id: item.id || Math.random().toString(36).substr(2, 9),
+                    id: item.id || `violation_${index}_${Date.now()}`,
                     datetime: formattedDatetime,
                     dateOnly: formattedDate,
                     timeOnly: formattedTime,
-                    helmetStatus: (item.helmetStatus || '').toLowerCase().trim(),
-                    gloveStatus: (item.gloveStatus || '').toLowerCase().trim(),
-                    employeeId: item.employeeId || '34',
-                    department: item.department || 'Industrial Safety',
-                    shift: item.shift || 'Morning (8AM-4PM)',
-                    imageUrl: item.imageUrl || generateSafetyImageUrl(item)
+                    helmetStatus: helmetStatus,
+                    gloveStatus: gloveStatus,
+                    employeeId: item.employeeId || item['Employee ID'] || 'EMP-' + (index + 1),
+                    department: item.department || item['Department'] || 'Industrial Safety',
+                    shift: item.shift || item['Shift'] || 'Morning (8AM-4PM)',
+                    imageUrl: imageUrl
                 };
             });
         }
         
-        // Generate safety image URL based on data
-        function generateSafetyImageUrl(item) {
-            // Ini adalah placeholder untuk demo
-            // Anda boleh ganti dengan URL sebenar dari Google Drive anda
-            const isCompliant = (item.helmetStatus === 'helmet' && item.gloveStatus === 'glove');
+        // Generate default image URL based on compliance status
+        function generateDefaultImageUrl(helmetStatus, gloveStatus) {
+            const isCompliant = helmetStatus === 'helmet' && gloveStatus === 'glove';
             
             if (isCompliant) {
                 // Image untuk compliant
@@ -1961,26 +2010,53 @@
         
         // Update statistics display
         function updateStatistics(stats) {
-            elements.totalViolations.textContent = stats.totalViolations || 0;
-            elements.helmetViolations.textContent = stats.helmetViolations || 0;
-            elements.gloveViolations.textContent = stats.gloveViolations || 0;
-            elements.fullPPE.textContent = stats.fullPPE || 0;
-            elements.helmetOK.textContent = stats.helmetOK || 0;
-            elements.gloveOK.textContent = stats.gloveOK || 0;
-            elements.totalRecords.textContent = stats.total || 0;
-            
-            elements.withHelmet.textContent = stats.helmetOK || 0;
-            elements.withoutHelmet.textContent = stats.helmetViolations || 0;
-            elements.withGloves.textContent = stats.gloveOK || 0;
-            elements.withoutGloves.textContent = stats.gloveViolations || 0;
+            if (!stats) {
+                // Calculate stats from data
+                const total = allData.length;
+                const helmetViolations = allData.filter(item => 
+                    item.helmetStatus && item.helmetStatus.includes('no')).length;
+                const gloveViolations = allData.filter(item => 
+                    item.gloveStatus && item.gloveStatus.includes('no')).length;
+                const fullPPE = allData.filter(item => 
+                    item.helmetStatus === 'helmet' && item.gloveStatus === 'glove').length;
+                const helmetOK = allData.filter(item => 
+                    item.helmetStatus === 'helmet').length;
+                const gloveOK = allData.filter(item => 
+                    item.gloveStatus === 'glove').length;
+                
+                elements.totalViolations.textContent = helmetViolations + gloveViolations;
+                elements.helmetViolations.textContent = helmetViolations;
+                elements.gloveViolations.textContent = gloveViolations;
+                elements.fullPPE.textContent = fullPPE;
+                elements.helmetOK.textContent = helmetOK;
+                elements.gloveOK.textContent = gloveOK;
+                elements.totalRecords.textContent = total;
+                
+                elements.withHelmet.textContent = helmetOK;
+                elements.withoutHelmet.textContent = helmetViolations;
+                elements.withGloves.textContent = gloveOK;
+                elements.withoutGloves.textContent = gloveViolations;
+            } else {
+                elements.totalViolations.textContent = stats.totalViolations || 0;
+                elements.helmetViolations.textContent = stats.helmetViolations || 0;
+                elements.gloveViolations.textContent = stats.gloveViolations || 0;
+                elements.fullPPE.textContent = stats.fullPPE || 0;
+                elements.helmetOK.textContent = stats.helmetOK || 0;
+                elements.gloveOK.textContent = stats.gloveOK || 0;
+                elements.totalRecords.textContent = stats.total || 0;
+                
+                elements.withHelmet.textContent = stats.helmetOK || 0;
+                elements.withoutHelmet.textContent = stats.helmetViolations || 0;
+                elements.withGloves.textContent = stats.gloveOK || 0;
+                elements.withoutGloves.textContent = stats.gloveViolations || 0;
+            }
         }
         
-        // Update compliance details (seperti gambar ke-2)
+        // Update compliance details
         function updateComplianceDetails() {
             const helmetViolations = parseInt(elements.helmetViolations.textContent) || 0;
             const gloveViolations = parseInt(elements.gloveViolations.textContent) || 0;
             const fullCompliance = parseInt(elements.fullPPE.textContent) || 0;
-            const totalRecords = parseInt(elements.totalRecords.textContent) || 0;
             
             elements.compHelmetViolations.textContent = helmetViolations;
             elements.compGloveViolations.textContent = gloveViolations;
@@ -1996,14 +2072,16 @@
             const todayData = allData.filter(item => {
                 try {
                     const itemDate = new Date(item.datetime);
-                    return itemDate.toISOString().split('T')[0] === todayStr;
+                    const itemDateStr = itemDate.toISOString().split('T')[0];
+                    return itemDateStr === todayStr;
                 } catch (e) {
                     return false;
                 }
             });
             
             const todayViolations = todayData.filter(item => 
-                item.helmetStatus.includes('no') || item.gloveStatus.includes('no')
+                (item.helmetStatus && item.helmetStatus.includes('no')) || 
+                (item.gloveStatus && item.gloveStatus.includes('no'))
             ).length;
             
             const todayCompliance = todayData.filter(item => 
@@ -2051,6 +2129,9 @@
                                 <i class="fas fa-database"></i>
                                 <h4>No Safety Data Available</h4>
                                 <p>No safety compliance records found for the selected filter.</p>
+                                <button class="btn btn-primary" onclick="clearDateFilter()" style="margin-top: 20px;">
+                                    <i class="fas fa-times"></i> Clear Filter
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -2091,7 +2172,7 @@
             elements.tableBody.innerHTML = tableHTML;
         }
         
-        // Open violation modal (seperti gambar ke-3)
+        // Open violation modal
         function openViolationModal(violationId) {
             currentViolationId = violationId;
             const violation = allData.find(item => item.id === violationId);
@@ -2100,6 +2181,12 @@
                 showNotification('Violation data not found', 'error');
                 return;
             }
+            
+            // Reset image display
+            elements.modalImagePreview.style.display = 'none';
+            elements.imageNotFound.style.display = 'none';
+            elements.imageControls.style.display = 'none';
+            elements.imageLoading.style.display = 'flex';
             
             // Set modal data
             elements.modalInspectionTime.textContent = violation.datetime;
@@ -2124,7 +2211,7 @@
             elements.modalGloveBadge.textContent = gloveBadgeText;
             
             // Employee info
-            elements.modalEmployeeId.textContent = violation.employeeId || '34';
+            elements.modalEmployeeId.textContent = violation.employeeId || 'EMP-34';
             elements.modalDepartment.textContent = violation.department || 'Industrial Safety';
             elements.modalShift.textContent = violation.shift || 'Morning (8AM-4PM)';
             
@@ -2164,13 +2251,18 @@
             let violation;
             
             if (type === 'helmet') {
-                violation = allData.find(item => item.helmetStatus.includes('no'));
+                violation = allData.find(item => 
+                    item.helmetStatus && item.helmetStatus.includes('no'));
             } else if (type === 'glove') {
-                violation = allData.find(item => item.gloveStatus.includes('no'));
+                violation = allData.find(item => 
+                    item.gloveStatus && item.gloveStatus.includes('no'));
             } else if (type === 'overall') {
-                violation = allData.find(item => item.helmetStatus.includes('no') || item.gloveStatus.includes('no'));
+                violation = allData.find(item => 
+                    (item.helmetStatus && item.helmetStatus.includes('no')) || 
+                    (item.gloveStatus && item.gloveStatus.includes('no')));
             } else if (type === 'compliant') {
-                violation = allData.find(item => item.helmetStatus === 'helmet' && item.gloveStatus === 'glove');
+                violation = allData.find(item => 
+                    item.helmetStatus === 'helmet' && item.gloveStatus === 'glove');
             }
             
             if (violation) {
@@ -2180,9 +2272,10 @@
             }
         }
         
-        // Load violation image
+        // Load violation image - FIXED VERSION
         function loadViolationImage(imageUrl) {
-            if (!imageUrl || imageUrl.trim() === '') {
+            if (!imageUrl || imageUrl.trim() === '' || imageUrl === 'undefined') {
+                console.log('No image URL provided');
                 setTimeout(() => {
                     elements.imageLoading.style.display = 'none';
                     elements.imageNotFound.style.display = 'block';
@@ -2190,34 +2283,76 @@
                 return;
             }
             
+            console.log('Loading image from URL:', imageUrl);
+            
+            // Create image element
             const img = new Image();
+            
             img.onload = function() {
+                console.log('Image loaded successfully');
                 elements.modalImagePreview.src = imageUrl;
                 elements.imageLoading.style.display = 'none';
                 elements.modalImagePreview.style.display = 'block';
                 elements.imageControls.style.display = 'flex';
+                elements.imageNotFound.style.display = 'none';
             };
             
-            img.onerror = function() {
+            img.onerror = function(error) {
+                console.error('Error loading image:', error);
+                elements.imageLoading.style.display = 'none';
+                elements.imageNotFound.style.display = 'block';
+                elements.imageControls.style.display = 'none';
+                
+                // Try fallback images if the original URL fails
+                const fallbackUrl = generateDefaultImageUrl('no helmet', 'no glove');
+                const fallbackImg = new Image();
+                
+                fallbackImg.onload = function() {
+                    elements.modalImagePreview.src = fallbackUrl;
+                    elements.modalImagePreview.style.display = 'block';
+                    elements.imageControls.style.display = 'flex';
+                    elements.imageNotFound.style.display = 'none';
+                    currentImageUrl = fallbackUrl;
+                };
+                
+                fallbackImg.onerror = function() {
+                    elements.imageNotFound.style.display = 'block';
+                };
+                
+                fallbackImg.src = fallbackUrl;
+            };
+            
+            // Set timeout in case image takes too long to load
+            const timeoutId = setTimeout(() => {
+                console.log('Image load timeout');
+                if (!img.complete) {
+                    img.onerror(new Error('Image load timeout'));
+                }
+            }, 8000);
+            
+            img.onload = function() {
+                clearTimeout(timeoutId);
+                elements.modalImagePreview.src = imageUrl;
+                elements.imageLoading.style.display = 'none';
+                elements.modalImagePreview.style.display = 'block';
+                elements.imageControls.style.display = 'flex';
+                elements.imageNotFound.style.display = 'none';
+            };
+            
+            img.onerror = function(error) {
+                clearTimeout(timeoutId);
+                console.error('Error loading image:', error);
                 elements.imageLoading.style.display = 'none';
                 elements.imageNotFound.style.display = 'block';
                 elements.imageControls.style.display = 'none';
             };
             
             img.src = imageUrl;
-            
-            // Set timeout in case image takes too long to load
-            setTimeout(() => {
-                if (elements.imageLoading.style.display !== 'none') {
-                    elements.imageLoading.style.display = 'none';
-                    elements.imageNotFound.style.display = 'block';
-                }
-            }, 5000);
         }
         
         // View safety image in fullscreen
         function viewSafetyImage() {
-            if (!currentImageUrl) {
+            if (!currentImageUrl || currentImageUrl.trim() === '') {
                 showNotification('No image available to view', 'warning');
                 return;
             }
@@ -2228,7 +2363,7 @@
         
         // Download safety image
         function downloadSafetyImage() {
-            if (!currentImageUrl) {
+            if (!currentImageUrl || currentImageUrl.trim() === '') {
                 showNotification('No image available to download', 'warning');
                 return;
             }
@@ -2236,7 +2371,10 @@
             try {
                 const link = document.createElement('a');
                 const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-                link.download = `safety-violation-evidence-${timestamp}.jpg`;
+                const violation = allData.find(item => item.id === currentViolationId);
+                const status = violation ? (violation.helmetStatus === 'helmet' && violation.gloveStatus === 'glove' ? 'compliant' : 'violation') : 'unknown';
+                
+                link.download = `safety-${status}-evidence-${timestamp}.jpg`;
                 link.href = currentImageUrl;
                 link.click();
                 
@@ -2325,6 +2463,12 @@
             
             currentPage = page;
             updateTableWithPagination();
+            
+            // Scroll to top of table
+            const tableContainer = document.querySelector('.table-container');
+            if (tableContainer) {
+                tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
         
         // Go to last page
@@ -2348,7 +2492,10 @@
                     const itemDate = new Date(item.datetime);
                     const filterDate = new Date(selectedDate);
                     
-                    return itemDate.toISOString().split('T')[0] === filterDate.toISOString().split('T')[0];
+                    const itemDateStr = itemDate.toISOString().split('T')[0];
+                    const filterDateStr = filterDate.toISOString().split('T')[0];
+                    
+                    return itemDateStr === filterDateStr;
                 } catch (e) {
                     return false;
                 }
@@ -2422,7 +2569,7 @@
             }
         }
         
-        // Add CSS for notifications
+        // Add CSS for notifications and animations
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideIn {
@@ -2432,6 +2579,10 @@
             @keyframes slideOut {
                 from { transform: translateX(0); opacity: 1; }
                 to { transform: translateX(100%); opacity: 0; }
+            }
+            @keyframes fadeIn {
+                from { opacity: 0; }
+                to { opacity: 1; }
             }
         `;
         document.head.appendChild(style);
@@ -2448,6 +2599,45 @@
                 closeFullscreenImage();
             }
         });
+        
+        // Add Escape key to close modals
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape') {
+                if (elements.violationModal.style.display === 'flex') {
+                    closeViolationModal();
+                }
+                if (elements.fullscreenImageModal.style.display === 'flex') {
+                    closeFullscreenImage();
+                }
+            }
+        });
+        
+        // Test function to debug image loading
+        function testImageLoading() {
+            console.log('Testing image loading...');
+            console.log('All data length:', allData.length);
+            
+            if (allData.length > 0) {
+                const firstItem = allData[0];
+                console.log('First item:', firstItem);
+                console.log('Image URL:', firstItem.imageUrl);
+                openViolationModal(firstItem.id);
+            } else {
+                showNotification('No data to test', 'warning');
+            }
+        }
+        
+        // Add debug button (optional)
+        const debugBtn = document.createElement('button');
+        debugBtn.textContent = 'Debug Images';
+        debugBtn.style.cssText = 'position: fixed; bottom: 20px; left: 20px; padding: 10px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; z-index: 9999; display: none;';
+        debugBtn.onclick = testImageLoading;
+        document.body.appendChild(debugBtn);
+        
+        // Show debug button only in development
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            debugBtn.style.display = 'block';
+        }
     </script>
 </body>
 </html>
