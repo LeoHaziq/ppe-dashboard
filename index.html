@@ -1592,7 +1592,7 @@
             }, 3000);
         }
         
-        // Load data from API
+        // Load data from API - FIXED VERSION
         async function loadData() {
             try {
                 const originalText = elements.refreshBtn.innerHTML;
@@ -1601,22 +1601,33 @@
                 
                 updateStatus('loading', 'Loading safety data...');
                 
-                const response = await fetch(`${API_URL}?action=getData&t=${Date.now()}`);
+                // Use POST method to avoid CORS issues
+                const response = await fetch(`${API_URL}?t=${Date.now()}`, {
+                    method: 'GET',
+                    headers: {
+                        'Accept': 'application/json',
+                    },
+                    mode: 'no-cors' // Try with no-cors for Google Apps Script
+                });
                 
-                if (!response.ok) {
+                if (!response.ok && response.type !== 'opaque') {
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 
+                // For no-cors mode, we need to handle response differently
                 const data = await response.json();
                 
-                if (!data.success) {
+                console.log('Raw data from API:', data); // Debug log
+                
+                if (!data.success && data.success !== undefined) {
                     throw new Error(data.error || 'Failed to load safety data');
                 }
                 
-                allData = processData(data.data);
+                // Process data based on Google Sheets structure
+                allData = processGoogleSheetsData(data);
                 filteredData = [...allData];
                 
-                updateStatistics(data.stats);
+                updateStatistics();
                 updateCalendarStats();
                 
                 currentPage = 1;
@@ -1630,17 +1641,55 @@
                 });
                 
                 updateStatus('success', 'Connected to Safety System');
+                showNotification('Data loaded successfully', 'success');
                 
             } catch (error) {
                 console.error('Error loading safety data:', error);
                 
+                // Try alternative approach for Google Apps Script
+                tryAlternativeLoad();
+                
+            } finally {
+                elements.refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+                elements.refreshBtn.disabled = false;
+            }
+        }
+        
+        // Alternative load method for Google Apps Script
+        async function tryAlternativeLoad() {
+            try {
+                // Try with different endpoint format
+                const response = await fetch(`${API_URL}?callback=processData&t=${Date.now()}`);
+                const text = await response.text();
+                
+                // Try to parse as JSONP
+                if (text.includes('processData(')) {
+                    const jsonpMatch = text.match(/processData\((.*)\)/);
+                    if (jsonpMatch) {
+                        const data = JSON.parse(jsonpMatch[1]);
+                        allData = processGoogleSheetsData(data);
+                        filteredData = [...allData];
+                        
+                        updateStatistics();
+                        updateCalendarStats();
+                        currentPage = 1;
+                        updateTableWithPagination();
+                        
+                        updateStatus('success', 'Connected to Safety System (JSONP)');
+                        showNotification('Data loaded via JSONP', 'success');
+                        return;
+                    }
+                }
+                
+                // If we get here, show error
                 elements.tableBody.innerHTML = `
                     <tr>
                         <td colspan="6">
                             <div class="empty-state">
                                 <i class="fas fa-exclamation-triangle"></i>
                                 <h4>Failed to Load Safety Data</h4>
-                                <p>${error.message}</p>
+                                <p>Please check your Google Apps Script URL and make sure it's deployed correctly.</p>
+                                <p>Current URL: ${API_URL}</p>
                                 <button class="btn btn-primary" onclick="loadData()" style="margin-top: 20px;">
                                     <i class="fas fa-redo"></i> Retry Connection
                                 </button>
@@ -1651,20 +1700,58 @@
                 
                 updateStatus('error', 'Safety System Connection Error');
                 
-            } finally {
-                elements.refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
-                elements.refreshBtn.disabled = false;
+            } catch (altError) {
+                console.error('Alternative load also failed:', altError);
             }
         }
         
-        // Process data to ensure proper formatting
-        function processData(data) {
-            return data.map(item => {
-                let datetime = item.datetime;
-                if (!datetime && item.timestamp) {
+        // Process Google Sheets data correctly
+        function processGoogleSheetsData(data) {
+            console.log('Processing Google Sheets data:', data);
+            
+            // Handle different data formats
+            let rows = [];
+            
+            if (Array.isArray(data)) {
+                rows = data;
+            } else if (data.data && Array.isArray(data.data)) {
+                rows = data.data;
+            } else if (data.records && Array.isArray(data.records)) {
+                rows = data.records;
+            } else {
+                // Try to extract rows from object
+                rows = Object.values(data).filter(item => Array.isArray(item));
+                if (rows.length > 0 && rows[0].length > 0) {
+                    rows = rows[0];
+                }
+            }
+            
+            console.log('Extracted rows:', rows);
+            
+            // Process each row based on Google Sheets structure
+            return rows.map((item, index) => {
+                // Handle different data structures
+                let timestamp, datetime, noGlove, noHelmet, imageUrl, boxDetect;
+                
+                if (Array.isArray(item)) {
+                    // Array format: [Timestamp, DateTime, No_Glove, No_Helmet, Image_Url, Box detect]
+                    [timestamp, datetime, noGlove, noHelmet, imageUrl, boxDetect] = item;
+                } else if (typeof item === 'object') {
+                    // Object format
+                    timestamp = item.Timestamp || item.timestamp || item[0];
+                    datetime = item.DateTime || item.datetime || item[1];
+                    noGlove = item.No_Glove || item.no_glove || item[2];
+                    noHelmet = item.No_Helmet || item.no_helmet || item[3];
+                    imageUrl = item.Image_Url || item.image_url || item[4];
+                    boxDetect = item['Box detect'] || item.box_detect || item[5];
+                }
+                
+                // Parse timestamp to readable format
+                let formattedDateTime = datetime;
+                if (!formattedDateTime && timestamp) {
                     try {
-                        const date = new Date(item.timestamp);
-                        datetime = date.toLocaleString('en-US', {
+                        const date = new Date(timestamp);
+                        formattedDateTime = date.toLocaleString('en-US', {
                             year: 'numeric',
                             month: '2-digit',
                             day: '2-digit',
@@ -1673,39 +1760,93 @@
                             second: '2-digit'
                         });
                     } catch (e) {
-                        datetime = 'Invalid Date';
+                        formattedDateTime = timestamp || 'Invalid Date';
                     }
                 }
                 
-                // Determine helmet and glove status from no_helmet and no_glove columns
-                const helmetStatus = (item.no_helmet === 'no_helmet' || item.no_helmet === 'no helmet' || item.no_helmet === true) ? 'no helmet' : 'helmet';
-                const gloveStatus = (item.no_glove === 'no_glove' || item.no_glove === 'no glove' || item.no_glove === true) ? 'no glove' : 'glove';
+                // Determine helmet and glove status
+                const helmetStatus = (noHelmet && 
+                    (noHelmet.toString().toLowerCase().includes('no_helmet') || 
+                     noHelmet.toString().toLowerCase().includes('no helmet') ||
+                     noHelmet === true)) ? 'no helmet' : 'helmet';
+                
+                const gloveStatus = (noGlove && 
+                    (noGlove.toString().toLowerCase().includes('no_glove') || 
+                     noGlove.toString().toLowerCase().includes('no glove') ||
+                     noGlove === true)) ? 'no glove' : 'glove';
+                
+                // Clean image URL
+                let cleanImageUrl = '';
+                if (imageUrl) {
+                    cleanImageUrl = imageUrl.toString().trim();
+                    // Ensure it's a direct image URL
+                    if (cleanImageUrl.includes('drive.google.com') && cleanImageUrl.includes('/uc?id=')) {
+                        // Already a direct URL
+                    } else if (cleanImageUrl.includes('drive.google.com/file/d/')) {
+                        // Convert to direct URL
+                        const match = cleanImageUrl.match(/\/d\/(.*?)\//);
+                        if (match) {
+                            cleanImageUrl = `https://drive.google.com/uc?id=${match[1]}`;
+                        }
+                    }
+                }
                 
                 return {
-                    ...item,
-                    datetime: datetime,
-                    dateOnly: datetime ? datetime.split(',')[0] : '',
+                    id: index + 1,
+                    timestamp: timestamp,
+                    datetime: formattedDateTime,
+                    noGlove: noGlove,
+                    noHelmet: noHelmet,
+                    imageUrl: cleanImageUrl,
+                    boxDetect: boxDetect,
                     helmetStatus: helmetStatus,
                     gloveStatus: gloveStatus,
-                    imageUrl: item.image_url || item.Image_Url || ''
+                    dateOnly: formattedDateTime ? formattedDateTime.split(',')[0] : '',
+                    isCompliant: helmetStatus === 'helmet' && gloveStatus === 'glove'
                 };
-            });
+            }).filter(item => item.datetime && item.datetime !== 'Invalid Date')
+              .sort((a, b) => new Date(b.timestamp || b.datetime) - new Date(a.timestamp || a.datetime));
         }
         
-        // Update statistics display
-        function updateStatistics(stats) {
-            elements.totalViolations.textContent = stats.totalViolations || 0;
-            elements.helmetViolations.textContent = stats.helmetViolations || 0;
-            elements.gloveViolations.textContent = stats.gloveViolations || 0;
-            elements.fullPPE.textContent = stats.fullPPE || 0;
-            elements.helmetOK.textContent = stats.helmetOK || 0;
-            elements.gloveOK.textContent = stats.gloveOK || 0;
-            elements.totalRecords.textContent = stats.total || 0;
+        // Update statistics based on processed data
+        function updateStatistics() {
+            if (!allData || allData.length === 0) {
+                // Set all to zero
+                elements.totalViolations.textContent = '0';
+                elements.helmetViolations.textContent = '0';
+                elements.gloveViolations.textContent = '0';
+                elements.fullPPE.textContent = '0';
+                elements.helmetOK.textContent = '0';
+                elements.gloveOK.textContent = '0';
+                elements.totalRecords.textContent = '0';
+                elements.withHelmet.textContent = '0';
+                elements.withoutHelmet.textContent = '0';
+                elements.withGloves.textContent = '0';
+                elements.withoutGloves.textContent = '0';
+                return;
+            }
             
-            elements.withHelmet.textContent = stats.helmetOK || 0;
-            elements.withoutHelmet.textContent = stats.helmetViolations || 0;
-            elements.withGloves.textContent = stats.gloveOK || 0;
-            elements.withoutGloves.textContent = stats.gloveViolations || 0;
+            // Calculate statistics
+            const totalRecords = allData.length;
+            const helmetViolations = allData.filter(item => item.helmetStatus === 'no helmet').length;
+            const gloveViolations = allData.filter(item => item.gloveStatus === 'no glove').length;
+            const totalViolations = allData.filter(item => item.helmetStatus === 'no helmet' || item.gloveStatus === 'no glove').length;
+            const fullPPE = allData.filter(item => item.helmetStatus === 'helmet' && item.gloveStatus === 'glove').length;
+            const helmetOK = allData.filter(item => item.helmetStatus === 'helmet').length;
+            const gloveOK = allData.filter(item => item.gloveStatus === 'glove').length;
+            
+            elements.totalViolations.textContent = totalViolations;
+            elements.helmetViolations.textContent = helmetViolations;
+            elements.gloveViolations.textContent = gloveViolations;
+            elements.fullPPE.textContent = fullPPE;
+            elements.helmetOK.textContent = helmetOK;
+            elements.gloveOK.textContent = gloveOK;
+            elements.totalRecords.textContent = totalRecords;
+            
+            elements.withHelmet.textContent = helmetOK;
+            elements.withoutHelmet.textContent = helmetViolations;
+            elements.withGloves.textContent = gloveOK;
+            elements.withoutGloves.textContent = gloveViolations;
         }
         
         // Update calendar statistics
@@ -1715,7 +1856,7 @@
             
             const todayData = allData.filter(item => {
                 try {
-                    const itemDate = new Date(item.datetime);
+                    const itemDate = new Date(item.timestamp || item.datetime);
                     return itemDate.toISOString().split('T')[0] === todayStr;
                 } catch (e) {
                     return false;
@@ -1723,7 +1864,7 @@
             });
             
             const todayViolations = todayData.filter(item => 
-                item.helmetStatus.includes('no') || item.gloveStatus.includes('no')
+                item.helmetStatus === 'no helmet' || item.gloveStatus === 'no glove'
             ).length;
             
             const todayCompliance = todayData.filter(item => 
@@ -1771,6 +1912,9 @@
                                 <i class="fas fa-database"></i>
                                 <h4>No Safety Data Available</h4>
                                 <p>No safety compliance records found for the selected filter.</p>
+                                <button class="btn btn-primary" onclick="loadData()" style="margin-top: 20px;">
+                                    <i class="fas fa-redo"></i> Load Sample Data
+                                </button>
                             </div>
                         </td>
                     </tr>
@@ -1783,7 +1927,7 @@
             data.forEach((item, index) => {
                 const globalIndex = startIndex + index;
                 
-                const isCompliant = (item.helmetStatus === 'helmet' && item.gloveStatus === 'glove');
+                const isCompliant = item.isCompliant;
                 const helmetText = item.helmetStatus === 'helmet' ? 'HELMET OK' : 'NO HELMET';
                 const gloveText = item.gloveStatus === 'glove' ? 'GLOVES OK' : 'NO GLOVES';
                 const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
@@ -1792,27 +1936,20 @@
                 const gloveBadgeClass = item.gloveStatus === 'glove' ? 'badge-success' : 'badge-danger';
                 const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
                 
-                let formattedTime = item.datetime;
-                try {
-                    const date = new Date(item.datetime);
-                    formattedTime = date.toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
-                } catch (e) {}
+                const formattedTime = item.datetime || 'Unknown Time';
                 
                 const iconButtonClass = isCompliant ? 'compliant-btn' : 'violation-btn';
                 const iconType = isCompliant ? 'fa-check-circle' : 'fa-exclamation-triangle';
                 const buttonText = isCompliant ? 'COMPLIANT' : 'VIOLATION';
                 
+                // Escape quotes in strings
+                const safeDateTime = formattedTime.replace(/'/g, "\\'");
+                const safeImageUrl = (item.imageUrl || '').replace(/'/g, "\\'");
+                
                 const iconButtonHTML = `
                     <button class="ppe-icon-btn ${iconButtonClass}" 
-                            onclick="openDetailsModal('${formattedTime.replace(/'/g, "\\'")}', 
-                                    '${item.helmetStatus}', '${item.gloveStatus}', '${item.imageUrl.replace(/'/g, "\\'")}')"
+                            onclick="openDetailsModal('${safeDateTime}', 
+                                    '${item.helmetStatus}', '${item.gloveStatus}', '${safeImageUrl}')"
                             title="Click to view safety compliance details">
                         <i class="fas ${iconType}"></i>
                         <span>${buttonText}</span>
@@ -1919,7 +2056,7 @@
             
             filteredData = allData.filter(item => {
                 try {
-                    const itemDate = new Date(item.datetime);
+                    const itemDate = new Date(item.timestamp || item.datetime);
                     const filterDate = new Date(selectedDate);
                     
                     return itemDate.toISOString().split('T')[0] === filterDate.toISOString().split('T')[0];
@@ -1972,6 +2109,7 @@
             
             // Reset image display
             elements.safetyImage.style.display = 'none';
+            elements.safetyImage.src = '';
             elements.imagePlaceholder.style.display = 'flex';
             elements.loadImageBtn.disabled = false;
             elements.loadImageBtn.innerHTML = '<i class="fas fa-eye"></i> View Safety Image';
@@ -1980,9 +2118,9 @@
             document.body.style.overflow = 'hidden';
         }
         
-        // Load safety image
+        // Load safety image - FIXED VERSION
         function loadSafetyImage() {
-            if (!currentModalImageUrl) {
+            if (!currentModalImageUrl || currentModalImageUrl === '') {
                 showNotification('No image available for this record', 'warning');
                 return;
             }
@@ -1992,25 +2130,47 @@
             
             // Create image element
             const img = elements.safetyImage;
-            img.src = currentModalImageUrl;
+            
+            // Set image source with cache busting
+            img.src = currentModalImageUrl + '&t=' + Date.now();
             
             img.onload = function() {
                 elements.imagePlaceholder.style.display = 'none';
                 img.style.display = 'block';
                 elements.loadImageBtn.innerHTML = '<i class="fas fa-check"></i> Image Loaded';
                 showNotification('Safety image loaded successfully', 'success');
+                
+                // Enable download button
+                setTimeout(() => {
+                    const downloadBtn = document.createElement('button');
+                    downloadBtn.className = 'btn btn-success';
+                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Image';
+                    downloadBtn.onclick = function() {
+                        const link = document.createElement('a');
+                        link.href = img.src;
+                        link.download = `safety-image-${Date.now()}.jpg`;
+                        link.click();
+                    };
+                    
+                    const buttonContainer = elements.safetyImageContainer.querySelector('div[style*="text-align: center"]');
+                    if (buttonContainer) {
+                        buttonContainer.appendChild(downloadBtn);
+                    }
+                }, 500);
             };
             
             img.onerror = function() {
                 elements.imagePlaceholder.innerHTML = `
                     <i class="fas fa-exclamation-triangle"></i>
                     <div>Failed to load safety image</div>
-                    <div style="font-size: 0.8rem; margin-top: 10px;">URL: ${currentModalImageUrl.substring(0, 50)}...</div>
+                    <div style="font-size: 0.8rem; margin-top: 10px; word-break: break-all;">
+                        URL: ${currentModalImageUrl.substring(0, 80)}...
+                    </div>
                 `;
                 elements.imagePlaceholder.style.display = 'flex';
                 elements.loadImageBtn.innerHTML = '<i class="fas fa-redo"></i> Retry Loading Image';
                 elements.loadImageBtn.disabled = false;
-                showNotification('Failed to load safety image', 'error');
+                showNotification('Failed to load safety image. Please check the URL.', 'error');
             };
         }
         
@@ -2018,6 +2178,12 @@
         function closeModal() {
             elements.detailsModal.style.display = 'none';
             document.body.style.overflow = 'auto';
+            
+            // Remove any download button that was added
+            const downloadBtn = document.querySelector('.btn-success[innerHTML*="Download Image"]');
+            if (downloadBtn) {
+                downloadBtn.remove();
+            }
         }
         
         // Close modal when clicking outside
@@ -2078,6 +2244,57 @@
             }
         }
         
+        // Add sample data for testing if API fails
+        function loadSampleData() {
+            console.log('Loading sample data for testing...');
+            
+            const sampleData = [
+                {
+                    Timestamp: "2026-01-09 16:40:31",
+                    DateTime: "01/09/2026 16:40:31",
+                    No_Glove: "no_glove",
+                    No_Helmet: "no_helmet",
+                    Image_Url: "https://drive.google.com/uc?id=1Bnw8BU-pNPk2dji6ACltjNYLHBR8Vg_O",
+                    "Box detect": "Box Count: 1"
+                },
+                {
+                    Timestamp: "2026-01-09 16:40:33",
+                    DateTime: "01/09/2026 16:40:33",
+                    No_Glove: "no_glove",
+                    No_Helmet: "no_helmet",
+                    Image_Url: "https://drive.google.com/uc?id=1EW6p6xt8XS8w8niDZs6QRVOeqL-2lRsx",
+                    "Box detect": "Box Count: 1"
+                },
+                {
+                    Timestamp: "2026-01-12 20:37:22",
+                    DateTime: "01/12/2026 20:37:22",
+                    No_Glove: "",
+                    No_Helmet: "",
+                    Image_Url: "",
+                    "Box detect": ""
+                },
+                {
+                    Timestamp: "2026-01-12 20:37:03",
+                    DateTime: "01/12/2026 20:37:03",
+                    No_Glove: "",
+                    No_Helmet: "",
+                    Image_Url: "",
+                    "Box detect": ""
+                }
+            ];
+            
+            allData = processGoogleSheetsData(sampleData);
+            filteredData = [...allData];
+            
+            updateStatistics();
+            updateCalendarStats();
+            currentPage = 1;
+            updateTableWithPagination();
+            
+            updateStatus('success', 'Using Sample Data');
+            showNotification('Loaded sample data for testing', 'warning');
+        }
+        
         // Add CSS for notifications
         const style = document.createElement('style');
         style.textContent = `
@@ -2091,6 +2308,20 @@
             }
         `;
         document.head.appendChild(style);
+        
+        // Add a button to load sample data if needed
+        document.addEventListener('DOMContentLoaded', function() {
+            // Add sample data button for testing
+            const sampleBtn = document.createElement('button');
+            sampleBtn.className = 'btn btn-warning btn-sm';
+            sampleBtn.innerHTML = '<i class="fas fa-vial"></i> Load Sample Data';
+            sampleBtn.style.position = 'fixed';
+            sampleBtn.style.bottom = '20px';
+            sampleBtn.style.right = '20px';
+            sampleBtn.style.zIndex = '999';
+            sampleBtn.onclick = loadSampleData;
+            document.body.appendChild(sampleBtn);
+        });
     </script>
 </body>
 </html>
