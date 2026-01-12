@@ -5,6 +5,7 @@
     <title>PPE Safety Monitoring System | UMPSA</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
+    <!-- ========== FAVICON / BROWSER ICONS ========== -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -35,27 +36,28 @@
             background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             color: var(--light);
             min-height: 100vh;
-            padding: 10px;
-            overflow-x: hidden;
+            padding: 20px;
         }
         
         .container {
-            max-width: 100%;
+            max-width: 1800px;
             margin: 0 auto;
         }
         
         /* ========== HEADER ========== */
         .header-container {
             display: flex;
-            flex-direction: column;
+            justify-content: space-between;
+            align-items: center;
             background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-            padding: 20px;
-            border-radius: 15px;
-            margin-bottom: 15px;
-            border-left: 6px solid var(--warning);
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+            padding: 20px 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border-left: 8px solid var(--warning);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
             position: relative;
             overflow: hidden;
+            flex-wrap: wrap;
         }
         
         .header-container::before {
@@ -64,34 +66,33 @@
             top: 0;
             left: 0;
             right: 0;
-            height: 3px;
+            height: 4px;
             background: linear-gradient(90deg, var(--primary), var(--success), var(--warning));
         }
         
-        .header-top {
+        .institution-section {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 15px;
-            flex-wrap: wrap;
-            gap: 10px;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 200px;
         }
         
         .institution-name {
-            font-size: 1.4rem;
+            font-size: 1.8rem;
             font-weight: 800;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
             color: white;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
         }
         
         .institution-badge {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             font-weight: 600;
-            padding: 5px 10px;
-            border-radius: 15px;
+            padding: 6px 15px;
+            border-radius: 20px;
             text-align: center;
             display: inline-block;
         }
@@ -107,117 +108,321 @@
         }
         
         .title-section {
+            flex-grow: 1;
             text-align: center;
-            margin: 10px 0;
+            padding: 0 30px;
             display: flex;
             flex-direction: column;
             align-items: center;
-            gap: 5px;
+            gap: 8px;
         }
         
         .main-title {
             color: white;
-            font-size: 1.6rem;
+            font-size: 2.2rem;
             font-weight: 800;
             margin: 0;
             display: flex;
             align-items: center;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
+            gap: 15px;
         }
         
         .subtitle {
             color: rgba(255, 255, 255, 0.9);
             font-weight: 400;
-            font-size: 0.95rem;
+            font-size: 1.1rem;
             margin: 0;
         }
         
-        .header-bottom {
+        .header-stats-container {
             display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
+            flex-direction: column;
             gap: 10px;
-            margin-top: 10px;
+            min-width: 200px;
+            align-items: flex-end;
         }
         
         .header-stat {
             background: rgba(255, 255, 255, 0.1);
-            padding: 8px 15px;
-            border-radius: 12px;
+            padding: 10px 20px;
+            border-radius: 15px;
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
             font-weight: 600;
-            font-size: 0.9rem;
+            width: 100%;
+            justify-content: center;
         }
         
         .header-stat i {
             color: var(--warning);
-            font-size: 1rem;
+            font-size: 1.2rem;
         }
         
         .datetime-display {
             color: rgba(255, 255, 255, 0.9);
             font-weight: 500;
-            font-size: 0.9rem;
-            padding: 6px 12px;
+            font-size: 1rem;
+            padding: 8px 15px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 10px;
+            border-radius: 12px;
             text-align: center;
+            width: 100%;
         }
         
-        /* Stats Grid - Mobile Responsive */
+        /* Responsive Header */
+        @media (max-width: 1200px) {
+            .header-container {
+                flex-direction: column;
+                gap: 20px;
+                padding: 25px 20px;
+            }
+            
+            .institution-section, .title-section, .header-stats-container {
+                width: 100%;
+                text-align: center;
+                align-items: center;
+            }
+            
+            .institution-section {
+                flex-direction: row;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .main-title {
+                font-size: 1.9rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 1.6rem;
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .institution-name {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+        
+        /* ========== LIVE STREAM SECTION ========== */
+        .live-stream-section {
+            background: var(--dark-secondary);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .live-stream-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .live-stream-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .stream-controls {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .live-stream-container {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 20px;
+        }
+
+        @media (max-width: 1200px) {
+            .live-stream-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Video Stream */
+        .video-container {
+            position: relative;
+            background: #000;
+            border-radius: 15px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+            min-height: 400px;
+        }
+
+        #liveVideo {
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            background: #000;
+        }
+
+        .video-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            padding: 15px;
+            background: linear-gradient(180deg, rgba(0,0,0,0.7) 0%, transparent 100%);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            color: white;
+        }
+
+        .video-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-indicator-stream {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--danger);
+            animation: pulse 2s infinite;
+        }
+
+        .status-indicator-stream.active {
+            background: var(--success);
+        }
+
+        .video-controls {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            padding: 20px;
+            background: linear-gradient(0deg, rgba(0,0,0,0.8) 0%, transparent 100%);
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+        }
+
+        .stream-info {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .info-card {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            border-left: 4px solid var(--primary);
+        }
+
+        .info-card-title {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .info-card-content {
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+            line-height: 1.5;
+        }
+
+        .cctv-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        .detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .detail-label {
+            color: var(--gray);
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            color: white;
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        /* Stats Grid */
         .stats-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 15px;
-            margin-bottom: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
         }
         
         .stat-card {
             background: var(--dark-secondary);
-            border-radius: 15px;
-            padding: 20px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
             transition: transform 0.3s, box-shadow 0.3s;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
         .stat-card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
         }
         
         .stat-card.violations {
-            border-top: 4px solid var(--danger);
+            border-top: 5px solid var(--danger);
         }
         
         .stat-card.compliance {
-            border-top: 4px solid var(--success);
+            border-top: 5px solid var(--success);
         }
         
         .stat-card.breakdown {
-            border-top: 4px solid var(--primary);
+            border-top: 5px solid var(--primary);
         }
         
         .stat-card-header {
             display: flex;
             align-items: center;
-            gap: 12px;
-            margin-bottom: 15px;
+            gap: 15px;
+            margin-bottom: 20px;
         }
         
         .stat-icon {
-            width: 40px;
-            height: 40px;
-            border-radius: 10px;
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 18px;
+            font-size: 20px;
         }
         
         .violations .stat-icon {
@@ -236,16 +441,16 @@
         }
         
         .stat-title {
-            font-size: 1.1rem;
+            font-size: 1.3rem;
             font-weight: 600;
             color: white;
         }
         
         .stat-value {
-            font-size: 2.5rem;
+            font-size: 3.5rem;
             font-weight: 700;
             text-align: center;
-            margin: 10px 0;
+            margin: 15px 0;
             line-height: 1;
         }
         
@@ -264,26 +469,26 @@
         .stats-details {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 10px;
-            margin-top: 15px;
+            gap: 15px;
+            margin-top: 20px;
         }
         
         .stat-detail {
             background: rgba(255, 255, 255, 0.05);
-            padding: 12px;
-            border-radius: 10px;
+            padding: 15px;
+            border-radius: 12px;
             text-align: center;
         }
         
         .stat-detail-label {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: var(--gray);
-            margin-bottom: 6px;
+            margin-bottom: 8px;
             font-weight: 500;
         }
         
         .stat-detail-value {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: 700;
             color: white;
         }
@@ -296,153 +501,43 @@
             color: var(--success) !important;
         }
         
-        /* Compliance Details Card */
-        .compliance-details-card {
-            background: var(--dark-secondary);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
-            border-top: 4px solid var(--danger);
-        }
-        
-        .compliance-details-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
-            gap: 10px;
-        }
-        
-        .compliance-details-title {
-            font-size: 1.4rem;
-            font-weight: 700;
-            color: white;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .compliance-details-title i {
-            color: var(--danger);
-        }
-        
-        .compliance-details-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 15px;
-        }
-        
-        .compliance-item {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            transition: all 0.3s;
-            cursor: pointer;
-        }
-        
-        .compliance-item:active {
-            transform: translateY(-3px);
-            border-color: var(--danger);
-            box-shadow: 0 8px 15px rgba(234, 67, 53, 0.2);
-        }
-        
-        .compliance-item.violation {
-            border-color: rgba(234, 67, 53, 0.3);
-            background: rgba(234, 67, 53, 0.1);
-        }
-        
-        .compliance-item.compliant {
-            border-color: rgba(52, 168, 83, 0.3);
-            background: rgba(52, 168, 83, 0.1);
-        }
-        
-        .compliance-item-label {
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--gray);
-            margin-bottom: 8px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 6px;
-        }
-        
-        .compliance-item-value {
-            font-size: 2rem;
-            font-weight: 800;
-            margin: 10px 0;
-        }
-        
-        .violation-value {
-            color: var(--danger);
-        }
-        
-        .compliant-value {
-            color: var(--success);
-        }
-        
-        .compliance-item-status {
-            padding: 6px 12px;
-            border-radius: 15px;
-            font-weight: 600;
-            font-size: 0.8rem;
-            display: inline-block;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
-        .status-violation {
-            background: rgba(234, 67, 53, 0.2);
-            color: var(--danger);
-        }
-        
-        .status-compliant {
-            background: rgba(52, 168, 83, 0.2);
-            color: var(--success);
-        }
-        
         /* Calendar & Filters */
         .calendar-section {
             background: var(--dark-secondary);
-            border-radius: 15px;
-            padding: 20px;
-            margin-bottom: 15px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         }
         
         .calendar-header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
         }
         
         .calendar-title {
-            font-size: 1.2rem;
+            font-size: 1.5rem;
             font-weight: 600;
             color: white;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
         
         .calendar-controls {
             display: flex;
-            gap: 10px;
+            gap: 15px;
             flex-wrap: wrap;
-            width: 100%;
         }
         
         .date-picker-container {
             position: relative;
             flex: 1;
-            min-width: 100%;
+            min-width: 200px;
         }
         
         .date-picker {
@@ -450,10 +545,10 @@
             padding: 12px 15px;
             background: rgba(255, 255, 255, 0.05);
             border: 2px solid rgba(255, 255, 255, 0.1);
-            border-radius: 10px;
+            border-radius: 12px;
             color: white;
             font-family: 'Poppins', sans-serif;
-            font-size: 0.95rem;
+            font-size: 1rem;
             transition: all 0.3s;
         }
         
@@ -465,48 +560,48 @@
         
         .calendar-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            gap: 15px;
-            margin-top: 15px;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
         }
         
         .calendar-card {
             background: rgba(255, 255, 255, 0.03);
-            border-radius: 12px;
-            padding: 15px;
+            border-radius: 15px;
+            padding: 20px;
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
         .calendar-card h4 {
-            font-size: 1.1rem;
-            margin-bottom: 12px;
+            font-size: 1.2rem;
+            margin-bottom: 15px;
             color: var(--primary);
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 10px;
         }
         
         .calendar-stats {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 10px;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
         }
         
         .calendar-stat {
             text-align: center;
-            padding: 12px;
+            padding: 15px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
+            border-radius: 10px;
         }
         
         .calendar-stat-value {
-            font-size: 1.5rem;
+            font-size: 2rem;
             font-weight: 700;
             color: white;
         }
         
         .calendar-stat-label {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             color: var(--gray);
             margin-top: 5px;
         }
@@ -514,49 +609,43 @@
         /* Controls */
         .controls {
             background: var(--dark-secondary);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 15px;
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
             display: flex;
             justify-content: space-between;
             align-items: center;
             flex-wrap: wrap;
-            gap: 10px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            gap: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
         }
         
         .controls-left {
             display: flex;
-            gap: 8px;
+            gap: 12px;
             align-items: center;
             flex-wrap: wrap;
-            width: 100%;
-            justify-content: space-between;
         }
         
         .controls-right {
             display: flex;
-            gap: 8px;
+            gap: 12px;
             align-items: center;
-            width: 100%;
-            justify-content: center;
-            margin-top: 10px;
         }
         
         .status-indicator {
             display: flex;
             align-items: center;
-            gap: 8px;
-            padding: 8px 15px;
+            gap: 10px;
+            padding: 10px 20px;
             background: rgba(255, 255, 255, 0.05);
-            border-radius: 20px;
+            border-radius: 50px;
             font-weight: 500;
-            font-size: 0.9rem;
         }
         
         .status-dot {
-            width: 8px;
-            height: 8px;
+            width: 10px;
+            height: 10px;
             border-radius: 50%;
             background: var(--success);
             animation: pulse 2s infinite;
@@ -570,44 +659,43 @@
         
         .datetime {
             color: var(--gray);
-            font-size: 0.9rem;
+            font-size: 1rem;
             font-weight: 500;
-            text-align: center;
         }
         
-        /* Button Styles for Mobile */
         .btn {
-            padding: 12px 20px;
+            padding: 12px 25px;
             border: none;
-            border-radius: 10px;
+            border-radius: 12px;
             font-weight: 600;
-            font-size: 0.95rem;
+            font-size: 1rem;
             cursor: pointer;
             transition: all 0.3s;
             display: flex;
             align-items: center;
-            justify-content: center;
             gap: 8px;
             font-family: 'Poppins', sans-serif;
-            touch-action: manipulation;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        .btn:active {
-            transform: translateY(2px);
         }
         
         .btn-primary {
             background: var(--primary);
             color: white;
-            flex: 1;
+        }
+        
+        .btn-primary:hover {
+            background: #0d62d9;
+            transform: translateY(-2px);
         }
         
         .btn-secondary {
             background: rgba(255, 255, 255, 0.1);
             color: white;
             border: 1px solid rgba(255, 255, 255, 0.2);
-            flex: 1;
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
         }
         
         .btn-success {
@@ -615,9 +703,19 @@
             color: white;
         }
         
+        .btn-success:hover {
+            background: #2a9c4f;
+            transform: translateY(-2px);
+        }
+        
         .btn-danger {
             background: var(--danger);
             color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #d23a2d;
+            transform: translateY(-2px);
         }
         
         .btn-warning {
@@ -625,18 +723,68 @@
             color: #333;
         }
         
-        .btn-sm {
-            padding: 8px 12px;
-            font-size: 0.85rem;
+        .btn-warning:hover {
+            background: #e0ac05;
+            transform: translateY(-2px);
         }
         
-        /* Table - Mobile Optimized */
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        /* PPE Icon Button */
+        .ppe-icon-btn {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            border: none;
+            border-radius: 12px;
+            width: 55px;
+            height: 55px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 8px;
+            gap: 5px;
+        }
+        
+        .ppe-icon-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
+        }
+        
+        .ppe-icon-btn i {
+            font-size: 20px;
+        }
+        
+        .ppe-icon-btn.violation-btn {
+            background: linear-gradient(135deg, #b71c1c 0%, #c62828 100%);
+        }
+        
+        .ppe-icon-btn.violation-btn:hover {
+            background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
+        }
+        
+        .ppe-icon-btn.compliant-btn {
+            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+        }
+        
+        .ppe-icon-btn.compliant-btn:hover {
+            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
+        }
+        
+        /* Table */
         .table-container {
             background: var(--dark-secondary);
-            border-radius: 15px;
-            padding: 15px;
-            margin-bottom: 15px;
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.2);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
             overflow: hidden;
         }
         
@@ -644,32 +792,31 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 15px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
         }
         
         .table-header h3 {
-            font-size: 1.3rem;
+            font-size: 1.5rem;
             font-weight: 600;
             color: white;
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 12px;
         }
         
         .table-wrapper {
             overflow-x: auto;
-            border-radius: 10px;
+            border-radius: 15px;
             border: 1px solid rgba(255, 255, 255, 0.05);
-            margin-bottom: 15px;
-            -webkit-overflow-scrolling: touch;
+            margin-bottom: 20px;
         }
         
         table {
             width: 100%;
             border-collapse: collapse;
-            min-width: 800px;
+            min-width: 1200px;
         }
         
         thead {
@@ -677,54 +824,57 @@
         }
         
         th {
-            padding: 15px 12px;
+            padding: 18px;
             text-align: left;
             font-weight: 600;
             color: white;
-            font-size: 0.9rem;
+            font-size: 1rem;
             text-transform: uppercase;
             letter-spacing: 0.5px;
-            white-space: nowrap;
         }
         
         th i {
-            margin-right: 6px;
+            margin-right: 8px;
         }
         
         tbody tr {
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
         
-        tbody tr:active {
+        tbody tr:hover {
             background: rgba(255, 255, 255, 0.02);
         }
         
         td {
-            padding: 15px 12px;
+            padding: 18px;
             color: rgba(255, 255, 255, 0.9);
             font-weight: 500;
-            white-space: nowrap;
         }
         
         .row-number {
             font-weight: 700;
             color: var(--primary);
-            font-size: 1rem;
+            font-size: 1.1rem;
         }
         
         .datetime-cell {
             font-family: 'Monaco', 'Courier New', monospace;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
             color: rgba(255, 255, 255, 0.8);
+            white-space: nowrap;
+        }
+        
+        .image-cell {
+            width: 120px;
         }
         
         .status-badge {
-            padding: 6px 12px;
-            border-radius: 15px;
+            padding: 8px 15px;
+            border-radius: 20px;
             font-weight: 600;
-            font-size: 0.75rem;
+            font-size: 0.8rem;
             display: inline-block;
-            min-width: 80px;
+            min-width: 100px;
             text-align: center;
             text-transform: uppercase;
             letter-spacing: 0.5px;
@@ -742,52 +892,29 @@
             border: 1px solid rgba(52, 168, 83, 0.3);
         }
         
-        .violation-cell {
-            cursor: pointer;
-            text-align: center;
-            padding: 8px 12px;
-            border-radius: 8px;
-            background: rgba(234, 67, 53, 0.1);
-            color: var(--danger);
-            font-weight: 600;
-            transition: all 0.3s;
-            font-size: 0.85rem;
-            touch-action: manipulation;
-        }
-        
-        .violation-cell:active {
-            background: rgba(234, 67, 53, 0.2);
-            transform: scale(0.98);
-        }
-        
-        /* Pagination - Mobile Friendly */
+        /* Pagination */
         .pagination {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 0;
+            padding: 15px 0;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 15px;
         }
         
         .pagination-info {
             color: var(--gray);
-            font-size: 0.85rem;
-            text-align: center;
-            width: 100%;
+            font-size: 0.95rem;
         }
         
         .pagination-controls {
             display: flex;
-            gap: 8px;
+            gap: 10px;
             align-items: center;
-            width: 100%;
-            justify-content: center;
-            flex-wrap: wrap;
         }
         
         .page-btn {
-            padding: 8px 12px;
+            padding: 8px 15px;
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 8px;
@@ -795,13 +922,11 @@
             cursor: pointer;
             transition: all 0.3s;
             font-weight: 500;
-            font-size: 0.85rem;
-            touch-action: manipulation;
         }
         
-        .page-btn:active:not(:disabled) {
+        .page-btn:hover:not(:disabled) {
             background: rgba(255, 255, 255, 0.1);
-            transform: translateY(2px);
+            transform: translateY(-2px);
         }
         
         .page-btn:disabled {
@@ -811,14 +936,12 @@
         
         .page-numbers {
             display: flex;
-            gap: 4px;
-            flex-wrap: wrap;
-            justify-content: center;
+            gap: 5px;
         }
         
         .page-number {
-            width: 32px;
-            height: 32px;
+            width: 35px;
+            height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -827,11 +950,9 @@
             cursor: pointer;
             transition: all 0.3s;
             font-weight: 500;
-            font-size: 0.85rem;
-            touch-action: manipulation;
         }
         
-        .page-number:active {
+        .page-number:hover {
             background: rgba(255, 255, 255, 0.1);
         }
         
@@ -843,17 +964,17 @@
         /* Footer */
         .footer {
             text-align: center;
-            padding: 15px;
+            padding: 20px;
             color: var(--gray);
-            font-size: 0.8rem;
+            font-size: 0.9rem;
             border-top: 1px solid rgba(255, 255, 255, 0.05);
-            margin-top: 15px;
+            margin-top: 20px;
         }
         
         .footer-stats {
             display: flex;
             justify-content: center;
-            gap: 15px;
+            gap: 25px;
             margin-top: 10px;
             flex-wrap: wrap;
         }
@@ -861,15 +982,14 @@
         .footer-stat {
             display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 0.8rem;
+            gap: 8px;
         }
         
         .footer-stat i {
             color: var(--primary);
         }
         
-        /* Modal for Safety Compliance Details - Mobile Optimized */
+        /* Modal */
         .modal {
             display: none;
             position: fixed;
@@ -877,21 +997,19 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0, 0, 0, 0.95);
+            background: rgba(0, 0, 0, 0.9);
             z-index: 1000;
             align-items: center;
             justify-content: center;
-            padding: 10px;
-            overflow-y: auto;
+            padding: 20px;
         }
         
         .modal-content {
             background: var(--dark-secondary);
-            border-radius: 15px;
+            border-radius: 20px;
+            max-width: 600px;
             width: 100%;
-            max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
+            overflow: hidden;
             position: relative;
             animation: modalFadeIn 0.3s ease;
         }
@@ -899,7 +1017,7 @@
         @keyframes modalFadeIn {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(-30px);
             }
             to {
                 opacity: 1;
@@ -908,86 +1026,61 @@
         }
         
         .modal-header {
-            padding: 15px 20px;
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            padding: 20px 25px;
+            background: var(--dark);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
         
         .modal-title {
-            font-size: 1.2rem;
-            font-weight: 700;
+            font-size: 1.4rem;
+            font-weight: 600;
             color: white;
             display: flex;
             align-items: center;
-            gap: 10px;
-        }
-        
-        .modal-title i {
-            color: var(--warning);
+            gap: 12px;
         }
         
         .close-modal {
             background: none;
             border: none;
-            color: white;
-            font-size: 22px;
+            color: var(--gray);
+            font-size: 24px;
             cursor: pointer;
-            width: 32px;
-            height: 32px;
+            width: 35px;
+            height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
             border-radius: 50%;
             transition: all 0.3s;
-            touch-action: manipulation;
         }
         
-        .close-modal:active {
-            background: rgba(255, 255, 255, 0.2);
-            color: var(--warning);
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
         }
         
         .modal-body {
-            padding: 20px;
+            padding: 25px;
         }
         
-        .modal-section-title {
-            font-size: 1.1rem;
-            color: var(--primary);
-            margin-bottom: 15px;
-            padding-bottom: 8px;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
-            display: flex;
-            align-items: center;
-            gap: 8px;
-        }
-        
-        .violation-details-grid {
+        .modal-info {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
-            margin-bottom: 20px;
         }
         
-        .violation-detail-item {
+        .info-item {
             background: rgba(255, 255, 255, 0.05);
+            padding: 18px;
             border-radius: 12px;
-            padding: 15px;
-            border-left: 4px solid var(--danger);
         }
         
-        .violation-detail-item.compliant {
-            border-left-color: var(--success);
-        }
-        
-        .violation-detail-label {
-            font-size: 0.8rem;
+        .info-label {
+            font-size: 0.85rem;
             color: var(--gray);
             margin-bottom: 6px;
             font-weight: 500;
@@ -995,150 +1088,10 @@
             letter-spacing: 0.5px;
         }
         
-        .violation-detail-value {
-            font-size: 1rem;
-            color: white;
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            flex-wrap: wrap;
-        }
-        
-        .violation-badge {
-            padding: 5px 10px;
-            border-radius: 12px;
-            font-weight: 600;
-            font-size: 0.75rem;
-        }
-        
-        .violation-badge.danger {
-            background: rgba(234, 67, 53, 0.2);
-            color: var(--danger);
-        }
-        
-        .violation-badge.success {
-            background: rgba(52, 168, 83, 0.2);
-            color: var(--success);
-        }
-        
-        .employee-info-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 12px;
-            margin-bottom: 20px;
-        }
-        
-        .info-item {
-            background: rgba(255, 255, 255, 0.05);
-            padding: 15px;
-            border-radius: 10px;
-        }
-        
-        .info-label {
-            font-size: 0.75rem;
-            color: var(--gray);
-            margin-bottom: 5px;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
-        }
-        
         .info-value {
-            font-size: 1rem;
+            font-size: 1.1rem;
             color: white;
             font-weight: 600;
-        }
-        
-        .compliance-status-overall {
-            text-align: center;
-            padding: 20px;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 12px;
-            margin: 15px 0;
-            border: 2px solid var(--danger);
-        }
-        
-        .compliance-status-overall.compliant {
-            border-color: var(--success);
-        }
-        
-        .compliance-status-label {
-            font-size: 0.9rem;
-            color: var(--gray);
-            margin-bottom: 8px;
-        }
-        
-        .compliance-status-value {
-            font-size: 1.5rem;
-            font-weight: 800;
-            margin: 8px 0;
-        }
-        
-        .compliance-status-overall.danger .compliance-status-value {
-            color: var(--danger);
-        }
-        
-        .compliance-status-overall.compliant .compliance-status-value {
-            color: var(--success);
-        }
-        
-        .compliance-status-overall i {
-            font-size: 2.5rem;
-            margin-bottom: 8px;
-        }
-        
-        /* Image Preview Section */
-        .image-preview-container {
-            text-align: center;
-            margin-top: 20px;
-        }
-        
-        .image-preview-title {
-            font-size: 1.1rem;
-            color: var(--primary);
-            margin-bottom: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-        }
-        
-        .image-preview {
-            max-width: 100%;
-            max-height: 250px;
-            border-radius: 8px;
-            margin-bottom: 12px;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-        }
-        
-        .image-not-found {
-            padding: 30px;
-            text-align: center;
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 8px;
-            margin: 15px 0;
-        }
-        
-        .image-not-found i {
-            font-size: 40px;
-            color: var(--gray);
-            margin-bottom: 12px;
-            opacity: 0.5;
-        }
-        
-        .image-not-found p {
-            color: var(--gray);
-            font-size: 0.9rem;
-        }
-        
-        .image-controls {
-            display: flex;
-            justify-content: center;
-            gap: 8px;
-            margin-top: 12px;
-            flex-wrap: wrap;
         }
         
         /* Loading */
@@ -1147,18 +1100,18 @@
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 40px;
+            padding: 50px;
             text-align: center;
         }
         
         .spinner {
-            width: 40px;
-            height: 40px;
-            border: 3px solid rgba(255, 255, 255, 0.1);
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
             border-radius: 50%;
             border-top-color: var(--primary);
             animation: spin 1s linear infinite;
-            margin-bottom: 12px;
+            margin-bottom: 15px;
         }
         
         @keyframes spin {
@@ -1167,202 +1120,21 @@
         
         /* Empty state */
         .empty-state {
-            padding: 40px 15px;
+            padding: 50px 15px;
             text-align: center;
             color: var(--gray);
         }
         
         .empty-state i {
-            font-size: 40px;
-            margin-bottom: 12px;
+            font-size: 50px;
+            margin-bottom: 15px;
             opacity: 0.5;
         }
         
         .empty-state h4 {
-            font-size: 1.1rem;
-            margin-bottom: 8px;
+            font-size: 1.3rem;
+            margin-bottom: 10px;
             color: rgba(255, 255, 255, 0.7);
-        }
-        
-        /* Full Screen Image Modal */
-        .modal-fullscreen {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.98);
-            z-index: 2000;
-            align-items: center;
-            justify-content: center;
-            padding: 10px;
-        }
-        
-        .modal-fullscreen-content {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .modal-fullscreen-header {
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            padding: 15px;
-            background: rgba(0, 0, 0, 0.7);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            z-index: 10;
-        }
-        
-        .modal-fullscreen-title {
-            font-size: 1rem;
-            font-weight: 600;
-            color: white;
-        }
-        
-        .modal-fullscreen-body {
-            width: 100%;
-            height: 100%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 60px 10px 10px 10px;
-        }
-        
-        .modal-fullscreen-image {
-            max-width: 100%;
-            max-height: 100%;
-            object-fit: contain;
-            border-radius: 5px;
-        }
-        
-        /* Mobile-specific improvements */
-        @media (max-width: 768px) {
-            body {
-                padding: 8px;
-            }
-            
-            .header-container {
-                padding: 15px;
-                border-radius: 12px;
-            }
-            
-            .main-title {
-                font-size: 1.3rem;
-                flex-direction: column;
-                gap: 5px;
-            }
-            
-            .institution-name {
-                font-size: 1.2rem;
-            }
-            
-            .subtitle {
-                font-size: 0.9rem;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-                gap: 12px;
-            }
-            
-            .stat-card {
-                padding: 18px;
-            }
-            
-            .stat-value {
-                font-size: 2.2rem;
-            }
-            
-            .stat-detail-value {
-                font-size: 1.3rem;
-            }
-            
-            .compliance-details-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .compliance-item-value {
-                font-size: 1.8rem;
-            }
-            
-            .btn {
-                padding: 10px 15px;
-                font-size: 0.9rem;
-            }
-            
-            table {
-                min-width: 900px;
-            }
-            
-            .page-number {
-                width: 30px;
-                height: 30px;
-            }
-            
-            .modal-body {
-                padding: 15px;
-            }
-            
-            .violation-details-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .employee-info-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (max-width: 480px) {
-            .main-title {
-                font-size: 1.1rem;
-            }
-            
-            .stat-value {
-                font-size: 2rem;
-            }
-            
-            .compliance-details-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .calendar-stats {
-                grid-template-columns: repeat(2, 1fr);
-            }
-            
-            .employee-info-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .image-controls {
-                flex-direction: column;
-                align-items: center;
-            }
-            
-            .btn {
-                width: 100%;
-            }
-        }
-        
-        /* Touch-friendly improvements */
-        * {
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        button, .violation-cell, .compliance-item, .page-number, .page-btn, .close-modal {
-            user-select: none;
-        }
-        
-        /* Better scrolling on iOS */
-        .table-wrapper, .modal-content {
-            -webkit-overflow-scrolling: touch;
         }
     </style>
 </head>
@@ -1370,35 +1142,149 @@
     <div class="container">
         <!-- ========== HEADER ========== -->
         <div class="header-container">
-            <div class="header-top">
+            <div class="institution-section">
                 <div class="institution-name">
                     <i class="fas fa-university"></i>
                     UMPSA
                 </div>
                 <span class="institution-badge umpsa-badge">UNIVERSITY</span>
-                
-                <div class="institution-name">
-                    <i class="fas fa-bolt"></i>
-                    VERSAFAC
-                </div>
-                <span class="institution-badge versafac-badge">SAFETY</span>
             </div>
             
             <div class="title-section">
                 <h1 class="main-title">
                     <i class="fas fa-hard-hat"></i>
-                    PPE SAFETY MONITORING
+                    PPE SAFETY MONITORING SYSTEM
                 </h1>
-                <p class="subtitle">Industrial Safety Compliance System</p>
+                <p class="subtitle">Industrial Safety Compliance & Monitoring</p>
             </div>
             
-            <div class="header-bottom">
+            <div class="header-stats-container">
+                <div class="institution-name">
+                    <i class="fas fa-bolt"></i>
+                    VERSAFAC
+                </div>
+                <span class="institution-badge versafac-badge">SAFETY SOLUTION</span>
+                
                 <div class="header-stat">
                     <i class="fas fa-shield-alt"></i>
                     <span>SAFETY FIRST</span>
                 </div>
                 <div class="datetime-display" id="currentDateTimeHeader">
                     Loading...
+                </div>
+            </div>
+        </div>
+        
+        <!-- LIVE STREAM SECTION -->
+        <div class="live-stream-section">
+            <div class="live-stream-header">
+                <div class="live-stream-title">
+                    <i class="fas fa-video"></i>
+                    LIVE CCTV MONITORING
+                </div>
+                <div class="stream-controls">
+                    <button class="btn btn-success" onclick="startCCTV()" id="startCCTVBtn">
+                        <i class="fas fa-play"></i> Start CCTV
+                    </button>
+                    <button class="btn btn-danger" onclick="stopCCTV()" id="stopCCTVBtn" disabled>
+                        <i class="fas fa-stop"></i> Stop CCTV
+                    </button>
+                    <button class="btn btn-warning" onclick="refreshStream()" id="refreshStreamBtn">
+                        <i class="fas fa-sync-alt"></i> Refresh Stream
+                    </button>
+                    <div class="status-indicator">
+                        <div class="status-dot" id="streamStatusDot"></div>
+                        <span id="streamStatusText">Checking connection...</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="live-stream-container">
+                <!-- Video Stream -->
+                <div class="video-container">
+                    <img id="liveVideo" src="" alt="Live CCTV Stream">
+                    <div class="video-overlay">
+                        <div class="video-status">
+                            <div class="status-indicator-stream" id="videoStatusIndicator"></div>
+                            <span id="videoStatusText">Initializing...</span>
+                        </div>
+                    </div>
+                    <div class="video-controls">
+                        <button class="btn btn-secondary btn-sm" onclick="takeSnapshot()">
+                            <i class="fas fa-camera"></i> Take Snapshot
+                        </button>
+                        <button class="btn btn-secondary btn-sm" onclick="toggleFullscreen()">
+                            <i class="fas fa-expand"></i> Fullscreen
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Stream Information -->
+                <div class="stream-info">
+                    <div class="info-card">
+                        <div class="info-card-title">
+                            <i class="fas fa-info-circle"></i>
+                            REAL-TIME DETECTION
+                        </div>
+                        <div class="info-card-content">
+                            Live PPE compliance monitoring with AI detection. The system automatically detects:
+                            <ul style="margin-top: 10px; padding-left: 20px;">
+                                <li>Safety Helmet Usage</li>
+                                <li>Safety Glove Compliance</li>
+                                <li>Safety Violations</li>
+                            </ul>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-card-title">
+                            <i class="fas fa-chart-bar"></i>
+                            CURRENT STATUS
+                        </div>
+                        <div class="cctv-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Stream Status:</span>
+                                <span class="detail-value" id="streamStatusDetail">OFF</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Frame Rate:</span>
+                                <span class="detail-value" id="frameRateInfo">0 FPS</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Last Detection:</span>
+                                <span class="detail-value" id="lastDetectionInfo">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Detections:</span>
+                                <span class="detail-value" id="detectionCount">0</span>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="info-card">
+                        <div class="info-card-title">
+                            <i class="fas fa-cogs"></i>
+                            SYSTEM INFO
+                        </div>
+                        <div class="cctv-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Server IP:</span>
+                                <span class="detail-value" id="serverIP">192.168.1.10:5000</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">RTSP Port:</span>
+                                <span class="detail-value">554</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Stream URL:</span>
+                                <span class="detail-value">/video</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Model:</span>
+                                <span class="detail-value">YOLO v8</span>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -1415,11 +1301,11 @@
                 <div class="stat-value" id="totalViolations">0</div>
                 <div class="stats-details">
                     <div class="stat-detail">
-                        <div class="stat-detail-label">Helmet</div>
+                        <div class="stat-detail-label">Helmet Violations</div>
                         <div class="stat-detail-value detail-bad" id="helmetViolations">0</div>
                     </div>
                     <div class="stat-detail">
-                        <div class="stat-detail-label">Gloves</div>
+                        <div class="stat-detail-label">Glove Violations</div>
                         <div class="stat-detail-value detail-bad" id="gloveViolations">0</div>
                     </div>
                 </div>
@@ -1435,11 +1321,11 @@
                 <div class="stat-value" id="fullPPE">0</div>
                 <div class="stats-details">
                     <div class="stat-detail">
-                        <div class="stat-detail-label">Helmet OK</div>
+                        <div class="stat-detail-label">Helmet Status OK</div>
                         <div class="stat-detail-value detail-good" id="helmetOK">0</div>
                     </div>
                     <div class="stat-detail">
-                        <div class="stat-detail-label">Gloves OK</div>
+                        <div class="stat-detail-label">Glove Status OK</div>
                         <div class="stat-detail-value detail-good" id="gloveOK">0</div>
                     </div>
                 </div>
@@ -1450,7 +1336,7 @@
                     <div class="stat-icon">
                         <i class="fas fa-chart-pie"></i>
                     </div>
-                    <div class="stat-title">SAFETY BREAKDOWN</div>
+                    <div class="stat-title">SAFETY STATUS BREAKDOWN</div>
                 </div>
                 <div class="stat-value" id="totalRecords">0</div>
                 <div class="stats-details">
@@ -1474,86 +1360,40 @@
             </div>
         </div>
         
-        <!-- Compliance Details Card -->
-        <div class="compliance-details-card">
-            <div class="compliance-details-header">
-                <div class="compliance-details-title">
-                    <i class="fas fa-exclamation-circle"></i>
-                    COMPLIANCE DETAILS
-                </div>
-                <div class="datetime">
-                    <i class="fas fa-history"></i> Updated: <span id="complianceUpdateTime">Just now</span>
-                </div>
-            </div>
-            <div class="compliance-details-grid">
-                <div class="compliance-item violation" onclick="openViolationDetails('helmet')">
-                    <div class="compliance-item-label">
-                        <i class="fas fa-hard-hat"></i> HELMET
-                    </div>
-                    <div class="compliance-item-value violation-value" id="compHelmetViolations">0</div>
-                    <div class="compliance-item-status status-violation">VIOLATION</div>
-                </div>
-                
-                <div class="compliance-item violation" onclick="openViolationDetails('glove')">
-                    <div class="compliance-item-label">
-                        <i class="fas fa-hand-paper"></i> GLOVES
-                    </div>
-                    <div class="compliance-item-value violation-value" id="compGloveViolations">0</div>
-                    <div class="compliance-item-status status-violation">VIOLATION</div>
-                </div>
-                
-                <div class="compliance-item violation" onclick="openViolationDetails('overall')">
-                    <div class="compliance-item-label">
-                        <i class="fas fa-clipboard-check"></i> OVERALL
-                    </div>
-                    <div class="compliance-item-value violation-value" id="compOverallViolations">0</div>
-                    <div class="compliance-item-status status-violation">VIOLATION</div>
-                </div>
-                
-                <div class="compliance-item compliant" onclick="openViolationDetails('compliant')">
-                    <div class="compliance-item-label">
-                        <i class="fas fa-check-circle"></i> FULL PPE
-                    </div>
-                    <div class="compliance-item-value compliant-value" id="compFullCompliance">0</div>
-                    <div class="compliance-item-status status-compliant">COMPLIANT</div>
-                </div>
-            </div>
-        </div>
-        
         <!-- Calendar & Date Filter -->
         <div class="calendar-section">
             <div class="calendar-header">
                 <div class="calendar-title">
                     <i class="fas fa-calendar-alt"></i>
-                    DATE FILTER
+                    SAFETY COMPLIANCE CALENDAR & FILTER
                 </div>
                 <div class="calendar-controls">
                     <div class="date-picker-container">
                         <input type="text" id="dateFilter" class="date-picker" placeholder="Select date to filter...">
                     </div>
                     <button class="btn btn-primary" onclick="filterByDate()">
-                        <i class="fas fa-filter"></i> Filter
+                        <i class="fas fa-filter"></i> Filter by Date
                     </button>
                     <button class="btn btn-secondary" onclick="clearDateFilter()">
-                        <i class="fas fa-times"></i> Clear
+                        <i class="fas fa-times"></i> Clear Filter
                     </button>
                 </div>
             </div>
             <div class="calendar-grid">
                 <div class="calendar-card">
-                    <h4><i class="fas fa-calendar-day"></i> TODAY'S STATS</h4>
+                    <h4><i class="fas fa-calendar-day"></i> TODAY'S SAFETY STATS</h4>
                     <div class="calendar-stats">
                         <div class="calendar-stat">
                             <div class="calendar-stat-value" id="todayViolations">0</div>
-                            <div class="calendar-stat-label">Violations</div>
+                            <div class="calendar-stat-label">Today's Violations</div>
                         </div>
                         <div class="calendar-stat">
                             <div class="calendar-stat-value" id="todayCompliance">0</div>
-                            <div class="calendar-stat-label">Compliant</div>
+                            <div class="calendar-stat-label">Compliant Today</div>
                         </div>
                         <div class="calendar-stat">
                             <div class="calendar-stat-value" id="todayTotal">0</div>
-                            <div class="calendar-stat-label">Total</div>
+                            <div class="calendar-stat-label">Total Inspections</div>
                         </div>
                     </div>
                 </div>
@@ -1564,20 +1404,20 @@
         <div class="controls">
             <div class="controls-left">
                 <button class="btn btn-primary" onclick="loadData()" id="refreshBtn">
-                    <i class="fas fa-sync-alt"></i> Refresh
+                    <i class="fas fa-sync-alt"></i> Refresh Data
                 </button>
                 <button class="btn btn-secondary" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
-                    <i class="fas fa-clock"></i> Auto: <span id="autoRefreshStatus">OFF</span>
+                    <i class="fas fa-clock"></i> Auto Refresh: <span id="autoRefreshStatus">OFF</span>
                 </button>
                 <div class="status-indicator">
                     <div class="status-dot" id="statusDot"></div>
-                    <span id="statusText">Connected</span>
+                    <span id="statusText">Connected to Safety System</span>
                 </div>
             </div>
             <div class="controls-right">
                 <div class="datetime">
-                    <i class="fas fa-database"></i> 
-                    <span id="showingRange">0-0</span> of <span id="totalFiltered">0</span>
+                    <i class="fas fa-database"></i> Displaying: 
+                    <span id="showingRange">0-0</span> of <span id="totalFiltered">0</span> safety records
                 </div>
             </div>
         </div>
@@ -1587,11 +1427,11 @@
             <div class="table-header">
                 <h3>
                     <i class="fas fa-history"></i>
-                    SAFETY ACTIVITY
+                    SAFETY COMPLIANCE ACTIVITY
                 </h3>
                 <div class="datetime">
-                    <i class="fas fa-filter"></i> 
-                    <span id="filterStatus">All Records</span>
+                    <i class="fas fa-filter"></i> Filtered: 
+                    <span id="filterStatus">All Safety Records</span>
                 </div>
             </div>
             <div class="table-wrapper">
@@ -1599,11 +1439,11 @@
                     <thead>
                         <tr>
                             <th><i class="fas fa-hashtag"></i> #</th>
-                            <th><i class="far fa-clock"></i> TIME</th>
-                            <th><i class="fas fa-hard-hat"></i> HELMET</th>
-                            <th><i class="fas fa-hand-paper"></i> GLOVES</th>
-                            <th><i class="fas fa-check"></i> STATUS</th>
-                            <th><i class="fas fa-eye"></i> VIEW</th>
+                            <th><i class="far fa-calendar-alt"></i> DATE & TIME</th>
+                            <th><i class="fas fa-search"></i> COMPLIANCE DETAILS</th>
+                            <th><i class="fas fa-hard-hat"></i> HELMET STATUS</th>
+                            <th><i class="fas fa-hand-paper"></i> GLOVE STATUS</th>
+                            <th><i class="fas fa-id-card"></i> COMPLIANCE STATUS</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -1611,7 +1451,7 @@
                             <td colspan="6">
                                 <div class="loading">
                                     <div class="spinner"></div>
-                                    <div>Loading safety data...</div>
+                                    <div>Loading safety compliance data...</div>
                                 </div>
                             </td>
                         </tr>
@@ -1623,15 +1463,15 @@
             <div class="pagination">
                 <div class="pagination-info">
                     Page <span id="currentPage">1</span> of <span id="totalPages">1</span> 
-                    | <span id="pageStart">1</span>-<span id="pageEnd">15</span> of 
-                    <span id="totalRecordsCount">0</span>
+                    | Displaying <span id="pageStart">1</span>-<span id="pageEnd">15</span> of 
+                    <span id="totalRecordsCount">0</span> safety records
                 </div>
                 <div class="pagination-controls">
                     <button class="page-btn" id="firstPage" onclick="goToPage(1)" disabled>
                         <i class="fas fa-angle-double-left"></i>
                     </button>
                     <button class="page-btn" id="prevPage" onclick="changePage(-1)" disabled>
-                        <i class="fas fa-angle-left"></i>
+                        <i class="fas fa-angle-left"></i> Previous
                     </button>
                     
                     <div class="page-numbers" id="pageNumbers">
@@ -1639,7 +1479,7 @@
                     </div>
                     
                     <button class="page-btn" id="nextPage" onclick="changePage(1)">
-                        <i class="fas fa-angle-right"></i>
+                        Next <i class="fas fa-angle-right"></i>
                     </button>
                     <button class="page-btn" id="lastPage" onclick="goToLastPage()">
                         <i class="fas fa-angle-double-right"></i>
@@ -1651,169 +1491,78 @@
         <!-- Footer -->
         <div class="footer">
             <div>
-                PPE Safety Monitoring System &copy; 2025 | UMPSA
+                PPE Safety Monitoring System &copy; 2025 | UMPSA Industrial Safety Division
             </div>
             <div class="footer-stats">
                 <div class="footer-stat">
                     <i class="fas fa-server"></i>
-                    <span id="apiStatus">Checking...</span>
+                    System Status: <span id="apiStatus">Checking...</span>
                 </div>
                 <div class="footer-stat">
                     <i class="fas fa-sync-alt"></i>
-                    <span id="lastUpdate">Never</span>
+                    Last Updated: <span id="lastUpdate">Never</span>
                 </div>
                 <div class="footer-stat">
-                    <i class="fas fa-clock"></i>
-                    <span id="autoRefreshFooter">OFF</span>
+                    <i class="fas fa-bolt"></i>
+                    Auto Refresh: <span id="autoRefreshFooter">OFF</span>
                 </div>
             </div>
         </div>
     </div>
     
     <!-- Safety Violation Details Modal -->
-    <div class="modal" id="violationModal">
+    <div class="modal" id="detailsModal">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">
                     <i class="fas fa-info-circle"></i>
-                    SAFETY DETAILS
+                    SAFETY COMPLIANCE DETAILS
                 </div>
-                <button class="close-modal" onclick="closeViolationModal()">&times;</button>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <!-- Inspection Time Section -->
-                <div class="violation-details-grid">
-                    <div class="violation-detail-item">
-                        <div class="violation-detail-label">INSPECTION TIME</div>
-                        <div class="violation-detail-value">
-                            <i class="far fa-clock"></i>
-                            <span id="modalInspectionTime">Loading...</span>
-                        </div>
-                    </div>
-                    
-                    <div class="violation-detail-item">
-                        <div class="violation-detail-label">INSPECTION DATE</div>
-                        <div class="violation-detail-value">
-                            <i class="far fa-calendar"></i>
-                            <span id="modalInspectionDate">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Helmet Compliance Section -->
-                <h3 class="modal-section-title">
-                    <i class="fas fa-hard-hat"></i>
-                    HELMET STATUS
-                </h3>
-                <div class="violation-details-grid">
-                    <div class="violation-detail-item">
-                        <div class="violation-detail-label">HELMET</div>
-                        <div class="violation-detail-value">
-                            <span id="modalHelmetStatusText">Loading...</span>
-                            <span id="modalHelmetBadge" class="violation-badge danger">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Glove Compliance Section -->
-                <h3 class="modal-section-title">
-                    <i class="fas fa-hand-paper"></i>
-                    GLOVE STATUS
-                </h3>
-                <div class="violation-details-grid">
-                    <div class="violation-detail-item">
-                        <div class="violation-detail-label">GLOVES</div>
-                        <div class="violation-detail-value">
-                            <span id="modalGloveStatusText">Loading...</span>
-                            <span id="modalGloveBadge" class="violation-badge danger">Loading...</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Employee Info Section -->
-                <h3 class="modal-section-title">
-                    <i class="fas fa-user-tie"></i>
-                    EMPLOYEE INFO
-                </h3>
-                <div class="employee-info-grid">
+                <div class="modal-info">
                     <div class="info-item">
-                        <div class="info-label">EMPLOYEE ID</div>
-                        <div class="info-value" id="modalEmployeeId">EMP-1</div>
+                        <div class="info-label">INSPECTION TIME</div>
+                        <div class="info-value" id="modalTime">-</div>
                     </div>
                     <div class="info-item">
-                        <div class="info-label">DEPARTMENT</div>
-                        <div class="info-value" id="modalDepartment">Industrial Safety</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">SHIFT</div>
-                        <div class="info-value" id="modalShift">Morning (8AM-4PM)</div>
-                    </div>
-                </div>
-                
-                <!-- Overall Compliance Status -->
-                <div class="compliance-status-overall danger" id="modalComplianceStatus">
-                    <i class="fas fa-exclamation-triangle"></i>
-                    <div class="compliance-status-label">OVERALL STATUS</div>
-                    <div class="compliance-status-value">LOADING...</div>
-                    <div class="violation-detail-value">
-                        <span id="modalOverallStatusText">Loading compliance status...</span>
-                    </div>
-                </div>
-                
-                <!-- Evidence Image Section -->
-                <div class="image-preview-container">
-                    <h3 class="image-preview-title">
-                        <i class="fas fa-image"></i>
-                        EVIDENCE IMAGE
-                    </h3>
-                    
-                    <div id="imageLoading" class="loading" style="display: none; padding: 20px;">
-                        <div class="spinner"></div>
-                        <div>Loading image...</div>
-                    </div>
-                    
-                    <div id="imagePreviewContent">
-                        <img id="modalImagePreview" class="image-preview" src="" alt="Safety Compliance Image" style="display: none;">
-                        <div id="imageNotFound" class="image-not-found" style="display: none;">
-                            <i class="fas fa-image"></i>
-                            <p>No image available</p>
+                        <div class="info-label">HELMET COMPLIANCE</div>
+                        <div class="info-value">
+                            <span id="modalHelmetStatus" class="status-badge badge-danger">NO HELMET</span>
                         </div>
                     </div>
-                    
-                    <div id="imageControls" class="image-controls" style="display: none;">
-                        <button class="btn btn-sm btn-danger" onclick="viewSafetyImage()">
-                            <i class="fas fa-expand"></i> Fullscreen
-                        </button>
-                        <button class="btn btn-sm btn-secondary" onclick="downloadSafetyImage()">
-                            <i class="fas fa-download"></i> Download
-                        </button>
+                    <div class="info-item">
+                        <div class="info-label">GLOVE COMPLIANCE</div>
+                        <div class="info-value">
+                            <span id="modalGloveStatus" class="status-badge badge-danger">NO GLOVES</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">OVERALL COMPLIANCE</div>
+                        <div class="info-value">
+                            <span id="modalCompliance" class="status-badge badge-danger">NON-COMPLIANT</span>
+                        </div>
                     </div>
                 </div>
-            </div>
-        </div>
-    </div>
-    
-    <!-- Full Screen Image Modal -->
-    <div class="modal modal-fullscreen" id="fullscreenImageModal">
-        <div class="modal-fullscreen-content">
-            <div class="modal-fullscreen-header">
-                <div class="modal-fullscreen-title">
-                    <i class="fas fa-expand"></i> Safety Evidence Image
-                </div>
-                <button class="close-modal" onclick="closeFullscreenImage()">&times;</button>
-            </div>
-            <div class="modal-fullscreen-body">
-                <img id="fullscreenImage" src="" alt="Fullscreen Safety Image" class="modal-fullscreen-image">
             </div>
         </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        // ============================================
-        // KONFIGURASI DAN DATA
-        // ============================================
+        // Configuration - GANTI INI DENGAN URL ANDA SENDIRI
         const API_URL = "https://script.google.com/macros/s/AKfycbw7aHL6T0GiigMT0h-s0je-uHiHElh0KXxRI4nd_BuKVo7N4lOYn7lNsBo7o4983PAm/exec";
+        
+        // AMBIL FLASK URL DARI PARAMETER URL ATAU GUNAKAN DEFAULT UNTUK IP ANDA 192.168.1.10
+        const urlParams = new URLSearchParams(window.location.search);
+        const flaskUrlParam = urlParams.get('flask_url');
+        const FLASK_URL = flaskUrlParam || "http://192.168.1.10:5000"; // GANTI DENGAN IP BENAR ANDA
+        
+        // Atau gunakan ngrok URL jika ada
+        // const FLASK_URL = "https://abcd-123-456-789.ngrok-free.app"; // Contoh ngrok URL
+        
+        console.log("Using Flask URL:", FLASK_URL);
         
         let autoRefreshInterval = null;
         let autoRefreshEnabled = false;
@@ -1823,11 +1572,28 @@
         const itemsPerPage = 15;
         let selectedDate = null;
         let dateFilter = null;
-        let currentImageUrl = '';
-        let currentViolationId = null;
+        let videoStreamInterval = null;
+        let isCCTVRunning = false;
+        let frameCount = 0;
+        let lastFrameTime = 0;
+        let detectionCount = 0;
+        let isFlaskConnected = false;
         
         // DOM Elements
         const elements = {
+            liveVideo: document.getElementById('liveVideo'),
+            videoStatusIndicator: document.getElementById('videoStatusIndicator'),
+            videoStatusText: document.getElementById('videoStatusText'),
+            startCCTVBtn: document.getElementById('startCCTVBtn'),
+            stopCCTVBtn: document.getElementById('stopCCTVBtn'),
+            refreshStreamBtn: document.getElementById('refreshStreamBtn'),
+            streamStatusDot: document.getElementById('streamStatusDot'),
+            streamStatusText: document.getElementById('streamStatusText'),
+            streamStatusDetail: document.getElementById('streamStatusDetail'),
+            frameRateInfo: document.getElementById('frameRateInfo'),
+            lastDetectionInfo: document.getElementById('lastDetectionInfo'),
+            detectionCount: document.getElementById('detectionCount'),
+            serverIP: document.getElementById('serverIP'),
             totalViolations: document.getElementById('totalViolations'),
             helmetViolations: document.getElementById('helmetViolations'),
             gloveViolations: document.getElementById('gloveViolations'),
@@ -1839,15 +1605,6 @@
             withGloves: document.getElementById('withGloves'),
             withoutGloves: document.getElementById('withoutGloves'),
             totalRecords: document.getElementById('totalRecords'),
-            
-            // Compliance Details
-            compHelmetViolations: document.getElementById('compHelmetViolations'),
-            compGloveViolations: document.getElementById('compGloveViolations'),
-            compOverallViolations: document.getElementById('compOverallViolations'),
-            compFullCompliance: document.getElementById('compFullCompliance'),
-            complianceUpdateTime: document.getElementById('complianceUpdateTime'),
-            
-            // Table elements
             tableBody: document.getElementById('tableBody'),
             currentDateTimeHeader: document.getElementById('currentDateTimeHeader'),
             lastUpdate: document.getElementById('lastUpdate'),
@@ -1875,61 +1632,12 @@
             nextPage: document.getElementById('nextPage'),
             lastPage: document.getElementById('lastPage'),
             pageNumbers: document.getElementById('pageNumbers'),
-            
-            // Modal elements
-            violationModal: document.getElementById('violationModal'),
-            modalInspectionTime: document.getElementById('modalInspectionTime'),
-            modalInspectionDate: document.getElementById('modalInspectionDate'),
-            modalHelmetStatusText: document.getElementById('modalHelmetStatusText'),
-            modalHelmetBadge: document.getElementById('modalHelmetBadge'),
-            modalGloveStatusText: document.getElementById('modalGloveStatusText'),
-            modalGloveBadge: document.getElementById('modalGloveBadge'),
-            modalEmployeeId: document.getElementById('modalEmployeeId'),
-            modalDepartment: document.getElementById('modalDepartment'),
-            modalShift: document.getElementById('modalShift'),
-            modalComplianceStatus: document.getElementById('modalComplianceStatus'),
-            modalOverallStatusText: document.getElementById('modalOverallStatusText'),
-            modalImagePreview: document.getElementById('modalImagePreview'),
-            imageLoading: document.getElementById('imageLoading'),
-            imagePreviewContent: document.getElementById('imagePreviewContent'),
-            imageNotFound: document.getElementById('imageNotFound'),
-            imageControls: document.getElementById('imageControls'),
-            fullscreenImageModal: document.getElementById('fullscreenImageModal'),
-            fullscreenImage: document.getElementById('fullscreenImage')
+            detailsModal: document.getElementById('detailsModal'),
+            modalTime: document.getElementById('modalTime'),
+            modalHelmetStatus: document.getElementById('modalHelmetStatus'),
+            modalGloveStatus: document.getElementById('modalGloveStatus'),
+            modalCompliance: document.getElementById('modalCompliance')
         };
-        
-        // ============================================
-        // FUNGSI INISIALISASI
-        // ============================================
-        
-        // Initialize saat halaman dimuat
-        document.addEventListener('DOMContentLoaded', function() {
-            initDateTime();
-            initCalendar();
-            initEventListeners();
-            loadData();
-            
-            // Auto refresh setiap 30 detik
-            startAutoRefresh(30000);
-        });
-        
-        // Initialize date time display
-        function initDateTime() {
-            function updateDateTime() {
-                const now = new Date();
-                const options = { 
-                    weekday: 'short',
-                    year: 'numeric', 
-                    month: 'short', 
-                    day: 'numeric',
-                    hour: '2-digit', 
-                    minute: '2-digit'
-                };
-                elements.currentDateTimeHeader.textContent = now.toLocaleDateString('en-US', options);
-            }
-            updateDateTime();
-            setInterval(updateDateTime, 60000); // Update setiap 1 minit
-        }
         
         // Initialize Flatpickr Calendar
         function initCalendar() {
@@ -1945,57 +1653,364 @@
             });
         }
         
-        // Initialize event listeners
-        function initEventListeners() {
-            // Close modal ketika klik di luar
-            elements.violationModal.addEventListener('click', function(event) {
-                if (event.target === elements.violationModal) {
-                    closeViolationModal();
-                }
-            });
-            
-            elements.fullscreenImageModal.addEventListener('click', function(event) {
-                if (event.target === elements.fullscreenImageModal) {
-                    closeFullscreenImage();
-                }
-            });
-            
-            // Escape key untuk close modal
-            document.addEventListener('keydown', function(event) {
-                if (event.key === 'Escape') {
-                    if (elements.violationModal.style.display === 'flex') {
-                        closeViolationModal();
-                    }
-                    if (elements.fullscreenImageModal.style.display === 'flex') {
-                        closeFullscreenImage();
-                    }
-                }
-            });
-            
-            // Touch feedback untuk button
-            document.querySelectorAll('button, .violation-cell, .compliance-item').forEach(element => {
-                element.addEventListener('touchstart', function() {
-                    this.style.transform = 'scale(0.95)';
-                });
-                
-                element.addEventListener('touchend', function() {
-                    this.style.transform = 'scale(1)';
-                });
-            });
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initDateTime();
+            initCalendar();
+            loadData();
+            testFlaskConnection();
+            startAutoRefresh(30000);
+        });
+        
+        // Initialize date time display
+        function initDateTime() {
+            function updateDateTime() {
+                const now = new Date();
+                const options = { 
+                    weekday: 'short',
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit'
+                };
+                elements.currentDateTimeHeader.textContent = now.toLocaleDateString('en-US', options);
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
         }
         
-        // ============================================
-        // FUNGSI UTAMA - LOAD DATA
-        // ============================================
+        // Test Flask connection dengan CORS handling
+        async function testFlaskConnection() {
+            try {
+                updateCCTVStatus('loading', 'Testing Flask connection...');
+                
+                // Cuba akses endpoint /status dengan timeout
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 5000);
+                
+                const response = await fetch(`${FLASK_URL}/status`, {
+                    method: 'GET',
+                    mode: 'cors',
+                    signal: controller.signal,
+                    headers: {
+                        'Accept': 'application/json'
+                    }
+                });
+                
+                clearTimeout(timeoutId);
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    isFlaskConnected = true;
+                    updateCCTVStatus('connected', `Flask Connected: ${data.cctv_status || 'OK'}`);
+                    isCCTVRunning = data.cctv_running || false;
+                    updateCCTVButtons();
+                    
+                    // Update IP display dengan IP yang betul
+                    const url = new URL(FLASK_URL);
+                    elements.serverIP.textContent = `${url.hostname}:${url.port || '5000'}`;
+                    
+                    // Jika CCTV sedang berjalan, mula stream
+                    if (isCCTVRunning) {
+                        startVideoStream();
+                    }
+                } else {
+                    throw new Error(`HTTP ${response.status}`);
+                }
+            } catch (error) {
+                console.warn('Flask connection test failed:', error);
+                updateCCTVStatus('error', 'Flask Server Not Found');
+                elements.startCCTVBtn.disabled = true;
+                elements.stopCCTVBtn.disabled = true;
+                elements.streamStatusDetail.textContent = 'OFFLINE';
+                elements.streamStatusDetail.style.color = '#ea4335';
+                
+                // Tunjukkan cara connect dalam alert
+                setTimeout(() => {
+                    alert(`Cannot connect to Flask server at ${FLASK_URL}\n\nTo fix this:\n1. Make sure Flask is running\n2. Use ngrok for public access\n3. Update the flask_url parameter in URL\n\nExample: ?flask_url=http://192.168.1.10:5000`);
+                }, 1000);
+            }
+        }
         
+        // Update CCTV status display
+        function updateCCTVStatus(status, message) {
+            const statusColors = {
+                'connected': '#34a853',
+                'loading': '#fbbc05',
+                'error': '#ea4335'
+            };
+            
+            elements.streamStatusDot.style.background = statusColors[status] || '#ea4335';
+            elements.streamStatusText.textContent = message;
+            
+            elements.videoStatusIndicator.style.background = statusColors[status] || '#ea4335';
+            elements.videoStatusText.textContent = message;
+            
+            if (status === 'connected') {
+                elements.videoStatusIndicator.classList.add('active');
+            } else {
+                elements.videoStatusIndicator.classList.remove('active');
+            }
+        }
+        
+        // Update CCTV control buttons
+        function updateCCTVButtons() {
+            if (isCCTVRunning) {
+                elements.startCCTVBtn.disabled = true;
+                elements.stopCCTVBtn.disabled = false;
+                elements.streamStatusDetail.textContent = 'RUNNING';
+                elements.streamStatusDetail.style.color = '#34a853';
+            } else {
+                elements.startCCTVBtn.disabled = !isFlaskConnected;
+                elements.stopCCTVBtn.disabled = true;
+                elements.streamStatusDetail.textContent = isFlaskConnected ? 'READY' : 'OFFLINE';
+                elements.streamStatusDetail.style.color = isFlaskConnected ? '#34a853' : '#ea4335';
+            }
+        }
+        
+        // Start CCTV dengan CORS handling
+        async function startCCTV() {
+            try {
+                updateCCTVStatus('loading', 'Starting CCTV...');
+                
+                const response = await fetch(`${FLASK_URL}/cctv_control`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ command: 'on' }),
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.status === 'ok' && data.running === true) {
+                        isCCTVRunning = true;
+                        updateCCTVButtons();
+                        updateCCTVStatus('connected', 'CCTV Running');
+                        startVideoStream();
+                        showNotification('CCTV started successfully!', 'success');
+                        return;
+                    }
+                }
+                throw new Error('Invalid response');
+            } catch (error) {
+                console.error('Error starting CCTV:', error);
+                updateCCTVStatus('error', 'Failed to start CCTV');
+                showNotification('Failed to start CCTV: ' + error.message, 'error');
+            }
+        }
+        
+        // Stop CCTV dengan CORS handling
+        async function stopCCTV() {
+            try {
+                updateCCTVStatus('loading', 'Stopping CCTV...');
+                
+                const response = await fetch(`${FLASK_URL}/cctv_control`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ command: 'off' }),
+                    mode: 'cors'
+                });
+                
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.status === 'ok' && data.running === false) {
+                        isCCTVRunning = false;
+                        updateCCTVButtons();
+                        updateCCTVStatus('connected', 'CCTV Stopped');
+                        stopVideoStream();
+                        showNotification('CCTV stopped successfully!', 'success');
+                        return;
+                    }
+                }
+                throw new Error('Invalid response');
+            } catch (error) {
+                console.error('Error stopping CCTV:', error);
+                updateCCTVStatus('error', 'Failed to stop CCTV');
+                showNotification('Failed to stop CCTV: ' + error.message, 'error');
+            }
+        }
+        
+        // Start video stream dengan fallback untuk HTTPS
+        function startVideoStream() {
+            if (videoStreamInterval) {
+                clearInterval(videoStreamInterval);
+            }
+            
+            frameCount = 0;
+            lastFrameTime = Date.now();
+            
+            // Gunakan URL yang sesuai (HTTP atau HTTPS)
+            const videoSrc = `${FLASK_URL}/video?t=${Date.now()}`;
+            
+            // Set video source
+            elements.liveVideo.src = videoSrc;
+            elements.videoStatusText.textContent = 'Live Stream Active';
+            
+            // Start frame rate calculation
+            videoStreamInterval = setInterval(calculateFrameRate, 1000);
+            
+            // Handle image errors
+            elements.liveVideo.onerror = function() {
+                console.warn('Stream error, retrying...');
+                elements.videoStatusText.textContent = 'Stream Error - Retrying...';
+                setTimeout(() => {
+                    if (isCCTVRunning) {
+                        const newTimestamp = Date.now();
+                        elements.liveVideo.src = `${FLASK_URL}/video?t=${newTimestamp}`;
+                    }
+                }, 2000);
+            };
+            
+            // Handle image load
+            elements.liveVideo.onload = function() {
+                frameCount++;
+                elements.videoStatusText.textContent = 'Live Stream Active';
+            };
+        }
+        
+        // Stop video stream
+        function stopVideoStream() {
+            if (videoStreamInterval) {
+                clearInterval(videoStreamInterval);
+                videoStreamInterval = null;
+            }
+            
+            elements.liveVideo.src = '';
+            elements.videoStatusText.textContent = 'Stream Stopped';
+            elements.frameRateInfo.textContent = '0 FPS';
+        }
+        
+        // Refresh stream
+        function refreshStream() {
+            if (isCCTVRunning) {
+                const timestamp = Date.now();
+                elements.liveVideo.src = `${FLASK_URL}/video?t=${timestamp}`;
+                updateCCTVStatus('connected', 'Stream Refreshed');
+                showNotification('Stream refreshed!', 'info');
+            } else {
+                showNotification('Please start CCTV first!', 'warning');
+            }
+        }
+        
+        // Calculate frame rate
+        function calculateFrameRate() {
+            const currentTime = Date.now();
+            const elapsed = (currentTime - lastFrameTime) / 1000;
+            const fps = elapsed > 0 ? Math.round(frameCount / elapsed) : 0;
+            
+            elements.frameRateInfo.textContent = `${fps} FPS`;
+            
+            // Simulate detections for demo
+            if (fps > 0 && Math.random() > 0.7) {
+                detectionCount++;
+                elements.detectionCount.textContent = detectionCount;
+                elements.lastDetectionInfo.textContent = new Date().toLocaleTimeString();
+            }
+            
+            frameCount = 0;
+            lastFrameTime = currentTime;
+        }
+        
+        // Take snapshot
+        function takeSnapshot() {
+            if (!isCCTVRunning || !elements.liveVideo.src) {
+                showNotification('Please start CCTV first!', 'warning');
+                return;
+            }
+            
+            try {
+                const canvas = document.createElement('canvas');
+                const video = elements.liveVideo;
+                const context = canvas.getContext('2d');
+                
+                canvas.width = video.videoWidth || 1280;
+                canvas.height = video.videoHeight || 720;
+                
+                context.drawImage(video, 0, 0, canvas.width, canvas.height);
+                
+                const link = document.createElement('a');
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                link.download = `ppe-snapshot-${timestamp}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+                
+                showNotification('Snapshot saved!', 'success');
+            } catch (error) {
+                showNotification('Error taking snapshot: ' + error.message, 'error');
+            }
+        }
+        
+        // Toggle fullscreen
+        function toggleFullscreen() {
+            const videoContainer = document.querySelector('.video-container');
+            
+            if (!document.fullscreenElement) {
+                if (videoContainer.requestFullscreen) {
+                    videoContainer.requestFullscreen();
+                } else if (videoContainer.webkitRequestFullscreen) {
+                    videoContainer.webkitRequestFullscreen();
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen();
+                } else if (document.webkitExitFullscreen) {
+                    document.webkitExitFullscreen();
+                }
+            }
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'info') {
+            const colors = {
+                'success': '#34a853',
+                'error': '#ea4335',
+                'warning': '#fbbc05',
+                'info': '#1a73e8'
+            };
+            
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                padding: 15px 20px;
+                background: ${colors[type] || '#1a73e8'};
+                color: white;
+                border-radius: 10px;
+                z-index: 10000;
+                font-weight: 500;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                animation: slideIn 0.3s ease;
+            `;
+            
+            notification.textContent = message;
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    document.body.removeChild(notification);
+                }, 300);
+            }, 3000);
+        }
+        
+        // Load data from API
         async function loadData() {
             try {
-                // Tunjukkan loading state
-                elements.refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                const originalText = elements.refreshBtn.innerHTML;
+                elements.refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
                 elements.refreshBtn.disabled = true;
-                updateStatus('loading', 'Loading data...');
                 
-                // Fetch data dari API
+                updateStatus('loading', 'Loading safety data...');
+                
                 const response = await fetch(`${API_URL}?action=getData&t=${Date.now()}`);
                 
                 if (!response.ok) {
@@ -2005,253 +2020,100 @@
                 const data = await response.json();
                 
                 if (!data.success) {
-                    throw new Error(data.error || 'Failed to load data');
+                    throw new Error(data.error || 'Failed to load safety data');
                 }
                 
-                // Process data
                 allData = processData(data.data);
                 filteredData = [...allData];
                 
-                // Update semua statistik
-                updateStatistics();
-                updateComplianceDetails();
+                updateStatistics(data.stats);
                 updateCalendarStats();
                 
-                // Reset ke halaman pertama
                 currentPage = 1;
                 updateTableWithPagination();
                 
-                // Update last update time
                 const now = new Date();
                 elements.lastUpdate.textContent = now.toLocaleTimeString('en-US', {
                     hour: '2-digit',
-                    minute: '2-digit'
+                    minute: '2-digit',
+                    second: '2-digit'
                 });
                 
-                elements.complianceUpdateTime.textContent = 'Just now';
-                
-                // Tunjukkan notifikasi success
-                updateStatus('success', 'Connected');
-                showNotification(`Loaded ${allData.length} records`, 'success');
+                updateStatus('success', 'Connected to Safety System');
                 
             } catch (error) {
-                console.error('Error loading data:', error);
+                console.error('Error loading safety data:', error);
                 
-                // Tunjukkan error state
                 elements.tableBody.innerHTML = `
                     <tr>
                         <td colspan="6">
                             <div class="empty-state">
                                 <i class="fas fa-exclamation-triangle"></i>
-                                <h4>Failed to Load Data</h4>
+                                <h4>Failed to Load Safety Data</h4>
                                 <p>${error.message}</p>
-                                <button class="btn btn-primary" onclick="loadData()" style="margin-top: 15px;">
-                                    <i class="fas fa-redo"></i> Retry
+                                <button class="btn btn-primary" onclick="loadData()" style="margin-top: 20px;">
+                                    <i class="fas fa-redo"></i> Retry Connection
                                 </button>
                             </div>
                         </td>
                     </tr>
                 `;
                 
-                updateStatus('error', 'Connection Error');
-                showNotification(`Error: ${error.message}`, 'error');
+                updateStatus('error', 'Safety System Connection Error');
                 
             } finally {
-                // Reset button state
-                elements.refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh';
+                elements.refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
                 elements.refreshBtn.disabled = false;
             }
         }
         
-        // Process data dari Google Sheet - DIPERBAIKI UNTUK IMAGE
+        // Process data to ensure proper formatting
         function processData(data) {
-            if (!Array.isArray(data)) {
-                console.error('Data is not an array:', data);
-                return [];
-            }
-            
-            return data.map((item, index) => {
-                // Extract timestamp
-                let datetime = item['DateTime'] || item['Timestamp'] || new Date().toISOString();
-                
-                // Extract helmet status
-                let helmetStatus = 'no helmet';
-                const noHelmetValue = item['No_Helmet'];
-                if (noHelmetValue !== undefined && noHelmetValue !== null) {
-                    const noHelmetStr = noHelmetValue.toString().toLowerCase().trim();
-                    
-                    if (noHelmetStr === 'false' || noHelmetStr === 'no' || noHelmetStr === '0' || 
-                        noHelmetStr === 'helmet' || noHelmetStr === 'with helmet' || noHelmetStr === 'ok') {
-                        helmetStatus = 'helmet';
-                    } else if (noHelmetStr === 'true' || noHelmetStr === 'yes' || noHelmetStr === '1' ||
-                              noHelmetStr === 'no helmet' || noHelmetStr === 'without helmet' || 
-                              noHelmetStr === 'violation') {
-                        helmetStatus = 'no helmet';
+            return data.map(item => {
+                let datetime = item.datetime;
+                if (!datetime && item.timestamp) {
+                    try {
+                        const date = new Date(item.timestamp);
+                        datetime = date.toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                    } catch (e) {
+                        datetime = 'Invalid Date';
                     }
                 }
                 
-                // Extract glove status
-                let gloveStatus = 'no glove';
-                const noGloveValue = item['No_Glove'];
-                if (noGloveValue !== undefined && noGloveValue !== null) {
-                    const noGloveStr = noGloveValue.toString().toLowerCase().trim();
-                    
-                    if (noGloveStr === 'false' || noGloveStr === 'no' || noGloveStr === '0' || 
-                        noGloveStr === 'glove' || noGloveStr === 'with glove' || noGloveStr === 'ok') {
-                        gloveStatus = 'glove';
-                    } else if (noGloveStr === 'true' || noGloveStr === 'yes' || noGloveStr === '1' ||
-                              noGloveStr === 'no glove' || noGloveStr === 'without glove' || 
-                              noGloveStr === 'violation') {
-                        gloveStatus = 'no glove';
-                    }
-                }
-                
-                // Extract image URL - CARA BARU YANG LEBIH TEPAT
-                let imageUrl = '';
-                let originalImageUrl = '';
-                
-                // Cari semua kemungkinan nama kolom untuk image
-                const allKeys = Object.keys(item);
-                console.log('Available columns in item:', allKeys);
-                
-                // Cari kolom yang mengandungi 'image' atau 'url'
-                for (const key of allKeys) {
-                    if (key.toLowerCase().includes('image') || key.toLowerCase().includes('url')) {
-                        const value = item[key];
-                        if (value && value.toString().trim() !== '' && 
-                            !value.toString().toLowerCase().includes('null') &&
-                            !value.toString().toLowerCase().includes('undefined')) {
-                            originalImageUrl = value.toString().trim();
-                            console.log(`Found image URL in column "${key}":`, originalImageUrl);
-                            break;
-                        }
-                    }
-                }
-                
-                // Convert Google Drive URL ke format yang betul
-                if (originalImageUrl) {
-                    imageUrl = convertGoogleDriveUrl(originalImageUrl);
-                    console.log('Converted image URL:', imageUrl);
-                }
-                
-                // Format datetime
-                let formattedDatetime, formattedDate;
-                try {
-                    const date = new Date(datetime);
-                    if (isNaN(date.getTime())) {
-                        const now = new Date();
-                        formattedDatetime = now.toLocaleString();
-                        formattedDate = now.toLocaleDateString();
-                    } else {
-                        formattedDatetime = date.toLocaleString();
-                        formattedDate = date.toLocaleDateString();
-                    }
-                } catch (e) {
-                    const now = new Date();
-                    formattedDatetime = now.toLocaleString();
-                    formattedDate = now.toLocaleDateString();
-                }
-                
-                // Return processed item
                 return {
                     ...item,
-                    id: `violation_${index}_${Date.now()}`,
-                    datetime: formattedDatetime,
-                    dateOnly: formattedDate,
-                    helmetStatus: helmetStatus,
-                    gloveStatus: gloveStatus,
-                    employeeId: item['Employee ID'] || item['EmployeeId'] || `EMP-${index + 1}`,
-                    department: item['Department'] || 'Industrial Safety',
-                    shift: item['Shift'] || 'Morning (8AM-4PM)',
-                    originalImageUrl: originalImageUrl,
-                    imageUrl: imageUrl,
-                    // Debug info
-                    _debug: {
-                        hasImage: !!originalImageUrl,
-                        originalUrl: originalImageUrl,
-                        convertedUrl: imageUrl
-                    }
+                    datetime: datetime,
+                    dateOnly: datetime ? datetime.split(',')[0] : '',
+                    helmetStatus: (item.helmetStatus || '').toLowerCase().trim(),
+                    gloveStatus: (item.gloveStatus || '').toLowerCase().trim()
                 };
             });
         }
         
-        // FUNGSI BARU: Convert Google Drive URL ke format yang betul
-        function convertGoogleDriveUrl(url) {
-            if (!url || url.trim() === '') {
-                return '';
-            }
+        // Update statistics display
+        function updateStatistics(stats) {
+            elements.totalViolations.textContent = stats.totalViolations || 0;
+            elements.helmetViolations.textContent = stats.helmetViolations || 0;
+            elements.gloveViolations.textContent = stats.gloveViolations || 0;
+            elements.fullPPE.textContent = stats.fullPPE || 0;
+            elements.helmetOK.textContent = stats.helmetOK || 0;
+            elements.gloveOK.textContent = stats.gloveOK || 0;
+            elements.totalRecords.textContent = stats.total || 0;
             
-            let finalUrl = url.trim();
-            
-            // 1. Jika URL sudah dalam format download, return as is
-            if (finalUrl.includes('uc?id=') || finalUrl.includes('uc?export=download')) {
-                return finalUrl;
-            }
-            
-            // 2. Jika URL adalah Google Drive view link, convert ke download link
-            if (finalUrl.includes('drive.google.com/file/d/')) {
-                // Contoh: https://drive.google.com/file/d/1aBcDeFgHiJkLmNoPqRsTuVwXyZ/view
-                const match = finalUrl.match(/\/d\/([^\/]+)/);
-                if (match && match[1]) {
-                    finalUrl = `https://drive.google.com/uc?id=${match[1]}&export=download`;
-                }
-            }
-            
-            // 3. Jika URL adalah Google Drive open link, convert ke download link
-            if (finalUrl.includes('drive.google.com/open?id=')) {
-                // Contoh: https://drive.google.com/open?id=1aBcDeFgHiJkLmNoPqRsTuVwXyZ
-                const match = finalUrl.match(/id=([^&]+)/);
-                if (match && match[1]) {
-                    finalUrl = `https://drive.google.com/uc?id=${match[1]}&export=download`;
-                }
-            }
-            
-            // 4. Tambah https:// jika tidak ada protocol
-            if (!finalUrl.startsWith('http')) {
-                finalUrl = 'https://' + finalUrl;
-            }
-            
-            console.log('URL Conversion:', url, '->', finalUrl);
-            return finalUrl;
+            elements.withHelmet.textContent = stats.helmetOK || 0;
+            elements.withoutHelmet.textContent = stats.helmetViolations || 0;
+            elements.withGloves.textContent = stats.gloveOK || 0;
+            elements.withoutGloves.textContent = stats.gloveViolations || 0;
         }
         
-        // ============================================
-        // FUNGSI STATISTIK
-        // ============================================
-        
-        function updateStatistics() {
-            const total = allData.length;
-            const helmetViolations = allData.filter(item => item.helmetStatus === 'no helmet').length;
-            const gloveViolations = allData.filter(item => item.gloveStatus === 'no glove').length;
-            const fullPPE = allData.filter(item => item.helmetStatus === 'helmet' && item.gloveStatus === 'glove').length;
-            const helmetOK = allData.filter(item => item.helmetStatus === 'helmet').length;
-            const gloveOK = allData.filter(item => item.gloveStatus === 'glove').length;
-            
-            elements.totalViolations.textContent = helmetViolations + gloveViolations;
-            elements.helmetViolations.textContent = helmetViolations;
-            elements.gloveViolations.textContent = gloveViolations;
-            elements.fullPPE.textContent = fullPPE;
-            elements.helmetOK.textContent = helmetOK;
-            elements.gloveOK.textContent = gloveOK;
-            elements.totalRecords.textContent = total;
-            
-            elements.withHelmet.textContent = helmetOK;
-            elements.withoutHelmet.textContent = helmetViolations;
-            elements.withGloves.textContent = gloveOK;
-            elements.withoutGloves.textContent = gloveViolations;
-        }
-        
-        function updateComplianceDetails() {
-            const helmetViolations = parseInt(elements.helmetViolations.textContent) || 0;
-            const gloveViolations = parseInt(elements.gloveViolations.textContent) || 0;
-            const fullCompliance = parseInt(elements.fullPPE.textContent) || 0;
-            
-            elements.compHelmetViolations.textContent = helmetViolations;
-            elements.compGloveViolations.textContent = gloveViolations;
-            elements.compOverallViolations.textContent = helmetViolations + gloveViolations;
-            elements.compFullCompliance.textContent = fullCompliance;
-        }
-        
+        // Update calendar statistics
         function updateCalendarStats() {
             const today = new Date();
             const todayStr = today.toISOString().split('T')[0];
@@ -2259,15 +2121,14 @@
             const todayData = allData.filter(item => {
                 try {
                     const itemDate = new Date(item.datetime);
-                    const itemDateStr = itemDate.toISOString().split('T')[0];
-                    return itemDateStr === todayStr;
+                    return itemDate.toISOString().split('T')[0] === todayStr;
                 } catch (e) {
                     return false;
                 }
             });
             
             const todayViolations = todayData.filter(item => 
-                item.helmetStatus === 'no helmet' || item.gloveStatus === 'no glove'
+                item.helmetStatus.includes('no') || item.gloveStatus.includes('no')
             ).length;
             
             const todayCompliance = todayData.filter(item => 
@@ -2279,10 +2140,7 @@
             elements.todayTotal.textContent = todayData.length;
         }
         
-        // ============================================
-        // FUNGSI TABLE & PAGINATION
-        // ============================================
-        
+        // Update table with pagination
         function updateTableWithPagination() {
             const totalItems = filteredData.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -2290,7 +2148,6 @@
             const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
             const currentData = filteredData.slice(startIndex, endIndex);
             
-            // Update pagination info
             elements.currentPage.textContent = currentPage;
             elements.totalPages.textContent = totalPages;
             elements.pageStart.textContent = totalItems > 0 ? startIndex + 1 : 0;
@@ -2302,14 +2159,14 @@
             if (selectedDate) {
                 elements.filterStatus.textContent = `Date: ${selectedDate}`;
             } else {
-                elements.filterStatus.textContent = 'All Records';
+                elements.filterStatus.textContent = 'All Safety Records';
             }
             
-            // Update table content
             updateTableContent(currentData, startIndex);
             updatePaginationControls(totalPages);
         }
         
+        // Update table content
         function updateTableContent(data, startIndex) {
             if (!data || data.length === 0) {
                 elements.tableBody.innerHTML = `
@@ -2317,11 +2174,8 @@
                         <td colspan="6">
                             <div class="empty-state">
                                 <i class="fas fa-database"></i>
-                                <h4>No Data Available</h4>
-                                <p>No records found for the selected filter.</p>
-                                <button class="btn btn-primary" onclick="clearDateFilter()" style="margin-top: 15px;">
-                                    <i class="fas fa-times"></i> Clear Filter
-                                </button>
+                                <h4>No Safety Data Available</h4>
+                                <p>No safety compliance records found for the selected filter.</p>
                             </div>
                         </td>
                     </tr>
@@ -2337,24 +2191,47 @@
                 const isCompliant = (item.helmetStatus === 'helmet' && item.gloveStatus === 'glove');
                 const helmetText = item.helmetStatus === 'helmet' ? 'HELMET OK' : 'NO HELMET';
                 const gloveText = item.gloveStatus === 'glove' ? 'GLOVES OK' : 'NO GLOVES';
-                const complianceText = isCompliant ? 'COMPLIANT' : 'VIOLATION';
+                const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
                 
                 const helmetBadgeClass = item.helmetStatus === 'helmet' ? 'badge-success' : 'badge-danger';
                 const gloveBadgeClass = item.gloveStatus === 'glove' ? 'badge-success' : 'badge-danger';
                 const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
                 
+                let formattedTime = item.datetime;
+                try {
+                    const date = new Date(item.datetime);
+                    formattedTime = date.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                } catch (e) {}
+                
+                const iconButtonClass = isCompliant ? 'compliant-btn' : 'violation-btn';
+                const iconType = isCompliant ? 'fa-check-circle' : 'fa-exclamation-triangle';
+                const buttonText = isCompliant ? 'COMPLIANT' : 'VIOLATION';
+                
+                const iconButtonHTML = `
+                    <button class="ppe-icon-btn ${iconButtonClass}" 
+                            onclick="openDetailsModal('${formattedTime.replace(/'/g, "\\'")}', 
+                                    '${item.helmetStatus}', '${item.gloveStatus}')"
+                            title="Click to view safety compliance details">
+                        <i class="fas ${iconType}"></i>
+                        <span>${buttonText}</span>
+                    </button>
+                `;
+                
                 tableHTML += `
                     <tr>
                         <td class="row-number">${globalIndex + 1}</td>
-                        <td class="datetime-cell">${item.datetime}</td>
+                        <td class="datetime-cell">${formattedTime}</td>
+                        <td class="image-cell">${iconButtonHTML}</td>
                         <td><span class="status-badge ${helmetBadgeClass}">${helmetText}</span></td>
                         <td><span class="status-badge ${gloveBadgeClass}">${gloveText}</span></td>
                         <td><span class="status-badge ${complianceBadgeClass}">${complianceText}</span></td>
-                        <td>
-                            <div class="violation-cell" onclick="openViolationModal('${item.id}')">
-                                <i class="fas fa-eye"></i> VIEW
-                            </div>
-                        </td>
                     </tr>
                 `;
             });
@@ -2362,6 +2239,7 @@
             elements.tableBody.innerHTML = tableHTML;
         }
         
+        // Update pagination controls
         function updatePaginationControls(totalPages) {
             elements.firstPage.disabled = currentPage === 1;
             elements.prevPage.disabled = currentPage === 1;
@@ -2411,11 +2289,13 @@
             elements.pageNumbers.innerHTML = pageNumbersHTML;
         }
         
+        // Change page
         function changePage(delta) {
             const newPage = currentPage + delta;
             goToPage(newPage);
         }
         
+        // Go to specific page
         function goToPage(page) {
             const totalPages = Math.ceil(filteredData.length / itemsPerPage);
             
@@ -2426,257 +2306,18 @@
             updateTableWithPagination();
         }
         
+        // Go to last page
         function goToLastPage() {
             const totalPages = Math.ceil(filteredData.length / itemsPerPage);
             goToPage(totalPages);
         }
         
-        // ============================================
-        // FUNGSI MODAL
-        // ============================================
-        
-        function openViolationModal(violationId) {
-            currentViolationId = violationId;
-            const violation = allData.find(item => item.id === violationId);
-            
-            if (!violation) {
-                showNotification('Data not found', 'error');
-                return;
-            }
-            
-            console.log('Opening modal for violation:', violation);
-            console.log('Image debug info:', violation._debug);
-            
-            // Reset image display
-            elements.modalImagePreview.style.display = 'none';
-            elements.imageNotFound.style.display = 'none';
-            elements.imageControls.style.display = 'none';
-            elements.imageLoading.style.display = 'flex';
-            
-            // Set modal data
-            elements.modalInspectionTime.textContent = violation.datetime;
-            elements.modalInspectionDate.textContent = violation.dateOnly;
-            
-            // Helmet status
-            const isHelmetOK = violation.helmetStatus === 'helmet';
-            const helmetText = isHelmetOK ? 'HELMET OK' : 'NO HELMET';
-            const helmetBadgeClass = isHelmetOK ? 'success' : 'danger';
-            const helmetBadgeText = isHelmetOK ? 'OK' : 'VIOLATION';
-            elements.modalHelmetStatusText.textContent = helmetText;
-            elements.modalHelmetBadge.className = `violation-badge ${helmetBadgeClass}`;
-            elements.modalHelmetBadge.textContent = helmetBadgeText;
-            
-            // Glove status
-            const isGloveOK = violation.gloveStatus === 'glove';
-            const gloveText = isGloveOK ? 'GLOVES OK' : 'NO GLOVES';
-            const gloveBadgeClass = isGloveOK ? 'success' : 'danger';
-            const gloveBadgeText = isGloveOK ? 'OK' : 'VIOLATION';
-            elements.modalGloveStatusText.textContent = gloveText;
-            elements.modalGloveBadge.className = `violation-badge ${gloveBadgeClass}`;
-            elements.modalGloveBadge.textContent = gloveBadgeText;
-            
-            // Employee info
-            elements.modalEmployeeId.textContent = violation.employeeId || 'EMP-1';
-            elements.modalDepartment.textContent = violation.department || 'Industrial Safety';
-            elements.modalShift.textContent = violation.shift || 'Morning (8AM-4PM)';
-            
-            // Overall compliance
-            const isCompliant = isHelmetOK && isGloveOK;
-            const overallStatus = isCompliant ? 'COMPLIANT' : 'VIOLATION';
-            const overallClass = isCompliant ? 'compliant' : 'danger';
-            const overallIcon = isCompliant ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
-            
-            elements.modalComplianceStatus.className = `compliance-status-overall ${overallClass}`;
-            elements.modalComplianceStatus.innerHTML = `
-                <i class="${overallIcon}"></i>
-                <div class="compliance-status-label">STATUS</div>
-                <div class="compliance-status-value">${overallStatus}</div>
-                <div class="violation-detail-value">
-                    <span id="modalOverallStatusText">
-                        ${isCompliant ? 'Helmet and Gloves OK' : 
-                          (!isHelmetOK ? 'Missing Helmet' : '') + 
-                          (!isHelmetOK && !isGloveOK ? ' & ' : '') + 
-                          (!isGloveOK ? 'Missing Gloves' : '')}
-                    </span>
-                </div>
-            `;
-            
-            // Load image - GUNAKAN URL YANG SUDAH DIPROSES
-            currentImageUrl = violation.imageUrl || violation.originalImageUrl;
-            console.log('Loading image from URL:', currentImageUrl);
-            
-            if (currentImageUrl && currentImageUrl.trim() !== '') {
-                loadViolationImage(currentImageUrl);
-            } else {
-                elements.imageLoading.style.display = 'none';
-                elements.imageNotFound.style.display = 'block';
-                showNotification('No image available for this record', 'info');
-            }
-            
-            // Show modal
-            elements.violationModal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function openViolationDetails(type) {
-            let violation;
-            
-            if (type === 'helmet') {
-                violation = allData.find(item => item.helmetStatus === 'no helmet');
-            } else if (type === 'glove') {
-                violation = allData.find(item => item.gloveStatus === 'no glove');
-            } else if (type === 'overall') {
-                violation = allData.find(item => item.helmetStatus === 'no helmet' || item.gloveStatus === 'no glove');
-            } else if (type === 'compliant') {
-                violation = allData.find(item => item.helmetStatus === 'helmet' && item.gloveStatus === 'glove');
-            }
-            
-            if (violation) {
-                openViolationModal(violation.id);
-            } else {
-                showNotification(`No ${type} data available`, 'warning');
-            }
-        }
-        
-        function closeViolationModal() {
-            elements.violationModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            currentViolationId = null;
-            currentImageUrl = '';
-        }
-        
-        // ============================================
-        // FUNGSI GAMBAR - DIPERBAIKI
-        // ============================================
-        
-        function loadViolationImage(imageUrl) {
-            // Reset
-            elements.modalImagePreview.style.display = 'none';
-            elements.imageNotFound.style.display = 'none';
-            elements.imageControls.style.display = 'none';
-            elements.imageLoading.style.display = 'flex';
-            
-            if (!imageUrl || imageUrl.trim() === '' || imageUrl === 'undefined') {
-                setTimeout(() => {
-                    elements.imageLoading.style.display = 'none';
-                    elements.imageNotFound.style.display = 'block';
-                }, 1000);
-                return;
-            }
-            
-            // Fix URL jika perlu
-            let fixedUrl = imageUrl;
-            
-            // Convert Google Drive URL jika perlu
-            fixedUrl = convertGoogleDriveUrl(fixedUrl);
-            
-            console.log('Attempting to load image from:', fixedUrl);
-            
-            // Load gambar
-            const img = new Image();
-            const timeout = setTimeout(() => {
-                if (!img.complete) {
-                    console.log('Image load timeout for:', fixedUrl);
-                    elements.imageLoading.style.display = 'none';
-                    elements.imageNotFound.style.display = 'block';
-                    showNotification('Image loading timeout', 'warning');
-                }
-            }, 8000);
-            
-            img.onload = function() {
-                clearTimeout(timeout);
-                console.log('Image loaded successfully:', fixedUrl);
-                elements.modalImagePreview.src = fixedUrl;
-                elements.imageLoading.style.display = 'none';
-                elements.modalImagePreview.style.display = 'block';
-                elements.imageControls.style.display = 'flex';
-                currentImageUrl = fixedUrl;
-            };
-            
-            img.onerror = function(error) {
-                clearTimeout(timeout);
-                console.error('Error loading image:', error, 'URL:', fixedUrl);
-                
-                // Cuba cara lain untuk Google Drive
-                if (fixedUrl.includes('drive.google.com')) {
-                    // Cuba format alternatif
-                    const altUrl = fixedUrl.replace('uc?id=', 'uc?export=view&id=');
-                    console.log('Trying alternative URL:', altUrl);
-                    
-                    const img2 = new Image();
-                    img2.onload = function() {
-                        elements.modalImagePreview.src = altUrl;
-                        elements.imageLoading.style.display = 'none';
-                        elements.modalImagePreview.style.display = 'block';
-                        elements.imageControls.style.display = 'flex';
-                        currentImageUrl = altUrl;
-                    };
-                    
-                    img2.onerror = function() {
-                        elements.imageLoading.style.display = 'none';
-                        elements.imageNotFound.style.display = 'block';
-                        showNotification('Failed to load image from Google Drive', 'error');
-                    };
-                    
-                    img2.src = altUrl;
-                } else {
-                    elements.imageLoading.style.display = 'none';
-                    elements.imageNotFound.style.display = 'block';
-                    showNotification('Failed to load image', 'error');
-                }
-            };
-            
-            img.src = fixedUrl;
-        }
-        
-        function viewSafetyImage() {
-            if (!currentImageUrl || currentImageUrl.trim() === '') {
-                showNotification('No image available', 'warning');
-                return;
-            }
-            
-            elements.fullscreenImage.src = currentImageUrl;
-            elements.fullscreenImageModal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-        
-        function closeFullscreenImage() {
-            elements.fullscreenImageModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-        }
-        
-        function downloadSafetyImage() {
-            if (!currentImageUrl || currentImageUrl.trim() === '') {
-                showNotification('No image available', 'warning');
-                return;
-            }
-            
-            try {
-                const link = document.createElement('a');
-                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-                const violation = allData.find(item => item.id === currentViolationId);
-                const status = violation ? (violation.helmetStatus === 'helmet' && violation.gloveStatus === 'glove' ? 'compliant' : 'violation') : 'safety';
-                
-                link.download = `safety-${status}-${timestamp}.jpg`;
-                link.href = currentImageUrl;
-                link.click();
-                
-                showNotification('Image downloaded!', 'success');
-            } catch (error) {
-                console.error('Error downloading image:', error);
-                showNotification('Failed to download image', 'error');
-            }
-        }
-        
-        // ============================================
-        // FUNGSI FILTER
-        // ============================================
-        
+        // Filter by date
         function filterByDate() {
             if (!selectedDate) {
                 selectedDate = elements.dateFilter.value;
                 if (!selectedDate) {
-                    showNotification('Please select a date', 'warning');
+                    showNotification('Please select a date to filter safety records', 'warning');
                     return;
                 }
             }
@@ -2686,10 +2327,7 @@
                     const itemDate = new Date(item.datetime);
                     const filterDate = new Date(selectedDate);
                     
-                    const itemDateStr = itemDate.toISOString().split('T')[0];
-                    const filterDateStr = filterDate.toISOString().split('T')[0];
-                    
-                    return itemDateStr === filterDateStr;
+                    return itemDate.toISOString().split('T')[0] === filterDate.toISOString().split('T')[0];
                 } catch (e) {
                     return false;
                 }
@@ -2697,22 +2335,61 @@
             
             currentPage = 1;
             updateTableWithPagination();
-            showNotification(`Filtered: ${selectedDate}`, 'info');
+            updateCalendarStats();
+            showNotification(`Filtered by date: ${selectedDate}`, 'info');
         }
         
+        // Clear date filter
         function clearDateFilter() {
             selectedDate = null;
             elements.dateFilter.value = '';
             filteredData = [...allData];
             currentPage = 1;
             updateTableWithPagination();
-            showNotification('Filter cleared', 'info');
+            updateCalendarStats();
+            showNotification('Date filter cleared', 'info');
         }
         
-        // ============================================
-        // FUNGSI STATUS & AUTO REFRESH
-        // ============================================
+        // Open details modal
+        function openDetailsModal(time, helmetStatus, gloveStatus) {
+            elements.modalTime.textContent = time;
+            
+            const isHelmetOK = helmetStatus === 'helmet';
+            const helmetBadgeClass = isHelmetOK ? 'badge-success' : 'badge-danger';
+            const helmetText = isHelmetOK ? 'HELMET DETECTED' : 'NO HELMET - SAFETY VIOLATION';
+            elements.modalHelmetStatus.className = `status-badge ${helmetBadgeClass}`;
+            elements.modalHelmetStatus.textContent = helmetText;
+            
+            const isGloveOK = gloveStatus === 'glove';
+            const gloveBadgeClass = isGloveOK ? 'badge-success' : 'badge-danger';
+            const gloveText = isGloveOK ? 'GLOVES DETECTED' : 'NO GLOVES - SAFETY VIOLATION';
+            elements.modalGloveStatus.className = `status-badge ${gloveBadgeClass}`;
+            elements.modalGloveStatus.textContent = gloveText;
+            
+            const isCompliant = isHelmetOK && isGloveOK;
+            const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
+            const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
+            elements.modalCompliance.className = `status-badge ${complianceBadgeClass}`;
+            elements.modalCompliance.textContent = complianceText;
+            
+            elements.detailsModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
         
+        // Close modal
+        function closeModal() {
+            elements.detailsModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+        }
+        
+        // Close modal when clicking outside
+        elements.detailsModal.addEventListener('click', function(event) {
+            if (event.target === elements.detailsModal) {
+                closeModal();
+            }
+        });
+        
+        // Update connection status
         function updateStatus(status, message) {
             const statusColors = {
                 'success': '#34a853',
@@ -2726,84 +2403,41 @@
             elements.apiStatus.style.color = statusColors[status] || '#ea4335';
         }
         
+        // Toggle auto refresh
         function toggleAutoRefresh() {
             autoRefreshEnabled = !autoRefreshEnabled;
             
             if (autoRefreshEnabled) {
                 startAutoRefresh(30000);
                 elements.autoRefreshStatus.textContent = 'ON';
-                elements.autoRefreshFooter.textContent = 'ON';
-                elements.autoRefreshBtn.innerHTML = '<i class="fas fa-clock"></i> Auto: ON';
+                elements.autoRefreshFooter.textContent = 'ON (30s)';
+                elements.autoRefreshBtn.innerHTML = '<i class="fas fa-clock"></i> Auto Refresh: ON';
                 elements.autoRefreshBtn.style.background = 'rgba(52, 168, 83, 0.2)';
-                showNotification('Auto refresh ON', 'success');
+                elements.autoRefreshBtn.style.borderColor = 'rgba(52, 168, 83, 0.3)';
+                showNotification('Auto refresh enabled (30 seconds)', 'success');
             } else {
                 stopAutoRefresh();
                 elements.autoRefreshStatus.textContent = 'OFF';
                 elements.autoRefreshFooter.textContent = 'OFF';
-                elements.autoRefreshBtn.innerHTML = '<i class="fas fa-clock"></i> Auto: OFF';
+                elements.autoRefreshBtn.innerHTML = '<i class="fas fa-clock"></i> Auto Refresh: OFF';
                 elements.autoRefreshBtn.style.background = '';
-                showNotification('Auto refresh OFF', 'info');
+                elements.autoRefreshBtn.style.borderColor = '';
+                showNotification('Auto refresh disabled', 'info');
             }
         }
         
+        // Start auto refresh
         function startAutoRefresh(interval) {
             stopAutoRefresh();
             autoRefreshInterval = setInterval(loadData, interval);
         }
         
+        // Stop auto refresh
         function stopAutoRefresh() {
             if (autoRefreshInterval) {
                 clearInterval(autoRefreshInterval);
                 autoRefreshInterval = null;
             }
-        }
-        
-        // ============================================
-        // FUNGSI NOTIFIKASI
-        // ============================================
-        
-        function showNotification(message, type = 'info') {
-            const colors = {
-                'success': '#34a853',
-                'error': '#ea4335',
-                'warning': '#fbbc05',
-                'info': '#1a73e8'
-            };
-            
-            // Remove existing notifications
-            document.querySelectorAll('.custom-notification').forEach(notif => notif.remove());
-            
-            // Create notification
-            const notification = document.createElement('div');
-            notification.className = 'custom-notification';
-            notification.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                padding: 12px 16px;
-                background: ${colors[type] || '#1a73e8'};
-                color: white;
-                border-radius: 8px;
-                z-index: 10000;
-                font-weight: 500;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                animation: slideIn 0.3s ease;
-                max-width: 250px;
-                font-size: 0.9rem;
-            `;
-            
-            notification.textContent = message;
-            document.body.appendChild(notification);
-            
-            // Remove after 3 seconds
-            setTimeout(() => {
-                notification.style.animation = 'slideOut 0.3s ease';
-                setTimeout(() => {
-                    if (notification.parentNode) {
-                        document.body.removeChild(notification);
-                    }
-                }, 300);
-            }, 3000);
         }
         
         // Add CSS for notifications
@@ -2822,3 +2456,4 @@
     </script>
 </body>
 </html>
+
