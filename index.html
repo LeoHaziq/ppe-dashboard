@@ -339,6 +339,115 @@
             color: var(--success) !important;
         }
         
+        /* Compliance Details Card (Seperti gambar ke-2) */
+        .compliance-details-card {
+            background: var(--dark-secondary);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            border-top: 5px solid var(--danger);
+        }
+        
+        .compliance-details-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .compliance-details-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .compliance-details-title i {
+            color: var(--danger);
+        }
+        
+        .compliance-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+        }
+        
+        .compliance-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .compliance-item:hover {
+            transform: translateY(-5px);
+            border-color: var(--danger);
+            box-shadow: 0 10px 20px rgba(234, 67, 53, 0.2);
+        }
+        
+        .compliance-item.violation {
+            border-color: rgba(234, 67, 53, 0.3);
+            background: rgba(234, 67, 53, 0.1);
+        }
+        
+        .compliance-item.compliant {
+            border-color: rgba(52, 168, 83, 0.3);
+            background: rgba(52, 168, 83, 0.1);
+        }
+        
+        .compliance-item-label {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: var(--gray);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+        
+        .compliance-item-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            margin: 15px 0;
+        }
+        
+        .violation-value {
+            color: var(--danger);
+        }
+        
+        .compliant-value {
+            color: var(--success);
+        }
+        
+        .compliance-item-status {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.9rem;
+            display: inline-block;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .status-violation {
+            background: rgba(234, 67, 53, 0.2);
+            color: var(--danger);
+        }
+        
+        .status-compliant {
+            background: rgba(52, 168, 83, 0.2);
+            color: var(--success);
+        }
+        
         /* Calendar & Filters */
         .calendar-section {
             background: var(--dark-secondary);
@@ -571,68 +680,6 @@
             font-size: 0.9rem;
         }
         
-        /* PPE Icon Button */
-        .ppe-icon-btn {
-            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
-            border: none;
-            border-radius: 12px;
-            width: 55px;
-            height: 55px;
-            cursor: pointer;
-            transition: all 0.3s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            color: white;
-            font-size: 11px;
-            font-weight: 600;
-            padding: 8px;
-            gap: 5px;
-        }
-        
-        .ppe-icon-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
-        }
-        
-        .ppe-icon-btn i {
-            font-size: 20px;
-        }
-        
-        .ppe-icon-btn.violation-btn {
-            background: linear-gradient(135deg, #b71c1c 0%, #c62828 100%);
-        }
-        
-        .ppe-icon-btn.violation-btn:hover {
-            background: linear-gradient(135deg, #c62828 0%, #b71c1c 100%);
-        }
-        
-        .ppe-icon-btn.compliant-btn {
-            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
-        }
-        
-        .ppe-icon-btn.compliant-btn:hover {
-            background: linear-gradient(135deg, #2e7d32 0%, #1b5e20 100%);
-        }
-        
-        /* Image Thumbnail */
-        .image-thumbnail {
-            width: 80px;
-            height: 80px;
-            border-radius: 10px;
-            object-fit: cover;
-            cursor: pointer;
-            transition: all 0.3s;
-            border: 2px solid rgba(255, 255, 255, 0.1);
-        }
-        
-        .image-thumbnail:hover {
-            transform: scale(1.05);
-            border-color: var(--primary);
-            box-shadow: 0 5px 15px rgba(26, 115, 232, 0.3);
-        }
-        
         /* Table */
         .table-container {
             background: var(--dark-secondary);
@@ -719,10 +766,6 @@
             white-space: nowrap;
         }
         
-        .image-cell {
-            width: 120px;
-        }
-        
         .status-badge {
             padding: 8px 15px;
             border-radius: 20px;
@@ -745,6 +788,22 @@
             background: rgba(52, 168, 83, 0.15);
             color: var(--success);
             border: 1px solid rgba(52, 168, 83, 0.3);
+        }
+        
+        .violation-cell {
+            cursor: pointer;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(234, 67, 53, 0.1);
+            color: var(--danger);
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+        
+        .violation-cell:hover {
+            background: rgba(234, 67, 53, 0.2);
+            transform: scale(1.05);
         }
         
         /* Pagination */
@@ -844,7 +903,7 @@
             color: var(--primary);
         }
         
-        /* Modal */
+        /* Modal for Safety Compliance Details (Seperti gambar ke-3) */
         .modal {
             display: none;
             position: fixed;
@@ -882,26 +941,30 @@
         
         .modal-header {
             padding: 20px 25px;
-            background: var(--dark);
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
             display: flex;
             justify-content: space-between;
             align-items: center;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
         
         .modal-title {
-            font-size: 1.4rem;
-            font-weight: 600;
+            font-size: 1.5rem;
+            font-weight: 700;
             color: white;
             display: flex;
             align-items: center;
             gap: 12px;
         }
         
+        .modal-title i {
+            color: var(--warning);
+        }
+        
         .close-modal {
             background: none;
             border: none;
-            color: var(--gray);
+            color: white;
             font-size: 24px;
             cursor: pointer;
             width: 35px;
@@ -914,19 +977,84 @@
         }
         
         .close-modal:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
+            background: rgba(255, 255, 255, 0.2);
+            color: var(--warning);
         }
         
         .modal-body {
-            padding: 25px;
+            padding: 30px;
         }
         
-        .modal-info {
+        .modal-section-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .violation-details-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .violation-detail-item {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            border-left: 5px solid var(--danger);
+        }
+        
+        .violation-detail-item.compliant {
+            border-left-color: var(--success);
+        }
+        
+        .violation-detail-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 8px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .violation-detail-value {
+            font-size: 1.2rem;
+            color: white;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .violation-badge {
+            padding: 6px 12px;
+            border-radius: 15px;
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+        
+        .violation-badge.danger {
+            background: rgba(234, 67, 53, 0.2);
+            color: var(--danger);
+        }
+        
+        .violation-badge.success {
+            background: rgba(52, 168, 83, 0.2);
+            color: var(--success);
+        }
+        
+        .employee-info-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
             gap: 15px;
-            margin-bottom: 20px;
+            margin-bottom: 30px;
         }
         
         .info-item {
@@ -950,18 +1078,67 @@
             font-weight: 600;
         }
         
-        /* Image Preview in Modal */
+        .compliance-status-overall {
+            text-align: center;
+            padding: 25px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            margin: 20px 0;
+            border: 2px solid var(--danger);
+        }
+        
+        .compliance-status-overall.compliant {
+            border-color: var(--success);
+        }
+        
+        .compliance-status-label {
+            font-size: 1rem;
+            color: var(--gray);
+            margin-bottom: 10px;
+        }
+        
+        .compliance-status-value {
+            font-size: 2rem;
+            font-weight: 800;
+            margin: 10px 0;
+        }
+        
+        .compliance-status-overall.danger .compliance-status-value {
+            color: var(--danger);
+        }
+        
+        .compliance-status-overall.compliant .compliance-status-value {
+            color: var(--success);
+        }
+        
+        .compliance-status-overall i {
+            font-size: 3rem;
+            margin-bottom: 10px;
+        }
+        
+        /* Image Preview Section */
         .image-preview-container {
             text-align: center;
-            margin-top: 20px;
+            margin-top: 25px;
+        }
+        
+        .image-preview-title {
+            font-size: 1.2rem;
+            color: var(--primary);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
         
         .image-preview {
             max-width: 100%;
-            max-height: 500px;
+            max-height: 400px;
             border-radius: 10px;
             margin-bottom: 15px;
             border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
         }
         
         .image-not-found {
@@ -982,6 +1159,14 @@
         .image-not-found p {
             color: var(--gray);
             font-size: 1rem;
+        }
+        
+        .image-controls {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
         }
         
         /* Loading */
@@ -1136,6 +1321,52 @@
             </div>
         </div>
         
+        <!-- Compliance Details Card (Seperti gambar ke-2) -->
+        <div class="compliance-details-card">
+            <div class="compliance-details-header">
+                <div class="compliance-details-title">
+                    <i class="fas fa-exclamation-circle"></i>
+                    COMPLIANCE DETAILS
+                </div>
+                <div class="datetime">
+                    <i class="fas fa-history"></i> Updated: <span id="complianceUpdateTime">Just now</span>
+                </div>
+            </div>
+            <div class="compliance-details-grid">
+                <div class="compliance-item violation" onclick="openViolationDetails('helmet')">
+                    <div class="compliance-item-label">
+                        <i class="fas fa-hard-hat"></i> HELMET COMPLIANCE
+                    </div>
+                    <div class="compliance-item-value violation-value" id="compHelmetViolations">0</div>
+                    <div class="compliance-item-status status-violation">VIOLATION</div>
+                </div>
+                
+                <div class="compliance-item violation" onclick="openViolationDetails('glove')">
+                    <div class="compliance-item-label">
+                        <i class="fas fa-hand-paper"></i> GLOVE COMPLIANCE
+                    </div>
+                    <div class="compliance-item-value violation-value" id="compGloveViolations">0</div>
+                    <div class="compliance-item-status status-violation">VIOLATION</div>
+                </div>
+                
+                <div class="compliance-item violation" onclick="openViolationDetails('overall')">
+                    <div class="compliance-item-label">
+                        <i class="fas fa-clipboard-check"></i> OVERALL COMPLIANCE
+                    </div>
+                    <div class="compliance-item-value violation-value" id="compOverallViolations">0</div>
+                    <div class="compliance-item-status status-violation">VIOLATION</div>
+                </div>
+                
+                <div class="compliance-item compliant" onclick="openViolationDetails('compliant')">
+                    <div class="compliance-item-label">
+                        <i class="fas fa-check-circle"></i> FULL PPE COMPLIANCE
+                    </div>
+                    <div class="compliance-item-value compliant-value" id="compFullCompliance">0</div>
+                    <div class="compliance-item-status status-compliant">COMPLIANT</div>
+                </div>
+            </div>
+        </div>
+        
         <!-- Calendar & Date Filter -->
         <div class="calendar-section">
             <div class="calendar-header">
@@ -1216,10 +1447,10 @@
                         <tr>
                             <th><i class="fas fa-hashtag"></i> #</th>
                             <th><i class="far fa-calendar-alt"></i> DATE & TIME</th>
-                            <th><i class="fas fa-image"></i> IMAGE VIEW</th>
                             <th><i class="fas fa-hard-hat"></i> HELMET STATUS</th>
                             <th><i class="fas fa-hand-paper"></i> GLOVE STATUS</th>
                             <th><i class="fas fa-id-card"></i> COMPLIANCE STATUS</th>
+                            <th><i class="fas fa-search"></i> VIEW DETAILS</th>
                         </tr>
                     </thead>
                     <tbody id="tableBody">
@@ -1286,64 +1517,126 @@
         </div>
     </div>
     
-    <!-- Safety Violation Details Modal with Image -->
-    <div class="modal" id="detailsModal">
+    <!-- Safety Violation Details Modal (Seperti gambar ke-3) -->
+    <div class="modal" id="violationModal">
         <div class="modal-content">
             <div class="modal-header">
                 <div class="modal-title">
                     <i class="fas fa-info-circle"></i>
-                    SAFETY COMPLIANCE DETAILS
+                    # SAFETY COMPLIANCE DETAILS
                 </div>
-                <button class="close-modal" onclick="closeModal()">&times;</button>
+                <button class="close-modal" onclick="closeViolationModal()">&times;</button>
             </div>
             <div class="modal-body">
-                <div class="modal-info">
-                    <div class="info-item">
-                        <div class="info-label">INSPECTION TIME</div>
-                        <div class="info-value" id="modalTime">-</div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">HELMET COMPLIANCE</div>
-                        <div class="info-value">
-                            <span id="modalHelmetStatus" class="status-badge badge-danger">NO HELMET</span>
+                <!-- Inspection Time Section -->
+                <div class="violation-details-grid">
+                    <div class="violation-detail-item">
+                        <div class="violation-detail-label">INSPECTION TIME</div>
+                        <div class="violation-detail-value">
+                            <i class="far fa-clock"></i>
+                            <span id="modalInspectionTime">01/12/2026, 11:44:58 AM</span>
                         </div>
                     </div>
-                    <div class="info-item">
-                        <div class="info-label">GLOVE COMPLIANCE</div>
-                        <div class="info-value">
-                            <span id="modalGloveStatus" class="status-badge badge-danger">NO GLOVES</span>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-label">OVERALL COMPLIANCE</div>
-                        <div class="info-value">
-                            <span id="modalCompliance" class="status-badge badge-danger">NON-COMPLIANT</span>
+                    
+                    <div class="violation-detail-item">
+                        <div class="violation-detail-label">INSPECTION DATE</div>
+                        <div class="violation-detail-value">
+                            <i class="far fa-calendar"></i>
+                            <span id="modalInspectionDate">01/12/2026</span>
                         </div>
                     </div>
                 </div>
                 
-                <!-- Image Preview Section -->
+                <!-- Helmet Compliance Section -->
+                <h3 class="modal-section-title">
+                    <i class="fas fa-hard-hat"></i>
+                    HELMET COMPLIANCE
+                </h3>
+                <div class="violation-details-grid">
+                    <div class="violation-detail-item">
+                        <div class="violation-detail-label">HELMET STATUS</div>
+                        <div class="violation-detail-value">
+                            <span id="modalHelmetStatusText">NO HELMET</span>
+                            <span id="modalHelmetBadge" class="violation-badge danger">SAFETY VIOLATION</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Glove Compliance Section -->
+                <h3 class="modal-section-title">
+                    <i class="fas fa-hand-paper"></i>
+                    GLOVE COMPLIANCE
+                </h3>
+                <div class="violation-details-grid">
+                    <div class="violation-detail-item">
+                        <div class="violation-detail-label">GLOVE STATUS</div>
+                        <div class="violation-detail-value">
+                            <span id="modalGloveStatusText">NO GLOVES</span>
+                            <span id="modalGloveBadge" class="violation-badge danger">SAFETY VIOLATION</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Employee Info Section -->
+                <h3 class="modal-section-title">
+                    <i class="fas fa-user-tie"></i>
+                    EMPLOYEE INFORMATION
+                </h3>
+                <div class="employee-info-grid">
+                    <div class="info-item">
+                        <div class="info-label">EMPLOYEE ID</div>
+                        <div class="info-value" id="modalEmployeeId">34</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">DEPARTMENT</div>
+                        <div class="info-value" id="modalDepartment">Industrial Safety</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">SHIFT</div>
+                        <div class="info-value" id="modalShift">Morning (8AM-4PM)</div>
+                    </div>
+                </div>
+                
+                <!-- Overall Compliance Status -->
+                <div class="compliance-status-overall danger" id="modalComplianceStatus">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div class="compliance-status-label">OVERALL COMPLIANCE STATUS</div>
+                    <div class="compliance-status-value">SAFETY VIOLATION</div>
+                    <div class="violation-detail-value">
+                        <span id="modalOverallStatusText">NON-COMPLIANT: Missing Helmet & Gloves</span>
+                    </div>
+                </div>
+                
+                <!-- Evidence Image Section -->
                 <div class="image-preview-container">
-                    <h4 style="margin-bottom: 15px; color: var(--primary);">
-                        <i class="fas fa-image"></i> SAFETY COMPLIANCE IMAGE
-                    </h4>
+                    <h3 class="image-preview-title">
+                        <i class="fas fa-image"></i>
+                        EVIDENCE IMAGE
+                    </h3>
+                    
                     <div id="imageLoading" class="loading" style="display: none; padding: 30px;">
                         <div class="spinner"></div>
                         <div>Loading safety compliance image...</div>
                     </div>
+                    
                     <div id="imagePreviewContent">
                         <img id="modalImagePreview" class="image-preview" src="" alt="Safety Compliance Image" style="display: none;">
                         <div id="imageNotFound" class="image-not-found" style="display: none;">
                             <i class="fas fa-image"></i>
                             <p>No safety compliance image available for this record</p>
+                            <p style="font-size: 0.9rem; margin-top: 10px;">
+                                <i class="fas fa-info-circle"></i>
+                                Image evidence may be temporarily unavailable
+                            </p>
                         </div>
                     </div>
-                    <div id="imageControls" style="margin-top: 15px; display: none;">
-                        <button class="btn btn-sm btn-secondary" onclick="downloadImage()">
-                            <i class="fas fa-download"></i> Download Image
+                    
+                    <div id="imageControls" class="image-controls" style="display: none;">
+                        <button class="btn btn-sm btn-danger" onclick="viewSafetyImage()">
+                            <i class="fas fa-external-link-alt"></i> VIEW SAFETY IMAGE
                         </button>
-                        <button class="btn btn-sm btn-primary" onclick="zoomImage()">
-                            <i class="fas fa-search-plus"></i> Zoom
+                        <button class="btn btn-sm btn-secondary" onclick="downloadSafetyImage()">
+                            <i class="fas fa-download"></i> Download Evidence
                         </button>
                     </div>
                 </div>
@@ -1357,25 +1650,20 @@
             <div class="modal-header">
                 <div class="modal-title">
                     <i class="fas fa-expand"></i>
-                    IMAGE PREVIEW
+                    SAFETY COMPLIANCE IMAGE PREVIEW
                 </div>
                 <button class="close-modal" onclick="closeFullscreenImage()">&times;</button>
             </div>
             <div class="modal-body" style="text-align: center; padding: 10px;">
-                <img id="fullscreenImage" src="" alt="Fullscreen Image" style="max-width: 100%; max-height: 70vh; border-radius: 10px;">
+                <img id="fullscreenImage" src="" alt="Fullscreen Safety Compliance Image" style="max-width: 100%; max-height: 70vh; border-radius: 10px;">
             </div>
         </div>
     </div>
     
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        // Configuration - GANTI INI DENGAN URL ANDA SENDIRI
+        // Configuration
         const API_URL = "https://script.google.com/macros/s/AKfycbw7aHL6T0GiigMT0h-s0je-uHiHElh0KXxRI4nd_BuKVo7N4lOYn7lNsBo7o4983PAm/exec";
-        
-        // Configuration untuk Google Drive images
-        // Anda boleh ganti dengan URL Google Drive anda atau buat API untuk ambil gambar
-        // Contoh: const IMAGE_BASE_URL = "https://drive.google.com/uc?export=view&id=";
-        // Anda perlu ada column "imageUrl" dalam Google Sheet anda
         
         let autoRefreshInterval = null;
         let autoRefreshEnabled = false;
@@ -1386,6 +1674,7 @@
         let selectedDate = null;
         let dateFilter = null;
         let currentImageUrl = '';
+        let currentViolationId = null;
         
         // DOM Elements
         const elements = {
@@ -1400,6 +1689,15 @@
             withGloves: document.getElementById('withGloves'),
             withoutGloves: document.getElementById('withoutGloves'),
             totalRecords: document.getElementById('totalRecords'),
+            
+            // Compliance Details
+            compHelmetViolations: document.getElementById('compHelmetViolations'),
+            compGloveViolations: document.getElementById('compGloveViolations'),
+            compOverallViolations: document.getElementById('compOverallViolations'),
+            compFullCompliance: document.getElementById('compFullCompliance'),
+            complianceUpdateTime: document.getElementById('complianceUpdateTime'),
+            
+            // Table elements
             tableBody: document.getElementById('tableBody'),
             currentDateTimeHeader: document.getElementById('currentDateTimeHeader'),
             lastUpdate: document.getElementById('lastUpdate'),
@@ -1427,11 +1725,20 @@
             nextPage: document.getElementById('nextPage'),
             lastPage: document.getElementById('lastPage'),
             pageNumbers: document.getElementById('pageNumbers'),
-            detailsModal: document.getElementById('detailsModal'),
-            modalTime: document.getElementById('modalTime'),
-            modalHelmetStatus: document.getElementById('modalHelmetStatus'),
-            modalGloveStatus: document.getElementById('modalGloveStatus'),
-            modalCompliance: document.getElementById('modalCompliance'),
+            
+            // Modal elements
+            violationModal: document.getElementById('violationModal'),
+            modalInspectionTime: document.getElementById('modalInspectionTime'),
+            modalInspectionDate: document.getElementById('modalInspectionDate'),
+            modalHelmetStatusText: document.getElementById('modalHelmetStatusText'),
+            modalHelmetBadge: document.getElementById('modalHelmetBadge'),
+            modalGloveStatusText: document.getElementById('modalGloveStatusText'),
+            modalGloveBadge: document.getElementById('modalGloveBadge'),
+            modalEmployeeId: document.getElementById('modalEmployeeId'),
+            modalDepartment: document.getElementById('modalDepartment'),
+            modalShift: document.getElementById('modalShift'),
+            modalComplianceStatus: document.getElementById('modalComplianceStatus'),
+            modalOverallStatusText: document.getElementById('modalOverallStatusText'),
             modalImagePreview: document.getElementById('modalImagePreview'),
             imageLoading: document.getElementById('imageLoading'),
             imagePreviewContent: document.getElementById('imagePreviewContent'),
@@ -1544,6 +1851,7 @@
                 filteredData = [...allData];
                 
                 updateStatistics(data.stats);
+                updateComplianceDetails();
                 updateCalendarStats();
                 
                 currentPage = 1;
@@ -1555,6 +1863,8 @@
                     minute: '2-digit',
                     second: '2-digit'
                 });
+                
+                elements.complianceUpdateTime.textContent = 'Just now';
                 
                 updateStatus('success', 'Connected to Safety System');
                 
@@ -1587,51 +1897,65 @@
         // Process data to ensure proper formatting
         function processData(data) {
             return data.map(item => {
-                let datetime = item.datetime;
-                if (!datetime && item.timestamp) {
-                    try {
-                        const date = new Date(item.timestamp);
-                        datetime = date.toLocaleString('en-US', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                        });
-                    } catch (e) {
-                        datetime = 'Invalid Date';
-                    }
+                let datetime = item.datetime || item.timestamp || new Date().toISOString();
+                let formattedDatetime = '';
+                let formattedDate = '';
+                let formattedTime = '';
+                
+                try {
+                    const date = new Date(datetime);
+                    formattedDatetime = date.toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit',
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                    formattedDate = date.toLocaleDateString('en-US', {
+                        year: 'numeric',
+                        month: '2-digit',
+                        day: '2-digit'
+                    });
+                    formattedTime = date.toLocaleTimeString('en-US', {
+                        hour: '2-digit',
+                        minute: '2-digit',
+                        second: '2-digit'
+                    });
+                } catch (e) {
+                    formattedDatetime = 'Invalid Date';
+                    formattedDate = 'Invalid Date';
+                    formattedTime = 'Invalid Time';
                 }
                 
                 return {
                     ...item,
-                    datetime: datetime,
-                    dateOnly: datetime ? datetime.split(',')[0] : '',
+                    id: item.id || Math.random().toString(36).substr(2, 9),
+                    datetime: formattedDatetime,
+                    dateOnly: formattedDate,
+                    timeOnly: formattedTime,
                     helmetStatus: (item.helmetStatus || '').toLowerCase().trim(),
                     gloveStatus: (item.gloveStatus || '').toLowerCase().trim(),
-                    // Jika ada imageUrl dalam data, gunakan. Jika tidak, generate placeholder
-                    imageUrl: item.imageUrl || generateImageUrl(item)
+                    employeeId: item.employeeId || '34',
+                    department: item.department || 'Industrial Safety',
+                    shift: item.shift || 'Morning (8AM-4PM)',
+                    imageUrl: item.imageUrl || generateSafetyImageUrl(item)
                 };
             });
         }
         
-        // Generate image URL based on data (untuk demo)
-        function generateImageUrl(item) {
-            // Ini adalah contoh sahaja. Anda perlu ganti dengan cara untuk dapatkan gambar dari Google Drive
-            // Contoh 1: Jika anda ada column "imageId" dalam Google Sheet
-            // return `https://drive.google.com/uc?export=view&id=${item.imageId}`;
-            
-            // Contoh 2: Jika anda mahu gunakan placeholder berdasarkan status
+        // Generate safety image URL based on data
+        function generateSafetyImageUrl(item) {
+            // Ini adalah placeholder untuk demo
+            // Anda boleh ganti dengan URL sebenar dari Google Drive anda
             const isCompliant = (item.helmetStatus === 'helmet' && item.gloveStatus === 'glove');
             
-            // Gunakan placeholder images untuk demo
             if (isCompliant) {
-                // Placeholder untuk compliant
+                // Image untuk compliant
                 return 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
             } else {
-                // Placeholder untuk violation
-                return 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w-800&q=80';
+                // Image untuk violation
+                return 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
             }
         }
         
@@ -1649,6 +1973,19 @@
             elements.withoutHelmet.textContent = stats.helmetViolations || 0;
             elements.withGloves.textContent = stats.gloveOK || 0;
             elements.withoutGloves.textContent = stats.gloveViolations || 0;
+        }
+        
+        // Update compliance details (seperti gambar ke-2)
+        function updateComplianceDetails() {
+            const helmetViolations = parseInt(elements.helmetViolations.textContent) || 0;
+            const gloveViolations = parseInt(elements.gloveViolations.textContent) || 0;
+            const fullCompliance = parseInt(elements.fullPPE.textContent) || 0;
+            const totalRecords = parseInt(elements.totalRecords.textContent) || 0;
+            
+            elements.compHelmetViolations.textContent = helmetViolations;
+            elements.compGloveViolations.textContent = gloveViolations;
+            elements.compOverallViolations.textContent = helmetViolations + gloveViolations;
+            elements.compFullCompliance.textContent = fullCompliance;
         }
         
         // Update calendar statistics
@@ -1735,43 +2072,192 @@
                 const gloveBadgeClass = item.gloveStatus === 'glove' ? 'badge-success' : 'badge-danger';
                 const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
                 
-                let formattedTime = item.datetime;
-                try {
-                    const date = new Date(item.datetime);
-                    formattedTime = date.toLocaleString('en-US', {
-                        year: 'numeric',
-                        month: '2-digit',
-                        day: '2-digit',
-                        hour: '2-digit',
-                        minute: '2-digit',
-                        second: '2-digit'
-                    });
-                } catch (e) {}
-                
-                // Create thumbnail image
-                const thumbnailHTML = `
-                    <img src="${item.imageUrl || ''}" 
-                         class="image-thumbnail" 
-                         alt="Safety Compliance Image"
-                         onclick="openDetailsModal('${formattedTime.replace(/'/g, "\\'")}', 
-                                  '${item.helmetStatus}', '${item.gloveStatus}', '${item.imageUrl || ''}')"
-                         title="Click to view safety compliance details and image"
-                         onerror="this.onerror=null; this.src='data:image/svg+xml,<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 100 100\"><rect width=\"100\" height=\"100\" fill=\"%231e293b\"/><text x=\"50\" y=\"50\" font-family=\"Arial\" font-size=\"12\" fill=\"%2364748b\" text-anchor=\"middle\" dy=\".3em\">No Image</text></svg>';">
-                `;
-                
                 tableHTML += `
                     <tr>
                         <td class="row-number">${globalIndex + 1}</td>
-                        <td class="datetime-cell">${formattedTime}</td>
-                        <td class="image-cell">${thumbnailHTML}</td>
+                        <td class="datetime-cell">${item.datetime}</td>
                         <td><span class="status-badge ${helmetBadgeClass}">${helmetText}</span></td>
                         <td><span class="status-badge ${gloveBadgeClass}">${gloveText}</span></td>
                         <td><span class="status-badge ${complianceBadgeClass}">${complianceText}</span></td>
+                        <td>
+                            <div class="violation-cell" onclick="openViolationModal('${item.id}')">
+                                <i class="fas fa-search"></i> VIEW DETAILS
+                            </div>
+                        </td>
                     </tr>
                 `;
             });
             
             elements.tableBody.innerHTML = tableHTML;
+        }
+        
+        // Open violation modal (seperti gambar ke-3)
+        function openViolationModal(violationId) {
+            currentViolationId = violationId;
+            const violation = allData.find(item => item.id === violationId);
+            
+            if (!violation) {
+                showNotification('Violation data not found', 'error');
+                return;
+            }
+            
+            // Set modal data
+            elements.modalInspectionTime.textContent = violation.datetime;
+            elements.modalInspectionDate.textContent = violation.dateOnly;
+            
+            // Helmet status
+            const isHelmetOK = violation.helmetStatus === 'helmet';
+            const helmetText = isHelmetOK ? 'HELMET DETECTED' : 'NO HELMET';
+            const helmetBadgeClass = isHelmetOK ? 'success' : 'danger';
+            const helmetBadgeText = isHelmetOK ? 'COMPLIANT' : 'SAFETY VIOLATION';
+            elements.modalHelmetStatusText.textContent = helmetText;
+            elements.modalHelmetBadge.className = `violation-badge ${helmetBadgeClass}`;
+            elements.modalHelmetBadge.textContent = helmetBadgeText;
+            
+            // Glove status
+            const isGloveOK = violation.gloveStatus === 'glove';
+            const gloveText = isGloveOK ? 'GLOVES DETECTED' : 'NO GLOVES';
+            const gloveBadgeClass = isGloveOK ? 'success' : 'danger';
+            const gloveBadgeText = isGloveOK ? 'COMPLIANT' : 'SAFETY VIOLATION';
+            elements.modalGloveStatusText.textContent = gloveText;
+            elements.modalGloveBadge.className = `violation-badge ${gloveBadgeClass}`;
+            elements.modalGloveBadge.textContent = gloveBadgeText;
+            
+            // Employee info
+            elements.modalEmployeeId.textContent = violation.employeeId || '34';
+            elements.modalDepartment.textContent = violation.department || 'Industrial Safety';
+            elements.modalShift.textContent = violation.shift || 'Morning (8AM-4PM)';
+            
+            // Overall compliance
+            const isCompliant = isHelmetOK && isGloveOK;
+            const overallStatus = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
+            const overallClass = isCompliant ? 'compliant' : 'danger';
+            const overallIcon = isCompliant ? 'fas fa-check-circle' : 'fas fa-exclamation-triangle';
+            
+            elements.modalComplianceStatus.className = `compliance-status-overall ${overallClass}`;
+            elements.modalComplianceStatus.innerHTML = `
+                <i class="${overallIcon}"></i>
+                <div class="compliance-status-label">OVERALL COMPLIANCE STATUS</div>
+                <div class="compliance-status-value">${overallStatus}</div>
+                <div class="violation-detail-value">
+                    <span id="modalOverallStatusText">
+                        ${isCompliant ? 'FULL PPE COMPLIANCE: Helmet and Gloves Detected' : 
+                          'NON-COMPLIANT: ' + 
+                          (!isHelmetOK ? 'Missing Helmet' : '') + 
+                          (!isHelmetOK && !isGloveOK ? ' & ' : '') + 
+                          (!isGloveOK ? 'Missing Gloves' : '')}
+                    </span>
+                </div>
+            `;
+            
+            // Load image
+            currentImageUrl = violation.imageUrl;
+            loadViolationImage(violation.imageUrl);
+            
+            // Show modal
+            elements.violationModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Open violation details from compliance card
+        function openViolationDetails(type) {
+            let violation;
+            
+            if (type === 'helmet') {
+                violation = allData.find(item => item.helmetStatus.includes('no'));
+            } else if (type === 'glove') {
+                violation = allData.find(item => item.gloveStatus.includes('no'));
+            } else if (type === 'overall') {
+                violation = allData.find(item => item.helmetStatus.includes('no') || item.gloveStatus.includes('no'));
+            } else if (type === 'compliant') {
+                violation = allData.find(item => item.helmetStatus === 'helmet' && item.gloveStatus === 'glove');
+            }
+            
+            if (violation) {
+                openViolationModal(violation.id);
+            } else {
+                showNotification(`No ${type} violation data available`, 'warning');
+            }
+        }
+        
+        // Load violation image
+        function loadViolationImage(imageUrl) {
+            if (!imageUrl || imageUrl.trim() === '') {
+                setTimeout(() => {
+                    elements.imageLoading.style.display = 'none';
+                    elements.imageNotFound.style.display = 'block';
+                }, 500);
+                return;
+            }
+            
+            const img = new Image();
+            img.onload = function() {
+                elements.modalImagePreview.src = imageUrl;
+                elements.imageLoading.style.display = 'none';
+                elements.modalImagePreview.style.display = 'block';
+                elements.imageControls.style.display = 'flex';
+            };
+            
+            img.onerror = function() {
+                elements.imageLoading.style.display = 'none';
+                elements.imageNotFound.style.display = 'block';
+                elements.imageControls.style.display = 'none';
+            };
+            
+            img.src = imageUrl;
+            
+            // Set timeout in case image takes too long to load
+            setTimeout(() => {
+                if (elements.imageLoading.style.display !== 'none') {
+                    elements.imageLoading.style.display = 'none';
+                    elements.imageNotFound.style.display = 'block';
+                }
+            }, 5000);
+        }
+        
+        // View safety image in fullscreen
+        function viewSafetyImage() {
+            if (!currentImageUrl) {
+                showNotification('No image available to view', 'warning');
+                return;
+            }
+            
+            elements.fullscreenImage.src = currentImageUrl;
+            elements.fullscreenImageModal.style.display = 'flex';
+        }
+        
+        // Download safety image
+        function downloadSafetyImage() {
+            if (!currentImageUrl) {
+                showNotification('No image available to download', 'warning');
+                return;
+            }
+            
+            try {
+                const link = document.createElement('a');
+                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
+                link.download = `safety-violation-evidence-${timestamp}.jpg`;
+                link.href = currentImageUrl;
+                link.click();
+                
+                showNotification('Safety evidence image downloaded!', 'success');
+            } catch (error) {
+                console.error('Error downloading image:', error);
+                showNotification('Failed to download image', 'error');
+            }
+        }
+        
+        // Close violation modal
+        function closeViolationModal() {
+            elements.violationModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentViolationId = null;
+            currentImageUrl = '';
+        }
+        
+        // Close fullscreen image
+        function closeFullscreenImage() {
+            elements.fullscreenImageModal.style.display = 'none';
         }
         
         // Update pagination controls
@@ -1885,137 +2371,6 @@
             showNotification('Date filter cleared', 'info');
         }
         
-        // Open details modal with image
-        function openDetailsModal(time, helmetStatus, gloveStatus, imageUrl = '') {
-            elements.modalTime.textContent = time;
-            
-            const isHelmetOK = helmetStatus === 'helmet';
-            const helmetBadgeClass = isHelmetOK ? 'badge-success' : 'badge-danger';
-            const helmetText = isHelmetOK ? 'HELMET DETECTED' : 'NO HELMET - SAFETY VIOLATION';
-            elements.modalHelmetStatus.className = `status-badge ${helmetBadgeClass}`;
-            elements.modalHelmetStatus.textContent = helmetText;
-            
-            const isGloveOK = gloveStatus === 'glove';
-            const gloveBadgeClass = isGloveOK ? 'badge-success' : 'badge-danger';
-            const gloveText = isGloveOK ? 'GLOVES DETECTED' : 'NO GLOVES - SAFETY VIOLATION';
-            elements.modalGloveStatus.className = `status-badge ${gloveBadgeClass}`;
-            elements.modalGloveStatus.textContent = gloveText;
-            
-            const isCompliant = isHelmetOK && isGloveOK;
-            const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
-            const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
-            elements.modalCompliance.className = `status-badge ${complianceBadgeClass}`;
-            elements.modalCompliance.textContent = complianceText;
-            
-            // Store current image URL
-            currentImageUrl = imageUrl;
-            
-            // Show loading for image
-            elements.imageLoading.style.display = 'flex';
-            elements.modalImagePreview.style.display = 'none';
-            elements.imageNotFound.style.display = 'none';
-            elements.imageControls.style.display = 'none';
-            
-            // Load image
-            loadImage(imageUrl);
-            
-            elements.detailsModal.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
-        }
-        
-        // Load image
-        function loadImage(imageUrl) {
-            if (!imageUrl || imageUrl.trim() === '') {
-                // No image URL provided
-                setTimeout(() => {
-                    elements.imageLoading.style.display = 'none';
-                    elements.imageNotFound.style.display = 'block';
-                }, 500);
-                return;
-            }
-            
-            const img = new Image();
-            img.onload = function() {
-                elements.modalImagePreview.src = imageUrl;
-                elements.imageLoading.style.display = 'none';
-                elements.modalImagePreview.style.display = 'block';
-                elements.imageControls.style.display = 'block';
-            };
-            
-            img.onerror = function() {
-                elements.imageLoading.style.display = 'none';
-                elements.imageNotFound.style.display = 'block';
-                elements.imageControls.style.display = 'none';
-            };
-            
-            img.src = imageUrl;
-            
-            // Set timeout in case image takes too long to load
-            setTimeout(() => {
-                if (elements.imageLoading.style.display !== 'none') {
-                    elements.imageLoading.style.display = 'none';
-                    elements.imageNotFound.style.display = 'block';
-                }
-            }, 5000);
-        }
-        
-        // Download image
-        function downloadImage() {
-            if (!currentImageUrl) {
-                showNotification('No image available to download', 'warning');
-                return;
-            }
-            
-            try {
-                const link = document.createElement('a');
-                const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-                link.download = `safety-compliance-${timestamp}.jpg`;
-                link.href = currentImageUrl;
-                link.click();
-                
-                showNotification('Image downloaded!', 'success');
-            } catch (error) {
-                console.error('Error downloading image:', error);
-                showNotification('Failed to download image', 'error');
-            }
-        }
-        
-        // Zoom image
-        function zoomImage() {
-            if (!currentImageUrl) {
-                showNotification('No image available to zoom', 'warning');
-                return;
-            }
-            
-            elements.fullscreenImage.src = currentImageUrl;
-            elements.fullscreenImageModal.style.display = 'flex';
-        }
-        
-        // Close fullscreen image
-        function closeFullscreenImage() {
-            elements.fullscreenImageModal.style.display = 'none';
-        }
-        
-        // Close modal
-        function closeModal() {
-            elements.detailsModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            currentImageUrl = '';
-        }
-        
-        // Close modal when clicking outside
-        elements.detailsModal.addEventListener('click', function(event) {
-            if (event.target === elements.detailsModal) {
-                closeModal();
-            }
-        });
-        
-        elements.fullscreenImageModal.addEventListener('click', function(event) {
-            if (event.target === elements.fullscreenImageModal) {
-                closeFullscreenImage();
-            }
-        });
-        
         // Update connection status
         function updateStatus(status, message) {
             const statusColors = {
@@ -2080,6 +2435,19 @@
             }
         `;
         document.head.appendChild(style);
+        
+        // Close modal when clicking outside
+        elements.violationModal.addEventListener('click', function(event) {
+            if (event.target === elements.violationModal) {
+                closeViolationModal();
+            }
+        });
+        
+        elements.fullscreenImageModal.addEventListener('click', function(event) {
+            if (event.target === elements.fullscreenImageModal) {
+                closeFullscreenImage();
+            }
+        });
     </script>
 </body>
 </html>
