@@ -1662,7 +1662,9 @@
     
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        // Configuration
+        // ============================================
+        // CONFIGURATION - SESUAIKAN DENGAN SHEET ANDA
+        // ============================================
         const API_URL = "https://script.google.com/macros/s/AKfycbw7aHL6T0GiigMT0h-s0je-uHiHElh0KXxRI4nd_BuKVo7N4lOYn7lNsBo7o4983PAm/exec";
         
         let autoRefreshInterval = null;
@@ -1748,6 +1750,10 @@
             fullscreenImage: document.getElementById('fullscreenImage')
         };
         
+        // ============================================
+        // INITIALIZATION
+        // ============================================
+        
         // Initialize Flatpickr Calendar
         function initCalendar() {
             dateFilter = flatpickr(elements.dateFilter, {
@@ -1767,7 +1773,12 @@
             initDateTime();
             initCalendar();
             loadData();
-            startAutoRefresh(30000);
+            startAutoRefresh(30000); // Auto refresh setiap 30 detik
+            
+            // Debug: Test data setelah 3 detik
+            setTimeout(() => {
+                testAPIData();
+            }, 3000);
         });
         
         // Initialize date time display
@@ -1789,7 +1800,49 @@
             setInterval(updateDateTime, 1000);
         }
         
-        // Show notification
+        // ============================================
+        // TEST FUNCTION - UNTUK DEBUGGING
+        // ============================================
+        
+        async function testAPIData() {
+            try {
+                console.log("=== TESTING API DATA ===");
+                const response = await fetch(`${API_URL}?action=getData&t=${Date.now()}`);
+                const data = await response.json();
+                
+                console.log("API Response:", data);
+                
+                if (data.success && data.data && data.data.length > 0) {
+                    const firstItem = data.data[0];
+                    console.log("First item from API:", firstItem);
+                    console.log("Available columns:", Object.keys(firstItem));
+                    
+                    // Cek kolom "Image Url" (dengan spasi)
+                    if (firstItem['Image Url']) {
+                        console.log("✅ Found 'Image Url' column:", firstItem['Image Url']);
+                    } else {
+                        console.warn("❌ 'Image Url' column NOT FOUND!");
+                        // Cek semua kemungkinan nama kolom
+                        Object.keys(firstItem).forEach(key => {
+                            if (key.toLowerCase().includes('image') || key.toLowerCase().includes('url')) {
+                                console.log(`Possible image column "${key}":`, firstItem[key]);
+                            }
+                        });
+                    }
+                    
+                    // Cek kolom No_Helmet dan No_Glove
+                    console.log("No_Helmet value:", firstItem['No_Helmet']);
+                    console.log("No_Glove value:", firstItem['No_Glove']);
+                }
+            } catch (error) {
+                console.error("Error testing API:", error);
+            }
+        }
+        
+        // ============================================
+        // NOTIFICATION SYSTEM
+        // ============================================
+        
         function showNotification(message, type = 'info') {
             const colors = {
                 'success': '#34a853',
@@ -1834,7 +1887,10 @@
             }, 3000);
         }
         
-        // Load data from API
+        // ============================================
+        // MAIN DATA LOADING FUNCTION
+        // ============================================
+        
         async function loadData() {
             try {
                 const originalText = elements.refreshBtn.innerHTML;
@@ -1854,6 +1910,8 @@
                 if (!data.success) {
                     throw new Error(data.error || 'Failed to load safety data');
                 }
+                
+                console.log("Data loaded from API:", data);
                 
                 allData = processData(data.data);
                 filteredData = [...allData];
@@ -1875,7 +1933,7 @@
                 elements.complianceUpdateTime.textContent = 'Just now';
                 
                 updateStatus('success', 'Connected to Safety System');
-                showNotification('Safety data loaded successfully!', 'success');
+                showNotification(`Loaded ${allData.length} safety records`, 'success');
                 
             } catch (error) {
                 console.error('Error loading safety data:', error);
@@ -1904,61 +1962,103 @@
             }
         }
         
-        // Process data to ensure proper formatting
+        // ============================================
+        // DATA PROCESSING - FIXED FOR YOUR SHEET STRUCTURE
+        // ============================================
+        
         function processData(data) {
+            console.log("Processing data with Excel structure:");
+            console.log("Column structure: Timestamp, DateTime, No_Glove, No_Helmet, Box detect, Image Url");
+            
             if (!Array.isArray(data)) {
                 console.error('Data is not an array:', data);
                 return [];
             }
             
             return data.map((item, index) => {
-                let datetime = item.datetime || item.timestamp || item.Timestamp || new Date().toISOString();
-                let formattedDatetime = '';
-                let formattedDate = '';
-                let formattedTime = '';
+                console.log(`Processing item ${index}:`, item);
                 
+                // 1. Extract timestamp - gunakan "DateTime" atau "Timestamp"
+                let datetime = item['DateTime'] || item['Timestamp'] || item.datetime || 
+                              item.timestamp || new Date().toISOString();
+                
+                // 2. Extract helmet status - dari kolom "No_Helmet"
+                // "No_Helmet" = true/yes/1 berarti TIDAK PAKAI HELMET (violation)
+                // "No_Helmet" = false/no/0 berarti PAKAI HELMET (compliant)
+                let helmetStatus = 'no helmet'; // default
+                const noHelmetValue = item['No_Helmet'];
+                if (noHelmetValue !== undefined && noHelmetValue !== null) {
+                    const noHelmetStr = noHelmetValue.toString().toLowerCase().trim();
+                    
+                    // Debug log
+                    console.log(`No_Helmet value: "${noHelmetStr}"`);
+                    
+                    // Handle berbagai format
+                    if (noHelmetStr === 'false' || noHelmetStr === 'no' || noHelmetStr === '0' || 
+                        noHelmetStr === 'helmet' || noHelmetStr === 'with helmet' || noHelmetStr === 'ok') {
+                        helmetStatus = 'helmet'; // Pakai helmet - COMPLIANT
+                    } else if (noHelmetStr === 'true' || noHelmetStr === 'yes' || noHelmetStr === '1' ||
+                              noHelmetStr === 'no helmet' || noHelmetStr === 'without helmet' || 
+                              noHelmetStr === 'violation') {
+                        helmetStatus = 'no helmet'; // Tidak pakai helmet - VIOLATION
+                    }
+                }
+                
+                // 3. Extract glove status - dari kolom "No_Glove"
+                // "No_Glove" = true/yes/1 berarti TIDAK PAKAI GLOVE (violation)
+                // "No_Glove" = false/no/0 berarti PAKAI GLOVE (compliant)
+                let gloveStatus = 'no glove'; // default
+                const noGloveValue = item['No_Glove'];
+                if (noGloveValue !== undefined && noGloveValue !== null) {
+                    const noGloveStr = noGloveValue.toString().toLowerCase().trim();
+                    
+                    // Debug log
+                    console.log(`No_Glove value: "${noGloveStr}"`);
+                    
+                    // Handle berbagai format
+                    if (noGloveStr === 'false' || noGloveStr === 'no' || noGloveStr === '0' || 
+                        noGloveStr === 'glove' || noGloveStr === 'with glove' || noGloveStr === 'ok') {
+                        gloveStatus = 'glove'; // Pakai glove - COMPLIANT
+                    } else if (noGloveStr === 'true' || noGloveStr === 'yes' || noGloveStr === '1' ||
+                              noGloveStr === 'no glove' || noGloveStr === 'without glove' || 
+                              noGloveStr === 'violation') {
+                        gloveStatus = 'no glove'; // Tidak pakai glove - VIOLATION
+                    }
+                }
+                
+                // 4. Extract image URL - dari kolom "Image Url" (dengan spasi!)
+                let imageUrl = '';
+                // Coba berbagai kemungkinan nama kolom
+                const possibleImageCols = ['Image Url', 'Image URL', 'imageUrl', 'imageURL', 'Image_Url', 
+                                          'image_url', 'Image', 'image', 'ImageUrl', 'imageLink'];
+                
+                for (const col of possibleImageCols) {
+                    if (item[col] && item[col].toString().trim() !== '') {
+                        imageUrl = item[col].toString().trim();
+                        console.log(`✅ Found image URL in column "${col}":`, imageUrl);
+                        break;
+                    }
+                }
+                
+                // Jika tidak ada image URL, generate berdasarkan status
+                if (!imageUrl || imageUrl === '') {
+                    console.log(`❌ No image URL found, generating default`);
+                    imageUrl = generateDefaultImage(helmetStatus, gloveStatus);
+                }
+                
+                // 5. Format datetime
+                let formattedDatetime, formattedDate, formattedTime;
                 try {
                     const date = new Date(datetime);
                     if (isNaN(date.getTime())) {
-                        // If date is invalid, use current date
                         const now = new Date();
-                        formattedDatetime = now.toLocaleString('en-US', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                        });
-                        formattedDate = now.toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit'
-                        });
-                        formattedTime = now.toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                        });
+                        formattedDatetime = now.toLocaleString();
+                        formattedDate = now.toLocaleDateString();
+                        formattedTime = now.toLocaleTimeString();
                     } else {
-                        formattedDatetime = date.toLocaleString('en-US', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit',
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                        });
-                        formattedDate = date.toLocaleDateString('en-US', {
-                            year: 'numeric',
-                            month: '2-digit',
-                            day: '2-digit'
-                        });
-                        formattedTime = date.toLocaleTimeString('en-US', {
-                            hour: '2-digit',
-                            minute: '2-digit',
-                            second: '2-digit'
-                        });
+                        formattedDatetime = date.toLocaleString();
+                        formattedDate = date.toLocaleDateString();
+                        formattedTime = date.toLocaleTimeString();
                     }
                 } catch (e) {
                     const now = new Date();
@@ -1967,56 +2067,165 @@
                     formattedTime = now.toLocaleTimeString();
                 }
                 
-                // Extract helmet and glove status from Google Sheets
-                const helmetStatus = (item.helmetStatus || item['Helmet Status'] || 'no helmet').toString().toLowerCase().trim();
-                const gloveStatus = (item.gloveStatus || item['Glove Status'] || 'no glove').toString().toLowerCase().trim();
-                
-                // Determine if image URL exists
-                let imageUrl = item.imageUrl || item['Image URL'] || '';
-                
-                // Generate a default image URL if none exists
-                if (!imageUrl || imageUrl.trim() === '') {
-                    imageUrl = generateDefaultImageUrl(helmetStatus, gloveStatus);
-                }
-                
-                return {
+                // 6. Create final object
+                const processedItem = {
                     ...item,
-                    id: item.id || `violation_${index}_${Date.now()}`,
+                    id: `violation_${index}_${Date.now()}`,
                     datetime: formattedDatetime,
                     dateOnly: formattedDate,
                     timeOnly: formattedTime,
                     helmetStatus: helmetStatus,
                     gloveStatus: gloveStatus,
-                    employeeId: item.employeeId || item['Employee ID'] || 'EMP-' + (index + 1),
-                    department: item.department || item['Department'] || 'Industrial Safety',
-                    shift: item.shift || item['Shift'] || 'Morning (8AM-4PM)',
-                    imageUrl: imageUrl
+                    employeeId: item['Employee ID'] || item['EmployeeId'] || item.employeeId || `EMP-${index + 1}`,
+                    department: item['Department'] || item.department || 'Industrial Safety',
+                    shift: item['Shift'] || item.shift || 'Morning (8AM-4PM)',
+                    imageUrl: imageUrl,
+                    // Debug info
+                    _debug: {
+                        rawHelmet: noHelmetValue,
+                        rawGlove: noGloveValue,
+                        processedHelmet: helmetStatus,
+                        processedGlove: gloveStatus
+                    }
                 };
+                
+                console.log(`Processed item ${index}:`, processedItem);
+                return processedItem;
             });
         }
         
-        // Generate default image URL based on compliance status
-        function generateDefaultImageUrl(helmetStatus, gloveStatus) {
+        // ============================================
+        // IMAGE FUNCTIONS - FIXED
+        // ============================================
+        
+        function generateDefaultImage(helmetStatus, gloveStatus) {
             const isCompliant = helmetStatus === 'helmet' && gloveStatus === 'glove';
             
+            // Gunakan gambar yang reliable
             if (isCompliant) {
-                // Image untuk compliant
                 return 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
             } else {
-                // Image untuk violation
                 return 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
             }
         }
         
-        // Update statistics display
+        function loadViolationImage(imageUrl) {
+            console.log("🔍 Loading image from URL:", imageUrl);
+            
+            // Reset semua tampilan gambar
+            elements.modalImagePreview.style.display = 'none';
+            elements.imageNotFound.style.display = 'none';
+            elements.imageControls.style.display = 'none';
+            elements.imageLoading.style.display = 'flex';
+            
+            // Validasi URL
+            if (!imageUrl || imageUrl.trim() === '' || imageUrl === 'undefined') {
+                console.warn("❌ Invalid image URL");
+                setTimeout(() => {
+                    elements.imageLoading.style.display = 'none';
+                    elements.imageNotFound.style.display = 'block';
+                }, 1000);
+                return;
+            }
+            
+            // Fix common URL issues
+            let fixedUrl = imageUrl;
+            
+            // 1. Jika URL adalah Google Drive link tapi belum di-convert
+            if (fixedUrl.includes('drive.google.com') && !fixedUrl.includes('uc?id=') && !fixedUrl.includes('uc?export=download')) {
+                // Coba extract file ID
+                const match = fixedUrl.match(/\/d\/(.*?)\//);
+                if (match && match[1]) {
+                    fixedUrl = `https://drive.google.com/uc?id=${match[1]}&export=download`;
+                    console.log("🔄 Converted Google Drive URL:", fixedUrl);
+                }
+            }
+            
+            // 2. Jika URL tidak memiliki protocol, tambahkan https://
+            if (!fixedUrl.startsWith('http')) {
+                fixedUrl = 'https://' + fixedUrl;
+                console.log("🔄 Added protocol to URL:", fixedUrl);
+            }
+            
+            // Load gambar
+            const img = new Image();
+            
+            // Set timeout
+            const timeout = setTimeout(() => {
+                console.log("⏰ Image load timeout");
+                if (!img.complete) {
+                    loadFallbackImage();
+                }
+            }, 8000); // 8 seconds timeout
+            
+            img.onload = function() {
+                clearTimeout(timeout);
+                console.log("✅ Image loaded successfully");
+                elements.modalImagePreview.src = fixedUrl;
+                elements.imageLoading.style.display = 'none';
+                elements.modalImagePreview.style.display = 'block';
+                elements.imageControls.style.display = 'flex';
+                elements.imageNotFound.style.display = 'none';
+                currentImageUrl = fixedUrl;
+                showNotification("Image loaded successfully", "success");
+            };
+            
+            img.onerror = function(error) {
+                clearTimeout(timeout);
+                console.error("❌ Error loading image:", error);
+                console.log("Failed URL:", fixedUrl);
+                loadFallbackImage();
+            };
+            
+            // Mulai loading
+            console.log("📤 Requesting image from:", fixedUrl);
+            img.src = fixedUrl;
+        }
+        
+        function loadFallbackImage() {
+            console.log("🔄 Loading fallback image");
+            
+            // Gunakan gambar default yang reliable dari Unsplash
+            const fallbackImages = [
+                'https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
+                'https://images.unsplash.com/photo-1581092160607-509bd0b6b54c?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
+            ];
+            
+            const randomImage = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
+            const img = new Image();
+            
+            img.onload = function() {
+                elements.modalImagePreview.src = randomImage;
+                elements.imageLoading.style.display = 'none';
+                elements.modalImagePreview.style.display = 'block';
+                elements.imageControls.style.display = 'flex';
+                elements.imageNotFound.style.display = 'none';
+                currentImageUrl = randomImage;
+                showNotification("Loaded default safety image", "info");
+            };
+            
+            img.onerror = function() {
+                elements.imageLoading.style.display = 'none';
+                elements.imageNotFound.style.display = 'block';
+                showNotification("Could not load image", "error");
+            };
+            
+            img.src = randomImage;
+        }
+        
+        // ============================================
+        // STATISTICS FUNCTIONS
+        // ============================================
+        
         function updateStatistics(stats) {
             if (!stats) {
                 // Calculate stats from data
                 const total = allData.length;
                 const helmetViolations = allData.filter(item => 
-                    item.helmetStatus && item.helmetStatus.includes('no')).length;
+                    item.helmetStatus === 'no helmet').length;
                 const gloveViolations = allData.filter(item => 
-                    item.gloveStatus && item.gloveStatus.includes('no')).length;
+                    item.gloveStatus === 'no glove').length;
                 const fullPPE = allData.filter(item => 
                     item.helmetStatus === 'helmet' && item.gloveStatus === 'glove').length;
                 const helmetOK = allData.filter(item => 
@@ -2052,7 +2261,6 @@
             }
         }
         
-        // Update compliance details
         function updateComplianceDetails() {
             const helmetViolations = parseInt(elements.helmetViolations.textContent) || 0;
             const gloveViolations = parseInt(elements.gloveViolations.textContent) || 0;
@@ -2064,7 +2272,6 @@
             elements.compFullCompliance.textContent = fullCompliance;
         }
         
-        // Update calendar statistics
         function updateCalendarStats() {
             const today = new Date();
             const todayStr = today.toISOString().split('T')[0];
@@ -2080,8 +2287,7 @@
             });
             
             const todayViolations = todayData.filter(item => 
-                (item.helmetStatus && item.helmetStatus.includes('no')) || 
-                (item.gloveStatus && item.gloveStatus.includes('no'))
+                item.helmetStatus === 'no helmet' || item.gloveStatus === 'no glove'
             ).length;
             
             const todayCompliance = todayData.filter(item => 
@@ -2093,7 +2299,10 @@
             elements.todayTotal.textContent = todayData.length;
         }
         
-        // Update table with pagination
+        // ============================================
+        // TABLE & PAGINATION FUNCTIONS
+        // ============================================
+        
         function updateTableWithPagination() {
             const totalItems = filteredData.length;
             const totalPages = Math.ceil(totalItems / itemsPerPage);
@@ -2119,7 +2328,6 @@
             updatePaginationControls(totalPages);
         }
         
-        // Update table content
         function updateTableContent(data, startIndex) {
             if (!data || data.length === 0) {
                 elements.tableBody.innerHTML = `
@@ -2172,7 +2380,85 @@
             elements.tableBody.innerHTML = tableHTML;
         }
         
-        // Open violation modal
+        function updatePaginationControls(totalPages) {
+            elements.firstPage.disabled = currentPage === 1;
+            elements.prevPage.disabled = currentPage === 1;
+            elements.nextPage.disabled = currentPage === totalPages || totalPages === 0;
+            elements.lastPage.disabled = currentPage === totalPages || totalPages === 0;
+            
+            let pageNumbersHTML = '';
+            const maxPagesToShow = 5;
+            
+            if (totalPages <= maxPagesToShow) {
+                for (let i = 1; i <= totalPages; i++) {
+                    pageNumbersHTML += `
+                        <div class="page-number ${i === currentPage ? 'active' : ''}" 
+                             onclick="goToPage(${i})">${i}</div>
+                    `;
+                }
+            } else {
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+                
+                if (endPage - startPage + 1 < maxPagesToShow) {
+                    startPage = Math.max(1, endPage - maxPagesToShow + 1);
+                }
+                
+                if (startPage > 1) {
+                    pageNumbersHTML += `
+                        <div class="page-number" onclick="goToPage(1)">1</div>
+                        <div class="page-number" style="pointer-events: none;">...</div>
+                    `;
+                }
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    pageNumbersHTML += `
+                        <div class="page-number ${i === currentPage ? 'active' : ''}" 
+                             onclick="goToPage(${i})">${i}</div>
+                    `;
+                }
+                
+                if (endPage < totalPages) {
+                    pageNumbersHTML += `
+                        <div class="page-number" style="pointer-events: none;">...</div>
+                        <div class="page-number" onclick="goToPage(${totalPages})">${totalPages}</div>
+                    `;
+                }
+            }
+            
+            elements.pageNumbers.innerHTML = pageNumbersHTML;
+        }
+        
+        function changePage(delta) {
+            const newPage = currentPage + delta;
+            goToPage(newPage);
+        }
+        
+        function goToPage(page) {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
+            
+            currentPage = page;
+            updateTableWithPagination();
+            
+            // Scroll to top of table
+            const tableContainer = document.querySelector('.table-container');
+            if (tableContainer) {
+                tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
+        }
+        
+        function goToLastPage() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            goToPage(totalPages);
+        }
+        
+        // ============================================
+        // MODAL FUNCTIONS
+        // ============================================
+        
         function openViolationModal(violationId) {
             currentViolationId = violationId;
             const violation = allData.find(item => item.id === violationId);
@@ -2181,6 +2467,8 @@
                 showNotification('Violation data not found', 'error');
                 return;
             }
+            
+            console.log("Opening modal for violation:", violation);
             
             // Reset image display
             elements.modalImagePreview.style.display = 'none';
@@ -2237,8 +2525,9 @@
                 </div>
             `;
             
-            // Load image
+            // Load image - FIXED!
             currentImageUrl = violation.imageUrl;
+            console.log("Image URL for modal:", currentImageUrl);
             loadViolationImage(violation.imageUrl);
             
             // Show modal
@@ -2246,20 +2535,16 @@
             document.body.style.overflow = 'hidden';
         }
         
-        // Open violation details from compliance card
         function openViolationDetails(type) {
             let violation;
             
             if (type === 'helmet') {
-                violation = allData.find(item => 
-                    item.helmetStatus && item.helmetStatus.includes('no'));
+                violation = allData.find(item => item.helmetStatus === 'no helmet');
             } else if (type === 'glove') {
-                violation = allData.find(item => 
-                    item.gloveStatus && item.gloveStatus.includes('no'));
+                violation = allData.find(item => item.gloveStatus === 'no glove');
             } else if (type === 'overall') {
                 violation = allData.find(item => 
-                    (item.helmetStatus && item.helmetStatus.includes('no')) || 
-                    (item.gloveStatus && item.gloveStatus.includes('no')));
+                    item.helmetStatus === 'no helmet' || item.gloveStatus === 'no glove');
             } else if (type === 'compliant') {
                 violation = allData.find(item => 
                     item.helmetStatus === 'helmet' && item.gloveStatus === 'glove');
@@ -2272,85 +2557,13 @@
             }
         }
         
-        // Load violation image - FIXED VERSION
-        function loadViolationImage(imageUrl) {
-            if (!imageUrl || imageUrl.trim() === '' || imageUrl === 'undefined') {
-                console.log('No image URL provided');
-                setTimeout(() => {
-                    elements.imageLoading.style.display = 'none';
-                    elements.imageNotFound.style.display = 'block';
-                }, 500);
-                return;
-            }
-            
-            console.log('Loading image from URL:', imageUrl);
-            
-            // Create image element
-            const img = new Image();
-            
-            img.onload = function() {
-                console.log('Image loaded successfully');
-                elements.modalImagePreview.src = imageUrl;
-                elements.imageLoading.style.display = 'none';
-                elements.modalImagePreview.style.display = 'block';
-                elements.imageControls.style.display = 'flex';
-                elements.imageNotFound.style.display = 'none';
-            };
-            
-            img.onerror = function(error) {
-                console.error('Error loading image:', error);
-                elements.imageLoading.style.display = 'none';
-                elements.imageNotFound.style.display = 'block';
-                elements.imageControls.style.display = 'none';
-                
-                // Try fallback images if the original URL fails
-                const fallbackUrl = generateDefaultImageUrl('no helmet', 'no glove');
-                const fallbackImg = new Image();
-                
-                fallbackImg.onload = function() {
-                    elements.modalImagePreview.src = fallbackUrl;
-                    elements.modalImagePreview.style.display = 'block';
-                    elements.imageControls.style.display = 'flex';
-                    elements.imageNotFound.style.display = 'none';
-                    currentImageUrl = fallbackUrl;
-                };
-                
-                fallbackImg.onerror = function() {
-                    elements.imageNotFound.style.display = 'block';
-                };
-                
-                fallbackImg.src = fallbackUrl;
-            };
-            
-            // Set timeout in case image takes too long to load
-            const timeoutId = setTimeout(() => {
-                console.log('Image load timeout');
-                if (!img.complete) {
-                    img.onerror(new Error('Image load timeout'));
-                }
-            }, 8000);
-            
-            img.onload = function() {
-                clearTimeout(timeoutId);
-                elements.modalImagePreview.src = imageUrl;
-                elements.imageLoading.style.display = 'none';
-                elements.modalImagePreview.style.display = 'block';
-                elements.imageControls.style.display = 'flex';
-                elements.imageNotFound.style.display = 'none';
-            };
-            
-            img.onerror = function(error) {
-                clearTimeout(timeoutId);
-                console.error('Error loading image:', error);
-                elements.imageLoading.style.display = 'none';
-                elements.imageNotFound.style.display = 'block';
-                elements.imageControls.style.display = 'none';
-            };
-            
-            img.src = imageUrl;
+        function closeViolationModal() {
+            elements.violationModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentViolationId = null;
+            currentImageUrl = '';
         }
         
-        // View safety image in fullscreen
         function viewSafetyImage() {
             if (!currentImageUrl || currentImageUrl.trim() === '') {
                 showNotification('No image available to view', 'warning');
@@ -2361,7 +2574,10 @@
             elements.fullscreenImageModal.style.display = 'flex';
         }
         
-        // Download safety image
+        function closeFullscreenImage() {
+            elements.fullscreenImageModal.style.display = 'none';
+        }
+        
         function downloadSafetyImage() {
             if (!currentImageUrl || currentImageUrl.trim() === '') {
                 showNotification('No image available to download', 'warning');
@@ -2385,99 +2601,10 @@
             }
         }
         
-        // Close violation modal
-        function closeViolationModal() {
-            elements.violationModal.style.display = 'none';
-            document.body.style.overflow = 'auto';
-            currentViolationId = null;
-            currentImageUrl = '';
-        }
+        // ============================================
+        // FILTER FUNCTIONS
+        // ============================================
         
-        // Close fullscreen image
-        function closeFullscreenImage() {
-            elements.fullscreenImageModal.style.display = 'none';
-        }
-        
-        // Update pagination controls
-        function updatePaginationControls(totalPages) {
-            elements.firstPage.disabled = currentPage === 1;
-            elements.prevPage.disabled = currentPage === 1;
-            elements.nextPage.disabled = currentPage === totalPages || totalPages === 0;
-            elements.lastPage.disabled = currentPage === totalPages || totalPages === 0;
-            
-            let pageNumbersHTML = '';
-            const maxPagesToShow = 5;
-            
-            if (totalPages <= maxPagesToShow) {
-                for (let i = 1; i <= totalPages; i++) {
-                    pageNumbersHTML += `
-                        <div class="page-number ${i === currentPage ? 'active' : ''}" 
-                             onclick="goToPage(${i})">${i}</div>
-                    `;
-                }
-            } else {
-                let startPage = Math.max(1, currentPage - 2);
-                let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
-                
-                if (endPage - startPage + 1 < maxPagesToShow) {
-                    startPage = Math.max(1, endPage - maxPagesToShow + 1);
-                }
-                
-                if (startPage > 1) {
-                    pageNumbersHTML += `
-                        <div class="page-number" onclick="goToPage(1)">1</div>
-                        <div class="page-number" style="pointer-events: none;">...</div>
-                    `;
-                }
-                
-                for (let i = startPage; i <= endPage; i++) {
-                    pageNumbersHTML += `
-                        <div class="page-number ${i === currentPage ? 'active' : ''}" 
-                             onclick="goToPage(${i})">${i}</div>
-                    `;
-                }
-                
-                if (endPage < totalPages) {
-                    pageNumbersHTML += `
-                        <div class="page-number" style="pointer-events: none;">...</div>
-                        <div class="page-number" onclick="goToPage(${totalPages})">${totalPages}</div>
-                    `;
-                }
-            }
-            
-            elements.pageNumbers.innerHTML = pageNumbersHTML;
-        }
-        
-        // Change page
-        function changePage(delta) {
-            const newPage = currentPage + delta;
-            goToPage(newPage);
-        }
-        
-        // Go to specific page
-        function goToPage(page) {
-            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-            
-            if (page < 1) page = 1;
-            if (page > totalPages) page = totalPages;
-            
-            currentPage = page;
-            updateTableWithPagination();
-            
-            // Scroll to top of table
-            const tableContainer = document.querySelector('.table-container');
-            if (tableContainer) {
-                tableContainer.scrollIntoView({ behavior: 'smooth', block: 'start' });
-            }
-        }
-        
-        // Go to last page
-        function goToLastPage() {
-            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-            goToPage(totalPages);
-        }
-        
-        // Filter by date
         function filterByDate() {
             if (!selectedDate) {
                 selectedDate = elements.dateFilter.value;
@@ -2507,7 +2634,6 @@
             showNotification(`Filtered by date: ${selectedDate}`, 'info');
         }
         
-        // Clear date filter
         function clearDateFilter() {
             selectedDate = null;
             elements.dateFilter.value = '';
@@ -2518,7 +2644,10 @@
             showNotification('Date filter cleared', 'info');
         }
         
-        // Update connection status
+        // ============================================
+        // STATUS & AUTO REFRESH FUNCTIONS
+        // ============================================
+        
         function updateStatus(status, message) {
             const statusColors = {
                 'success': '#34a853',
@@ -2532,7 +2661,6 @@
             elements.apiStatus.style.color = statusColors[status] || '#ea4335';
         }
         
-        // Toggle auto refresh
         function toggleAutoRefresh() {
             autoRefreshEnabled = !autoRefreshEnabled;
             
@@ -2555,13 +2683,11 @@
             }
         }
         
-        // Start auto refresh
         function startAutoRefresh(interval) {
             stopAutoRefresh();
             autoRefreshInterval = setInterval(loadData, interval);
         }
         
-        // Stop auto refresh
         function stopAutoRefresh() {
             if (autoRefreshInterval) {
                 clearInterval(autoRefreshInterval);
@@ -2569,7 +2695,11 @@
             }
         }
         
-        // Add CSS for notifications and animations
+        // ============================================
+        // EVENT LISTENERS
+        // ============================================
+        
+        // Add CSS for notifications
         const style = document.createElement('style');
         style.textContent = `
             @keyframes slideIn {
@@ -2612,32 +2742,51 @@
             }
         });
         
-        // Test function to debug image loading
-        function testImageLoading() {
-            console.log('Testing image loading...');
-            console.log('All data length:', allData.length);
+        // ============================================
+        // DEBUG FUNCTIONS (optional)
+        // ============================================
+        
+        // Add debug button for testing
+        const debugBtn = document.createElement('button');
+        debugBtn.textContent = '🔧 Debug';
+        debugBtn.style.cssText = `
+            position: fixed;
+            bottom: 20px;
+            left: 20px;
+            padding: 10px 15px;
+            background: #333;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 9999;
+            font-size: 12px;
+            opacity: 0.7;
+        `;
+        debugBtn.onclick = function() {
+            console.log("=== DEBUG INFO ===");
+            console.log("All data:", allData);
+            console.log("Filtered data:", filteredData);
+            console.log("Current page:", currentPage);
             
             if (allData.length > 0) {
-                const firstItem = allData[0];
-                console.log('First item:', firstItem);
-                console.log('Image URL:', firstItem.imageUrl);
-                openViolationModal(firstItem.id);
-            } else {
-                showNotification('No data to test', 'warning');
+                console.log("First item details:", allData[0]);
+                console.log("First item image URL:", allData[0].imageUrl);
             }
-        }
-        
-        // Add debug button (optional)
-        const debugBtn = document.createElement('button');
-        debugBtn.textContent = 'Debug Images';
-        debugBtn.style.cssText = 'position: fixed; bottom: 20px; left: 20px; padding: 10px; background: #333; color: white; border: none; border-radius: 5px; cursor: pointer; z-index: 9999; display: none;';
-        debugBtn.onclick = testImageLoading;
+            
+            testAPIData();
+        };
         document.body.appendChild(debugBtn);
         
-        // Show debug button only in development
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+        // Only show in development
+        if (!window.location.hostname.includes('github') && !window.location.hostname.includes('netlify')) {
             debugBtn.style.display = 'block';
         }
+        
+        console.log("PPE Safety Monitoring System initialized successfully!");
+        console.log("API URL:", API_URL);
+        console.log("Column structure expected: Timestamp, DateTime, No_Glove, No_Helmet, Box detect, Image Url");
+        
     </script>
 </body>
 </html>
