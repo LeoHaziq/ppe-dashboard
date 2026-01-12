@@ -5,7 +5,6 @@
     <title>PPE Safety Monitoring System | UMPSA</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
-    <!-- ========== FAVICON / BROWSER ICONS ========== -->
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -1361,14 +1360,6 @@
             user-select: none;
         }
         
-        /* Prevent text selection on mobile */
-        .no-select {
-            -webkit-user-select: none;
-            -moz-user-select: none;
-            -ms-user-select: none;
-            user-select: none;
-        }
-        
         /* Better scrolling on iOS */
         .table-wrapper, .modal-content {
             -webkit-overflow-scrolling: touch;
@@ -2072,7 +2063,7 @@
             }
         }
         
-        // Process data dari Google Sheet
+        // Process data dari Google Sheet - DIPERBAIKI UNTUK IMAGE
         function processData(data) {
             if (!Array.isArray(data)) {
                 console.error('Data is not an array:', data);
@@ -2115,22 +2106,32 @@
                     }
                 }
                 
-                // Extract image URL
+                // Extract image URL - CARA BARU YANG LEBIH TEPAT
                 let imageUrl = '';
-                const possibleImageCols = ['Image Url', 'Image URL', 'imageUrl', 'imageURL', 'Image_Url'];
+                let originalImageUrl = '';
                 
-                for (const col of possibleImageCols) {
-                    if (item[col] && item[col].toString().trim() !== '') {
-                        imageUrl = item[col].toString().trim();
-                        break;
+                // Cari semua kemungkinan nama kolom untuk image
+                const allKeys = Object.keys(item);
+                console.log('Available columns in item:', allKeys);
+                
+                // Cari kolom yang mengandungi 'image' atau 'url'
+                for (const key of allKeys) {
+                    if (key.toLowerCase().includes('image') || key.toLowerCase().includes('url')) {
+                        const value = item[key];
+                        if (value && value.toString().trim() !== '' && 
+                            !value.toString().toLowerCase().includes('null') &&
+                            !value.toString().toLowerCase().includes('undefined')) {
+                            originalImageUrl = value.toString().trim();
+                            console.log(`Found image URL in column "${key}":`, originalImageUrl);
+                            break;
+                        }
                     }
                 }
                 
-                // Default image jika tidak ada
-                if (!imageUrl || imageUrl === '') {
-                    imageUrl = helmetStatus === 'helmet' && gloveStatus === 'glove' 
-                        ? 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-                        : 'https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80';
+                // Convert Google Drive URL ke format yang betul
+                if (originalImageUrl) {
+                    imageUrl = convertGoogleDriveUrl(originalImageUrl);
+                    console.log('Converted image URL:', imageUrl);
                 }
                 
                 // Format datetime
@@ -2159,12 +2160,59 @@
                     dateOnly: formattedDate,
                     helmetStatus: helmetStatus,
                     gloveStatus: gloveStatus,
-                    employeeId: item['Employee ID'] || `EMP-${index + 1}`,
+                    employeeId: item['Employee ID'] || item['EmployeeId'] || `EMP-${index + 1}`,
                     department: item['Department'] || 'Industrial Safety',
                     shift: item['Shift'] || 'Morning (8AM-4PM)',
-                    imageUrl: imageUrl
+                    originalImageUrl: originalImageUrl,
+                    imageUrl: imageUrl,
+                    // Debug info
+                    _debug: {
+                        hasImage: !!originalImageUrl,
+                        originalUrl: originalImageUrl,
+                        convertedUrl: imageUrl
+                    }
                 };
             });
+        }
+        
+        // FUNGSI BARU: Convert Google Drive URL ke format yang betul
+        function convertGoogleDriveUrl(url) {
+            if (!url || url.trim() === '') {
+                return '';
+            }
+            
+            let finalUrl = url.trim();
+            
+            // 1. Jika URL sudah dalam format download, return as is
+            if (finalUrl.includes('uc?id=') || finalUrl.includes('uc?export=download')) {
+                return finalUrl;
+            }
+            
+            // 2. Jika URL adalah Google Drive view link, convert ke download link
+            if (finalUrl.includes('drive.google.com/file/d/')) {
+                // Contoh: https://drive.google.com/file/d/1aBcDeFgHiJkLmNoPqRsTuVwXyZ/view
+                const match = finalUrl.match(/\/d\/([^\/]+)/);
+                if (match && match[1]) {
+                    finalUrl = `https://drive.google.com/uc?id=${match[1]}&export=download`;
+                }
+            }
+            
+            // 3. Jika URL adalah Google Drive open link, convert ke download link
+            if (finalUrl.includes('drive.google.com/open?id=')) {
+                // Contoh: https://drive.google.com/open?id=1aBcDeFgHiJkLmNoPqRsTuVwXyZ
+                const match = finalUrl.match(/id=([^&]+)/);
+                if (match && match[1]) {
+                    finalUrl = `https://drive.google.com/uc?id=${match[1]}&export=download`;
+                }
+            }
+            
+            // 4. Tambah https:// jika tidak ada protocol
+            if (!finalUrl.startsWith('http')) {
+                finalUrl = 'https://' + finalUrl;
+            }
+            
+            console.log('URL Conversion:', url, '->', finalUrl);
+            return finalUrl;
         }
         
         // ============================================
@@ -2396,6 +2444,9 @@
                 return;
             }
             
+            console.log('Opening modal for violation:', violation);
+            console.log('Image debug info:', violation._debug);
+            
             // Reset image display
             elements.modalImagePreview.style.display = 'none';
             elements.imageNotFound.style.display = 'none';
@@ -2450,9 +2501,17 @@
                 </div>
             `;
             
-            // Load image
-            currentImageUrl = violation.imageUrl;
-            loadViolationImage(violation.imageUrl);
+            // Load image - GUNAKAN URL YANG SUDAH DIPROSES
+            currentImageUrl = violation.imageUrl || violation.originalImageUrl;
+            console.log('Loading image from URL:', currentImageUrl);
+            
+            if (currentImageUrl && currentImageUrl.trim() !== '') {
+                loadViolationImage(currentImageUrl);
+            } else {
+                elements.imageLoading.style.display = 'none';
+                elements.imageNotFound.style.display = 'block';
+                showNotification('No image available for this record', 'info');
+            }
             
             // Show modal
             elements.violationModal.style.display = 'flex';
@@ -2487,7 +2546,7 @@
         }
         
         // ============================================
-        // FUNGSI GAMBAR
+        // FUNGSI GAMBAR - DIPERBAIKI
         // ============================================
         
         function loadViolationImage(imageUrl) {
@@ -2508,27 +2567,25 @@
             // Fix URL jika perlu
             let fixedUrl = imageUrl;
             
-            if (fixedUrl.includes('drive.google.com') && !fixedUrl.includes('uc?id=') && !fixedUrl.includes('uc?export=download')) {
-                const match = fixedUrl.match(/\/d\/(.*?)\//);
-                if (match && match[1]) {
-                    fixedUrl = `https://drive.google.com/uc?id=${match[1]}&export=download`;
-                }
-            }
+            // Convert Google Drive URL jika perlu
+            fixedUrl = convertGoogleDriveUrl(fixedUrl);
             
-            if (!fixedUrl.startsWith('http')) {
-                fixedUrl = 'https://' + fixedUrl;
-            }
+            console.log('Attempting to load image from:', fixedUrl);
             
             // Load gambar
             const img = new Image();
             const timeout = setTimeout(() => {
                 if (!img.complete) {
-                    loadFallbackImage();
+                    console.log('Image load timeout for:', fixedUrl);
+                    elements.imageLoading.style.display = 'none';
+                    elements.imageNotFound.style.display = 'block';
+                    showNotification('Image loading timeout', 'warning');
                 }
-            }, 5000);
+            }, 8000);
             
             img.onload = function() {
                 clearTimeout(timeout);
+                console.log('Image loaded successfully:', fixedUrl);
                 elements.modalImagePreview.src = fixedUrl;
                 elements.imageLoading.style.display = 'none';
                 elements.modalImagePreview.style.display = 'block';
@@ -2536,37 +2593,40 @@
                 currentImageUrl = fixedUrl;
             };
             
-            img.onerror = function() {
+            img.onerror = function(error) {
                 clearTimeout(timeout);
-                loadFallbackImage();
+                console.error('Error loading image:', error, 'URL:', fixedUrl);
+                
+                // Cuba cara lain untuk Google Drive
+                if (fixedUrl.includes('drive.google.com')) {
+                    // Cuba format alternatif
+                    const altUrl = fixedUrl.replace('uc?id=', 'uc?export=view&id=');
+                    console.log('Trying alternative URL:', altUrl);
+                    
+                    const img2 = new Image();
+                    img2.onload = function() {
+                        elements.modalImagePreview.src = altUrl;
+                        elements.imageLoading.style.display = 'none';
+                        elements.modalImagePreview.style.display = 'block';
+                        elements.imageControls.style.display = 'flex';
+                        currentImageUrl = altUrl;
+                    };
+                    
+                    img2.onerror = function() {
+                        elements.imageLoading.style.display = 'none';
+                        elements.imageNotFound.style.display = 'block';
+                        showNotification('Failed to load image from Google Drive', 'error');
+                    };
+                    
+                    img2.src = altUrl;
+                } else {
+                    elements.imageLoading.style.display = 'none';
+                    elements.imageNotFound.style.display = 'block';
+                    showNotification('Failed to load image', 'error');
+                }
             };
             
             img.src = fixedUrl;
-        }
-        
-        function loadFallbackImage() {
-            const fallbackImages = [
-                'https://images.unsplash.com/photo-1581094794329-c8112a89af12?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80',
-                'https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80'
-            ];
-            
-            const randomImage = fallbackImages[Math.floor(Math.random() * fallbackImages.length)];
-            const img = new Image();
-            
-            img.onload = function() {
-                elements.modalImagePreview.src = randomImage;
-                elements.imageLoading.style.display = 'none';
-                elements.modalImagePreview.style.display = 'block';
-                elements.imageControls.style.display = 'flex';
-                currentImageUrl = randomImage;
-            };
-            
-            img.onerror = function() {
-                elements.imageLoading.style.display = 'none';
-                elements.imageNotFound.style.display = 'block';
-            };
-            
-            img.src = randomImage;
         }
         
         function viewSafetyImage() {
@@ -2594,13 +2654,17 @@
             try {
                 const link = document.createElement('a');
                 const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-                link.download = `safety-evidence-${timestamp}.jpg`;
+                const violation = allData.find(item => item.id === currentViolationId);
+                const status = violation ? (violation.helmetStatus === 'helmet' && violation.gloveStatus === 'glove' ? 'compliant' : 'violation') : 'safety';
+                
+                link.download = `safety-${status}-${timestamp}.jpg`;
                 link.href = currentImageUrl;
                 link.click();
                 
                 showNotification('Image downloaded!', 'success');
             } catch (error) {
-                showNotification('Failed to download', 'error');
+                console.error('Error downloading image:', error);
+                showNotification('Failed to download image', 'error');
             }
         }
         
