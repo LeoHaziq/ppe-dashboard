@@ -2,148 +2,766 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <title>PPE Safety Monitoring System | UMPSA</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PPE Safety Monitoring Dashboard</title>
     
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- ========== FAVICON / BROWSER ICONS ========== -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🛡️</text></svg>">
     
-    <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         :root {
-            --primary-color: #2c3e50;
-            --secondary-color: #3498db;
-            --success-color: #27ae60;
-            --danger-color: #e74c3c;
-            --warning-color: #f39c12;
-            --info-color: #17a2b8;
+            --primary: #1a73e8;
+            --danger: #ea4335;
+            --success: #34a853;
+            --warning: #fbbc05;
+            --dark: #0f172a;
+            --dark-secondary: #1e293b;
+            --light: #f8fafc;
+            --gray: #64748b;
+            --umpsa-blue: #0047AB;
+            --versafac-green: #006400;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
         
         body {
-            background-color: #f5f7fa;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            padding-bottom: 20px;
+            font-family: 'Poppins', sans-serif;
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            color: var(--light);
+            min-height: 100vh;
+            padding: 20px;
         }
         
-        .navbar-custom {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        .container {
+            max-width: 1800px;
+            margin: 0 auto;
         }
         
-        .card {
-            border-radius: 10px;
-            border: none;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.07);
-            transition: transform 0.3s ease;
-            margin-bottom: 20px;
+        /* ========== HEADER ========== */
+        .header-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            padding: 20px 30px;
+            border-radius: 20px;
+            margin-bottom: 25px;
+            border-left: 8px solid var(--warning);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            position: relative;
             overflow: hidden;
+            flex-wrap: wrap;
         }
         
-        .card:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        .header-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--success), var(--warning));
         }
         
-        .card-header {
-            background-color: rgba(44, 62, 80, 0.95);
+        .institution-section {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            min-width: 200px;
+        }
+        
+        .institution-name {
+            font-size: 1.8rem;
+            font-weight: 800;
+            letter-spacing: 1px;
             color: white;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+        
+        .institution-badge {
+            font-size: 0.9rem;
             font-weight: 600;
-            border-bottom: none;
-            padding: 15px 20px;
+            padding: 6px 15px;
+            border-radius: 20px;
+            text-align: center;
+            display: inline-block;
+        }
+        
+        .umpsa-badge {
+            background: linear-gradient(135deg, var(--umpsa-blue), #1a73e8);
+            color: white;
+        }
+        
+        .versafac-badge {
+            background: linear-gradient(135deg, var(--versafac-green), #228B22);
+            color: white;
+        }
+        
+        .title-section {
+            flex-grow: 1;
+            text-align: center;
+            padding: 0 30px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .main-title {
+            color: white;
+            font-size: 2.2rem;
+            font-weight: 800;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .subtitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 400;
+            font-size: 1.1rem;
+            margin: 0;
+        }
+        
+        .header-stats-container {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            min-width: 200px;
+            align-items: flex-end;
+        }
+        
+        .header-stat {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 10px 20px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-weight: 600;
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .header-stat i {
+            color: var(--warning);
+            font-size: 1.2rem;
+        }
+        
+        .datetime-display {
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+            font-size: 1rem;
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
+            text-align: center;
+            width: 100%;
+        }
+        
+        /* Responsive Header */
+        @media (max-width: 1200px) {
+            .header-container {
+                flex-direction: column;
+                gap: 20px;
+                padding: 25px 20px;
+            }
+            
+            .institution-section, .title-section, .header-stats-container {
+                width: 100%;
+                text-align: center;
+                align-items: center;
+            }
+            
+            .institution-section {
+                flex-direction: row;
+                justify-content: space-between;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+            
+            .main-title {
+                font-size: 1.9rem;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 1.6rem;
+                flex-direction: column;
+                gap: 8px;
+            }
+            
+            .institution-name {
+                font-size: 1.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+            }
+        }
+        
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
         }
         
         .stat-card {
-            border-left: 5px solid;
-            padding: 20px;
-            height: 100%;
+            background: var(--dark-secondary);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            transition: transform 0.3s, box-shadow 0.3s;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
         
-        .stat-1 { border-left-color: var(--secondary-color); }
-        .stat-2 { border-left-color: var(--success-color); }
-        .stat-3 { border-left-color: var(--warning-color); }
-        .stat-4 { border-left-color: var(--danger-color); }
-        
-        .stat-number {
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 5px;
-            color: var(--primary-color);
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
         }
         
-        .stat-label {
-            color: #6c757d;
-            font-size: 0.85rem;
-            font-weight: 500;
-            text-transform: uppercase;
-            letter-spacing: 0.5px;
+        .stat-card.violations {
+            border-top: 5px solid var(--danger);
         }
         
-        .badge-pill {
-            border-radius: 50px;
-            padding: 5px 12px;
-            font-weight: 500;
+        .stat-card.compliance {
+            border-top: 5px solid var(--success);
         }
         
-        .live-indicator {
-            display: inline-block;
-            width: 8px;
-            height: 8px;
-            background-color: #e74c3c;
-            border-radius: 50%;
-            margin-right: 8px;
-            animation: pulse 1.5s infinite;
+        .stat-card.breakdown {
+            border-top: 5px solid var(--primary);
         }
         
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
+        .stat-card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
         }
         
-        .table-container {
-            max-height: 500px;
-            overflow-y: auto;
-            border-radius: 8px;
-            background: white;
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 20px;
         }
         
-        .table th {
-            background-color: #f8f9fa;
-            border-bottom: 2px solid #dee2e6;
+        .violations .stat-icon {
+            background: rgba(234, 67, 53, 0.15);
+            color: var(--danger);
+        }
+        
+        .compliance .stat-icon {
+            background: rgba(52, 168, 83, 0.15);
+            color: var(--success);
+        }
+        
+        .breakdown .stat-icon {
+            background: rgba(26, 115, 232, 0.15);
+            color: var(--primary);
+        }
+        
+        .stat-title {
+            font-size: 1.3rem;
             font-weight: 600;
-            color: var(--primary-color);
-            position: sticky;
-            top: 0;
-            z-index: 10;
+            color: white;
         }
         
-        .violation-row {
-            background-color: rgba(231, 76, 60, 0.05) !important;
-            border-left: 4px solid var(--danger-color);
+        .stat-value {
+            font-size: 3.5rem;
+            font-weight: 700;
+            text-align: center;
+            margin: 15px 0;
+            line-height: 1;
         }
         
-        .compliance-row {
-            background-color: rgba(39, 174, 96, 0.05) !important;
-            border-left: 4px solid var(--success-color);
+        .violations .stat-value {
+            color: var(--danger);
+        }
+        
+        .compliance .stat-value {
+            color: var(--success);
+        }
+        
+        .breakdown .stat-value {
+            color: var(--primary);
+        }
+        
+        .stats-details {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-detail {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 15px;
+            border-radius: 12px;
+            text-align: center;
+        }
+        
+        .stat-detail-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .stat-detail-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .detail-bad {
+            color: var(--danger) !important;
+        }
+        
+        .detail-good {
+            color: var(--success) !important;
+        }
+        
+        /* Calendar & Filters */
+        .calendar-section {
+            background: var(--dark-secondary);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .calendar-title {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .calendar-controls {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .date-picker-container {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .date-picker {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            color: white;
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .date-picker:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .calendar-card {
+            background: rgba(255, 255, 255, 0.03);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .calendar-card h4 {
+            font-size: 1.2rem;
+            margin-bottom: 15px;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .calendar-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+        
+        .calendar-stat {
+            text-align: center;
+            padding: 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+        }
+        
+        .calendar-stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: white;
+        }
+        
+        .calendar-stat-label {
+            font-size: 0.9rem;
+            color: var(--gray);
+            margin-top: 5px;
+        }
+        
+        /* Controls */
+        .controls {
+            background: var(--dark-secondary);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+        
+        .controls-left {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+        
+        .controls-right {
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 50px;
+            font-weight: 500;
         }
         
         .status-dot {
             width: 10px;
             height: 10px;
             border-radius: 50%;
-            display: inline-block;
+            background: var(--success);
+            animation: pulse 2s infinite;
+        }
+        
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+        
+        .datetime {
+            color: var(--gray);
+            font-size: 1rem;
+            font-weight: 500;
+        }
+        
+        .btn {
+            padding: 12px 25px;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+        
+        .btn-primary:hover {
+            background: #0d62d9;
+            transform: translateY(-2px);
+        }
+        
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        
+        .btn-secondary:hover {
+            background: rgba(255, 255, 255, 0.15);
+            transform: translateY(-2px);
+        }
+        
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .btn-success:hover {
+            background: #2a9c4f;
+            transform: translateY(-2px);
+        }
+        
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .btn-danger:hover {
+            background: #d23a2d;
+            transform: translateY(-2px);
+        }
+        
+        .btn-warning {
+            background: var(--warning);
+            color: #333;
+        }
+        
+        .btn-warning:hover {
+            background: #e0ac05;
+            transform: translateY(-2px);
+        }
+        
+        .btn-sm {
+            padding: 8px 15px;
+            font-size: 0.9rem;
+        }
+        
+        /* PPE Icon Button */
+        .ppe-icon-btn {
+            background: linear-gradient(135deg, #1a237e 0%, #283593 100%);
+            border: none;
+            border-radius: 12px;
+            width: 55px;
+            height: 55px;
+            cursor: pointer;
+            transition: all 0.3s;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 11px;
+            font-weight: 600;
+            padding: 8px;
+            gap: 5px;
+        }
+        
+        .ppe-icon-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(26, 115, 232, 0.4);
+        }
+        
+        .ppe-icon-btn i {
+            font-size: 20px;
+        }
+        
+        .ppe-icon-btn.violation-btn {
+            background: linear-gradient(135deg, #b71c1c 0%, #c62828 100%);
+        }
+        
+        .ppe-icon-btn.violation-btn:hover {
+            box-shadow: 0 8px 20px rgba(198, 40, 40, 0.4);
+        }
+        
+        .ppe-icon-btn.compliant-btn {
+            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+        }
+        
+        .ppe-icon-btn.compliant-btn:hover {
+            box-shadow: 0 8px 20px rgba(46, 125, 50, 0.4);
+        }
+        
+        /* Table */
+        .table-container {
+            background: var(--dark-secondary);
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        
+        .table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .table-header h3 {
+            font-size: 1.5rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .table-wrapper {
+            overflow-x: auto;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 20px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 1200px;
+        }
+        
+        thead {
+            background: linear-gradient(90deg, var(--primary), #3f51b5);
+        }
+        
+        th {
+            padding: 18px;
+            text-align: left;
+            font-weight: 600;
+            color: white;
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        th i {
             margin-right: 8px;
         }
         
-        .dot-success { background-color: var(--success-color); }
-        .dot-danger { background-color: var(--danger-color); }
-        .dot-warning { background-color: var(--warning-color); }
-        .dot-info { background-color: var(--info-color); }
+        tbody tr {
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        tbody tr:hover {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        td {
+            padding: 18px;
+            color: rgba(255, 255, 255, 0.9);
+            font-weight: 500;
+        }
+        
+        .row-number {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.1rem;
+        }
+        
+        .datetime-cell {
+            font-family: 'Monaco', 'Courier New', monospace;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.8);
+            white-space: nowrap;
+        }
+        
+        .image-cell {
+            width: 120px;
+        }
+        
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            display: inline-block;
+            min-width: 100px;
+            text-align: center;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .badge-danger {
+            background: rgba(234, 67, 53, 0.15);
+            color: var(--danger);
+            border: 1px solid rgba(234, 67, 53, 0.3);
+        }
+        
+        .badge-success {
+            background: rgba(52, 168, 83, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(52, 168, 83, 0.3);
+        }
+        
+        /* Chart Container */
+        .chart-section {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+        
+        .chart-card {
+            background: var(--dark-secondary);
+            border-radius: 20px;
+            padding: 25px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .chart-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 20px;
+        }
+        
+        .chart-title {
+            font-size: 1.3rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
         
         .chart-container {
             position: relative;
@@ -151,618 +769,1512 @@
             width: 100%;
         }
         
-        .time-filter {
-            background-color: white;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        /* Pagination */
+        .pagination {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 0;
+            flex-wrap: wrap;
+            gap: 15px;
         }
         
-        .image-preview {
-            width: 80px;
-            height: 60px;
-            object-fit: cover;
-            border-radius: 5px;
+        .pagination-info {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+        
+        .pagination-controls {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        
+        .page-btn {
+            padding: 8px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            color: white;
             cursor: pointer;
             transition: all 0.3s;
+            font-weight: 500;
         }
         
-        .image-preview:hover {
-            transform: scale(1.05);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+        .page-btn:hover:not(:disabled) {
+            background: rgba(255, 255, 255, 0.1);
+            transform: translateY(-2px);
         }
         
-        .refresh-btn {
-            background-color: var(--secondary-color);
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
+        .page-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .page-numbers {
+            display: flex;
+            gap: 5px;
+        }
+        
+        .page-number {
+            width: 35px;
+            height: 35px;
             display: flex;
             align-items: center;
             justify-content: center;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.05);
+            cursor: pointer;
             transition: all 0.3s;
-        }
-        
-        .refresh-btn:hover {
-            background-color: #2980b9;
-            transform: rotate(90deg);
-        }
-        
-        .export-btn {
-            background-color: var(--success-color);
-            color: white;
-            border: none;
-            padding: 8px 20px;
-            border-radius: 6px;
             font-weight: 500;
+        }
+        
+        .page-number:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .page-number.active {
+            background: var(--primary);
+            color: white;
+        }
+        
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 20px;
+            color: var(--gray);
+            font-size: 0.9rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.05);
+            margin-top: 20px;
+        }
+        
+        .footer-stats {
+            display: flex;
+            justify-content: center;
+            gap: 25px;
+            margin-top: 10px;
+            flex-wrap: wrap;
+        }
+        
+        .footer-stat {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .footer-stat i {
+            color: var(--primary);
+        }
+        
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .modal-content {
+            background: var(--dark-secondary);
+            border-radius: 20px;
+            max-width: 800px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        @keyframes modalFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .modal-header {
+            padding: 20px 25px;
+            background: var(--dark);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+        }
+        
+        .modal-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: white;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--gray);
+            font-size: 24px;
+            cursor: pointer;
+            width: 35px;
+            height: 35px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
             transition: all 0.3s;
         }
         
-        .export-btn:hover {
-            background-color: #219653;
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
         }
         
+        .modal-body {
+            padding: 25px;
+        }
+        
+        .modal-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 25px;
+        }
+        
+        .info-item {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 18px;
+            border-radius: 12px;
+        }
+        
+        .info-label {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-bottom: 6px;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        .info-value {
+            font-size: 1.1rem;
+            color: white;
+            font-weight: 600;
+        }
+        
+        /* Safety Image Section */
+        .safety-image-section {
+            margin-top: 25px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .safety-image-header {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .safety-image-header i {
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .safety-image-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: white;
+        }
+        
+        .safety-image-container {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 15px;
+            padding: 20px;
+            text-align: center;
+            min-height: 300px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .safety-image {
+            max-width: 100%;
+            max-height: 400px;
+            border-radius: 10px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+        
+        .image-placeholder {
+            color: var(--gray);
+            font-size: 1rem;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .image-placeholder i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        /* Loading */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 50px;
+            text-align: center;
+        }
+        
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Empty state */
+        .empty-state {
+            padding: 50px 15px;
+            text-align: center;
+            color: var(--gray);
+        }
+        
+        .empty-state i {
+            font-size: 50px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+        
+        .empty-state h4 {
+            font-size: 1.3rem;
+            margin-bottom: 10px;
+            color: rgba(255, 255, 255, 0.7);
+        }
+        
+        /* Responsive adjustments */
         @media (max-width: 768px) {
-            .stat-number {
-                font-size: 1.8rem;
+            body {
+                padding: 10px;
+            }
+            
+            .header-container, .stat-card, .calendar-section, .controls, .table-container, .chart-card {
+                padding: 15px;
+                border-radius: 15px;
+            }
+            
+            .stats-grid, .chart-section {
+                grid-template-columns: 1fr;
+            }
+            
+            .chart-section {
+                gap: 15px;
+            }
+            
+            .stat-value {
+                font-size: 2.8rem;
+            }
+            
+            .stat-detail-value {
+                font-size: 1.6rem;
+            }
+            
+            .calendar-controls {
+                flex-direction: column;
+                width: 100%;
+            }
+            
+            .date-picker-container {
+                width: 100%;
+            }
+            
+            .controls {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .controls-left, .controls-right {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .table-wrapper {
+                margin-left: -15px;
+                margin-right: -15px;
+                border-radius: 0;
+            }
+            
+            .pagination {
+                flex-direction: column;
+                align-items: center;
+                text-align: center;
+            }
+            
+            .modal-content {
+                max-width: 95%;
+            }
+            
+            .modal-info {
+                grid-template-columns: 1fr;
             }
             
             .chart-container {
                 height: 250px;
             }
+        }
+        
+        @media (max-width: 480px) {
+            .main-title {
+                font-size: 1.4rem;
+            }
             
-            .table-container {
-                max-height: 400px;
+            .subtitle {
+                font-size: 0.9rem;
+            }
+            
+            .institution-name {
+                font-size: 1.3rem;
+            }
+            
+            .stat-title, .calendar-title, .table-header h3 {
+                font-size: 1.2rem;
+            }
+            
+            .btn {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+            
+            th, td {
+                padding: 12px 8px;
+                font-size: 0.85rem;
+            }
+            
+            .status-badge {
+                padding: 6px 10px;
+                font-size: 0.75rem;
+                min-width: 80px;
+            }
+            
+            .chart-section {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Notification Styles */
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 10px;
+            z-index: 10000;
+            font-weight: 500;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            animation: slideIn 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            max-width: 350px;
+        }
+        
+        .notification.success {
+            background: var(--success);
+            color: white;
+        }
+        
+        .notification.error {
+            background: var(--danger);
+            color: white;
+        }
+        
+        .notification.warning {
+            background: var(--warning);
+            color: #333;
+        }
+        
+        .notification.info {
+            background: var(--primary);
+            color: white;
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateX(100%);
+                opacity: 0;
+            }
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        
+        @keyframes slideOut {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100%);
+                opacity: 0;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-dark navbar-custom">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="#">
-                <i class="fas fa-hard-hat me-2"></i>PPE Safety Monitoring
-            </a>
-            <div class="d-flex align-items-center">
-                <span class="live-indicator"></span>
-                <span class="text-white me-3" id="lastUpdate">Loading...</span>
-                <button class="refresh-btn" onclick="loadDashboardData()" title="Refresh Data">
-                    <i class="fas fa-sync-alt"></i>
+    <div class="container">
+        <!-- ========== HEADER ========== -->
+        <div class="header-container">
+            <div class="institution-section">
+                <div class="institution-name">
+                    <i class="fas fa-university"></i>
+                    UMPSA
+                </div>
+                <span class="institution-badge umpsa-badge">UNIVERSITY</span>
+            </div>
+            
+            <div class="title-section">
+                <h1 class="main-title">
+                    <i class="fas fa-hard-hat"></i>
+                    PPE SAFETY MONITORING SYSTEM
+                </h1>
+                <p class="subtitle">Industrial Safety Compliance & Monitoring</p>
+            </div>
+            
+            <div class="header-stats-container">
+                <div class="institution-name">
+                    <i class="fas fa-bolt"></i>
+                    VERSAFAC
+                </div>
+                <span class="institution-badge versafac-badge">SAFETY SOLUTION</span>
+                
+                <div class="header-stat">
+                    <i class="fas fa-shield-alt"></i>
+                    <span>SAFETY FIRST</span>
+                </div>
+                <div class="datetime-display" id="currentDateTimeHeader">
+                    Loading...
+                </div>
+            </div>
+        </div>
+        
+        <!-- Stats Grid -->
+        <div class="stats-grid">
+            <div class="stat-card violations">
+                <div class="stat-card-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-exclamation-triangle"></i>
+                    </div>
+                    <div class="stat-title">SAFETY VIOLATIONS</div>
+                </div>
+                <div class="stat-value" id="totalViolations">0</div>
+                <div class="stats-details">
+                    <div class="stat-detail">
+                        <div class="stat-detail-label">Helmet Violations</div>
+                        <div class="stat-detail-value detail-bad" id="helmetViolations">0</div>
+                    </div>
+                    <div class="stat-detail">
+                        <div class="stat-detail-label">Glove Violations</div>
+                        <div class="stat-detail-value detail-bad" id="gloveViolations">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card compliance">
+                <div class="stat-card-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <div class="stat-title">FULL PPE COMPLIANCE</div>
+                </div>
+                <div class="stat-value" id="fullPPE">0</div>
+                <div class="stats-details">
+                    <div class="stat-detail">
+                        <div class="stat-detail-label">Helmet Status OK</div>
+                        <div class="stat-detail-value detail-good" id="helmetOK">0</div>
+                    </div>
+                    <div class="stat-detail">
+                        <div class="stat-detail-label">Glove Status OK</div>
+                        <div class="stat-detail-value detail-good" id="gloveOK">0</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stat-card breakdown">
+                <div class="stat-card-header">
+                    <div class="stat-icon">
+                        <i class="fas fa-chart-pie"></i>
+                    </div>
+                    <div class="stat-title">SAFETY STATUS BREAKDOWN</div>
+                </div>
+                <div class="stat-value" id="totalRecords">0</div>
+                <div class="stats-details">
+                    <div class="stat-detail">
+                        <div class="stat-detail-label">With Helmet</div>
+                        <div class="stat-detail-value" id="withHelmet">0</div>
+                    </div>
+                    <div class="stat-detail">
+                        <div class="stat-detail-label">Without Helmet</div>
+                        <div class="stat-detail-value detail-bad" id="withoutHelmet">0</div>
+                    </div>
+                    <div class="stat-detail">
+                        <div class="stat-detail-label">With Gloves</div>
+                        <div class="stat-detail-value" id="withGloves">0</div>
+                    </div>
+                    <div class="stat-detail">
+                        <div class="stat-detail-label">Without Gloves</div>
+                        <div class="stat-detail-value detail-bad" id="withoutGloves">0</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Chart Section -->
+        <div class="chart-section">
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-line"></i>
+                        SAFETY COMPLIANCE TREND
+                    </div>
+                    <select id="chartType" class="date-picker" style="width: auto; padding: 8px 15px;">
+                        <option value="daily">Daily</option>
+                        <option value="weekly">Weekly</option>
+                        <option value="monthly">Monthly</option>
+                    </select>
+                </div>
+                <div class="chart-container">
+                    <canvas id="complianceChart"></canvas>
+                </div>
+            </div>
+            
+            <div class="chart-card">
+                <div class="chart-header">
+                    <div class="chart-title">
+                        <i class="fas fa-chart-pie"></i>
+                        PPE COMPLIANCE DISTRIBUTION
+                    </div>
+                    <button class="btn btn-sm btn-secondary" onclick="refreshCharts()">
+                        <i class="fas fa-sync-alt"></i> Refresh
+                    </button>
+                </div>
+                <div class="chart-container">
+                    <canvas id="distributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Calendar & Date Filter -->
+        <div class="calendar-section">
+            <div class="calendar-header">
+                <div class="calendar-title">
+                    <i class="fas fa-calendar-alt"></i>
+                    SAFETY COMPLIANCE CALENDAR & FILTER
+                </div>
+                <div class="calendar-controls">
+                    <div class="date-picker-container">
+                        <input type="text" id="dateFilter" class="date-picker" placeholder="Select date to filter...">
+                    </div>
+                    <button class="btn btn-primary" onclick="filterByDate()">
+                        <i class="fas fa-filter"></i> Filter by Date
+                    </button>
+                    <button class="btn btn-secondary" onclick="clearDateFilter()">
+                        <i class="fas fa-times"></i> Clear Filter
+                    </button>
+                </div>
+            </div>
+            <div class="calendar-grid">
+                <div class="calendar-card">
+                    <h4><i class="fas fa-calendar-day"></i> TODAY'S SAFETY STATS</h4>
+                    <div class="calendar-stats">
+                        <div class="calendar-stat">
+                            <div class="calendar-stat-value" id="todayViolations">0</div>
+                            <div class="calendar-stat-label">Today's Violations</div>
+                        </div>
+                        <div class="calendar-stat">
+                            <div class="calendar-stat-value" id="todayCompliance">0</div>
+                            <div class="calendar-stat-label">Compliant Today</div>
+                        </div>
+                        <div class="calendar-stat">
+                            <div class="calendar-stat-value" id="todayTotal">0</div>
+                            <div class="calendar-stat-label">Total Inspections</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="calendar-card">
+                    <h4><i class="fas fa-chart-bar"></i> WEEKLY PERFORMANCE</h4>
+                    <div class="calendar-stats">
+                        <div class="calendar-stat">
+                            <div class="calendar-stat-value" id="weeklyCompliance">0%</div>
+                            <div class="calendar-stat-label">Compliance Rate</div>
+                        </div>
+                        <div class="calendar-stat">
+                            <div class="calendar-stat-value" id="weeklyViolations">0</div>
+                            <div class="calendar-stat-label">Weekly Violations</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Controls -->
+        <div class="controls">
+            <div class="controls-left">
+                <button class="btn btn-primary" onclick="loadData()" id="refreshBtn">
+                    <i class="fas fa-sync-alt"></i> Refresh Data
                 </button>
+                <button class="btn btn-secondary" onclick="toggleAutoRefresh()" id="autoRefreshBtn">
+                    <i class="fas fa-clock"></i> Auto Refresh: <span id="autoRefreshStatus">OFF</span>
+                </button>
+                <div class="status-indicator">
+                    <div class="status-dot" id="statusDot"></div>
+                    <span id="statusText">Connected to Safety System</span>
+                </div>
+            </div>
+            <div class="controls-right">
+                <div class="datetime">
+                    <i class="fas fa-database"></i> Displaying: 
+                    <span id="showingRange">0-0</span> of <span id="totalFiltered">0</span> safety records
+                </div>
             </div>
         </div>
-    </nav>
-
-    <div class="container-fluid mt-4 px-3 px-md-4">
-        <!-- System Status Banner -->
-        <div class="alert alert-info d-flex justify-content-between align-items-center">
+        
+        <!-- Data Table -->
+        <div class="table-container">
+            <div class="table-header">
+                <h3>
+                    <i class="fas fa-history"></i>
+                    SAFETY COMPLIANCE ACTIVITY
+                </h3>
+                <div class="datetime">
+                    <i class="fas fa-filter"></i> Filtered: 
+                    <span id="filterStatus">All Safety Records</span>
+                </div>
+            </div>
+            <div class="table-wrapper">
+                <table>
+                    <thead>
+                        <tr>
+                            <th><i class="fas fa-hashtag"></i> #</th>
+                            <th><i class="far fa-calendar-alt"></i> DATE & TIME</th>
+                            <th><i class="fas fa-search"></i> COMPLIANCE DETAILS</th>
+                            <th><i class="fas fa-hard-hat"></i> HELMET STATUS</th>
+                            <th><i class="fas fa-hand-paper"></i> GLOVE STATUS</th>
+                            <th><i class="fas fa-id-card"></i> COMPLIANCE STATUS</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tableBody">
+                        <tr>
+                            <td colspan="6">
+                                <div class="loading">
+                                    <div class="spinner"></div>
+                                    <div>Loading safety compliance data...</div>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            
+            <!-- Pagination -->
+            <div class="pagination">
+                <div class="pagination-info">
+                    Page <span id="currentPage">1</span> of <span id="totalPages">1</span> 
+                    | Displaying <span id="pageStart">1</span>-<span id="pageEnd">15</span> of 
+                    <span id="totalRecordsCount">0</span> safety records
+                </div>
+                <div class="pagination-controls">
+                    <button class="page-btn" id="firstPage" onclick="goToPage(1)" disabled>
+                        <i class="fas fa-angle-double-left"></i>
+                    </button>
+                    <button class="page-btn" id="prevPage" onclick="changePage(-1)" disabled>
+                        <i class="fas fa-angle-left"></i> Previous
+                    </button>
+                    
+                    <div class="page-numbers" id="pageNumbers">
+                        <!-- Page numbers will be generated here -->
+                    </div>
+                    
+                    <button class="page-btn" id="nextPage" onclick="changePage(1)">
+                        Next <i class="fas fa-angle-right"></i>
+                    </button>
+                    <button class="page-btn" id="lastPage" onclick="goToLastPage()">
+                        <i class="fas fa-angle-double-right"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Footer -->
+        <div class="footer">
             <div>
-                <i class="fas fa-server me-2"></i>
-                <strong>System Status:</strong> 
-                <span id="systemStatusText" class="ms-2">Checking...</span>
+                PPE Safety Monitoring System &copy; 2025 | UMPSA Industrial Safety Division
             </div>
-            <div class="small">
-                <i class="fas fa-clock me-1"></i>
-                <span id="currentTime">--:--:--</span>
-            </div>
-        </div>
-
-        <!-- Statistics Cards -->
-        <div class="row" id="statsRow">
-            <!-- Cards will be populated by JavaScript -->
-        </div>
-
-        <!-- Charts Row -->
-        <div class="row mt-4">
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>PPE Compliance Overview</span>
-                        <div class="small">
-                            <span class="badge bg-success me-2">Helmet</span>
-                            <span class="badge bg-info">Glove</span>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="complianceChart"></canvas>
-                        </div>
-                    </div>
+            <div class="footer-stats">
+                <div class="footer-stat">
+                    <i class="fas fa-server"></i>
+                    System Status: <span id="apiStatus">Checking...</span>
                 </div>
-            </div>
-            
-            <div class="col-lg-6">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <span>Violations Analysis</span>
-                        <small class="text-white">Today's Data</small>
-                    </div>
-                    <div class="card-body">
-                        <div class="chart-container">
-                            <canvas id="violationsChart"></canvas>
-                        </div>
-                    </div>
+                <div class="footer-stat">
+                    <i class="fas fa-sync-alt"></i>
+                    Last Updated: <span id="lastUpdate">Never</span>
                 </div>
-            </div>
-        </div>
-
-        <!-- Recent Detections -->
-        <div class="row mt-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-header d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Recent Detections</h5>
-                        <div>
-                            <button class="btn btn-sm btn-outline-secondary me-2" onclick="toggleViolationsOnly()">
-                                <i class="fas fa-filter"></i> Show Violations Only
-                            </button>
-                            <button class="export-btn btn-sm" onclick="exportData()">
-                                <i class="fas fa-download me-1"></i> Export
-                            </button>
-                        </div>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-container p-3">
-                            <table class="table table-hover mb-0" id="detectionsTable">
-                                <thead>
-                                    <tr>
-                                        <th>Timestamp</th>
-                                        <th>Helmet Status</th>
-                                        <th>Glove Status</th>
-                                        <th>Image</th>
-                                        <th>Type</th>
-                                        <th>Time</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="detectionsBody">
-                                    <tr id="loadingRow">
-                                        <td colspan="6" class="text-center py-5">
-                                            <div class="spinner-border text-primary" role="status">
-                                                <span class="visually-hidden">Loading...</span>
-                                            </div>
-                                            <p class="mt-3 text-muted">Loading detection data...</p>
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                    <div class="card-footer d-flex justify-content-between align-items-center">
-                        <div class="text-muted">
-                            Showing <span id="showingCount">0</span> of <span id="totalCount">0</span> records
-                        </div>
-                        <div class="btn-group">
-                            <button class="btn btn-sm btn-outline-primary" onclick="prevPage()" id="prevBtn" disabled>
-                                <i class="fas fa-chevron-left"></i>
-                            </button>
-                            <span class="px-3">Page <span id="currentPage">1</span></span>
-                            <button class="btn btn-sm btn-outline-primary" onclick="nextPage()" id="nextBtn" disabled>
-                                <i class="fas fa-chevron-right"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- System Information -->
-        <div class="row mt-4">
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">System Information</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row" id="systemInfo">
-                            <!-- Will be populated by JavaScript -->
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <div class="col-md-6">
-                <div class="card">
-                    <div class="card-header">
-                        <h5 class="mb-0">Quick Actions</h5>
-                    </div>
-                    <div class="card-body">
-                        <div class="row g-2">
-                            <div class="col-6">
-                                <button class="btn btn-outline-primary w-100" onclick="testAPI()">
-                                    <i class="fas fa-bolt me-2"></i>Test API
-                                </button>
-                            </div>
-                            <div class="col-6">
-                                <button class="btn btn-outline-success w-100" onclick="addTestRecord()">
-                                    <i class="fas fa-plus me-2"></i>Test Record
-                                </button>
-                            </div>
-                            <div class="col-6">
-                                <button class="btn btn-outline-info w-100" onclick="loadDashboardData()">
-                                    <i class="fas fa-sync me-2"></i>Refresh All
-                                </button>
-                            </div>
-                            <div class="col-6">
-                                <button class="btn btn-outline-danger w-100" onclick="clearFilters()">
-                                    <i class="fas fa-times me-2"></i>Clear Filters
-                                </button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="footer-stat">
+                    <i class="fas fa-bolt"></i>
+                    Auto Refresh: <span id="autoRefreshFooter">OFF</span>
                 </div>
             </div>
         </div>
     </div>
-
-    <!-- Image Modal -->
-    <div class="modal fade" id="imageModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Detection Image</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body text-center">
-                    <img id="modalImage" src="" class="img-fluid rounded" alt="Detection Image">
-                    <div class="mt-3">
-                        <p class="mb-1" id="imageTimestamp"></p>
-                        <p class="text-muted small" id="imageStatus"></p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Bootstrap & jQuery -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     
+    <!-- Safety Violation Details Modal -->
+    <div class="modal" id="detailsModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">
+                    <i class="fas fa-info-circle"></i>
+                    SAFETY COMPLIANCE DETAILS
+                </div>
+                <button class="close-modal" onclick="closeModal()">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-info">
+                    <div class="info-item">
+                        <div class="info-label">INSPECTION TIME</div>
+                        <div class="info-value" id="modalTime">-</div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">HELMET COMPLIANCE</div>
+                        <div class="info-value">
+                            <span id="modalHelmetStatus" class="status-badge badge-danger">NO HELMET</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">GLOVE COMPLIANCE</div>
+                        <div class="info-value">
+                            <span id="modalGloveStatus" class="status-badge badge-danger">NO GLOVES</span>
+                        </div>
+                    </div>
+                    <div class="info-item">
+                        <div class="info-label">OVERALL COMPLIANCE</div>
+                        <div class="info-value">
+                            <span id="modalCompliance" class="status-badge badge-danger">NON-COMPLIANT</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="safety-image-section">
+                    <div class="safety-image-header">
+                        <i class="fas fa-camera"></i>
+                        <div class="safety-image-title">SAFETY IMAGE</div>
+                    </div>
+                    <div class="safety-image-container" id="safetyImageContainer">
+                        <div class="image-placeholder" id="imagePlaceholder">
+                            <i class="fas fa-image"></i>
+                            <div>Click "View Safety Image" to load image</div>
+                        </div>
+                        <img id="safetyImage" class="safety-image" style="display: none;" alt="Safety Image">
+                    </div>
+                    <div style="text-align: center; margin-top: 15px;">
+                        <button class="btn btn-primary" onclick="loadSafetyImage()" id="loadImageBtn">
+                            <i class="fas fa-eye"></i> View Safety Image
+                        </button>
+                        <button class="btn btn-success" onclick="downloadSafetyImage()" id="downloadImageBtn" style="display: none; margin-left: 10px;">
+                            <i class="fas fa-download"></i> Download
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
-        // ================= CONFIGURATION =================
-        const CONFIG = {
-            // Replace with your Google Apps Script Web App URL
-            API_URL: 'https://script.google.com/macros/s/YOUR_SCRIPT_ID/exec',
-            
-            // For testing - use mock data if API fails
-            USE_MOCK_DATA: true,
-            
-            // Refresh interval in milliseconds (30 seconds)
-            REFRESH_INTERVAL: 30000,
-            
-            // Items per page for table
-            ITEMS_PER_PAGE: 10
-        };
-
-        // ================= GLOBAL VARIABLES =================
+        // ================= KONFIGURASI =================
+        let autoRefreshInterval = null;
+        let autoRefreshEnabled = false;
         let allData = [];
         let filteredData = [];
         let currentPage = 1;
-        let showViolationsOnly = false;
+        const itemsPerPage = 15;
+        let selectedDate = null;
+        let dateFilter = null;
+        let currentModalImageUrl = '';
         let complianceChart = null;
-        let violationsChart = null;
-
-        // ================= INITIALIZATION =================
-        $(document).ready(function() {
-            console.log('Dashboard initialized');
+        let distributionChart = null;
+        let currentChartsType = 'daily';
+        
+        // DOM Elements
+        const elements = {
+            totalViolations: document.getElementById('totalViolations'),
+            helmetViolations: document.getElementById('helmetViolations'),
+            gloveViolations: document.getElementById('gloveViolations'),
+            fullPPE: document.getElementById('fullPPE'),
+            helmetOK: document.getElementById('helmetOK'),
+            gloveOK: document.getElementById('gloveOK'),
+            withHelmet: document.getElementById('withHelmet'),
+            withoutHelmet: document.getElementById('withoutHelmet'),
+            withGloves: document.getElementById('withGloves'),
+            withoutGloves: document.getElementById('withoutGloves'),
+            totalRecords: document.getElementById('totalRecords'),
+            tableBody: document.getElementById('tableBody'),
+            currentDateTimeHeader: document.getElementById('currentDateTimeHeader'),
+            lastUpdate: document.getElementById('lastUpdate'),
+            statusDot: document.getElementById('statusDot'),
+            statusText: document.getElementById('statusText'),
+            apiStatus: document.getElementById('apiStatus'),
+            refreshBtn: document.getElementById('refreshBtn'),
+            autoRefreshBtn: document.getElementById('autoRefreshBtn'),
+            autoRefreshStatus: document.getElementById('autoRefreshStatus'),
+            autoRefreshFooter: document.getElementById('autoRefreshFooter'),
+            dateFilter: document.getElementById('dateFilter'),
+            todayViolations: document.getElementById('todayViolations'),
+            todayCompliance: document.getElementById('todayCompliance'),
+            todayTotal: document.getElementById('todayTotal'),
+            weeklyCompliance: document.getElementById('weeklyCompliance'),
+            weeklyViolations: document.getElementById('weeklyViolations'),
+            currentPage: document.getElementById('currentPage'),
+            totalPages: document.getElementById('totalPages'),
+            pageStart: document.getElementById('pageStart'),
+            pageEnd: document.getElementById('pageEnd'),
+            totalRecordsCount: document.getElementById('totalRecordsCount'),
+            showingRange: document.getElementById('showingRange'),
+            totalFiltered: document.getElementById('totalFiltered'),
+            filterStatus: document.getElementById('filterStatus'),
+            firstPage: document.getElementById('firstPage'),
+            prevPage: document.getElementById('prevPage'),
+            nextPage: document.getElementById('nextPage'),
+            lastPage: document.getElementById('lastPage'),
+            pageNumbers: document.getElementById('pageNumbers'),
+            detailsModal: document.getElementById('detailsModal'),
+            modalTime: document.getElementById('modalTime'),
+            modalHelmetStatus: document.getElementById('modalHelmetStatus'),
+            modalGloveStatus: document.getElementById('modalGloveStatus'),
+            modalCompliance: document.getElementById('modalCompliance'),
+            safetyImageContainer: document.getElementById('safetyImageContainer'),
+            imagePlaceholder: document.getElementById('imagePlaceholder'),
+            safetyImage: document.getElementById('safetyImage'),
+            loadImageBtn: document.getElementById('loadImageBtn'),
+            downloadImageBtn: document.getElementById('downloadImageBtn'),
+            chartType: document.getElementById('chartType')
+        };
+        
+        // Initialize Flatpickr Calendar
+        function initCalendar() {
+            dateFilter = flatpickr(elements.dateFilter, {
+                dateFormat: "Y-m-d",
+                maxDate: "today",
+                onChange: function(selectedDates, dateStr) {
+                    selectedDate = dateStr;
+                    if (dateStr) {
+                        filterByDate();
+                    }
+                }
+            });
+        }
+        
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            initDateTime();
+            initCalendar();
+            loadData();
+            startAutoRefresh(30000); // Auto refresh setiap 30 detik
             
-            // Load initial data
-            loadDashboardData();
-            
-            // Set up auto-refresh
-            setInterval(loadDashboardData, CONFIG.REFRESH_INTERVAL);
-            
-            // Update clock every second
-            setInterval(updateClock, 1000);
-            updateClock();
-            
-            // Check for URL parameters
-            checkUrlParams();
+            // Add chart type change listener
+            elements.chartType.addEventListener('change', function() {
+                currentChartsType = this.value;
+                updateCharts();
+            });
         });
-
-        // ================= MAIN DATA LOADING =================
-        function loadDashboardData() {
-            showLoading(true);
-            updateLastUpdateTime();
+        
+        // Initialize date time display
+        function initDateTime() {
+            function updateDateTime() {
+                const now = new Date();
+                const options = { 
+                    weekday: 'short',
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric',
+                    hour: '2-digit', 
+                    minute: '2-digit',
+                    second: '2-digit'
+                };
+                elements.currentDateTimeHeader.textContent = now.toLocaleDateString('en-US', options);
+            }
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+        }
+        
+        // Show notification
+        function showNotification(message, type = 'info') {
+            // Remove existing notifications
+            const existingNotifications = document.querySelectorAll('.notification');
+            existingNotifications.forEach(notification => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => notification.remove(), 300);
+            });
             
-            // Load dashboard data from Google Apps Script
-            $.ajax({
-                url: CONFIG.API_URL + '?action=dashboard',
-                method: 'GET',
-                dataType: 'json',
-                timeout: 10000,
-                success: function(response) {
-                    console.log('Dashboard data loaded:', response);
-                    
-                    if (response.success) {
-                        updateSystemStatus(response);
-                        loadStatistics();
-                        loadRecentData();
-                    } else {
-                        showError('Failed to load dashboard data');
-                        if (CONFIG.USE_MOCK_DATA) {
-                            loadMockData();
-                        }
+            // Create notification element
+            const notification = document.createElement('div');
+            notification.className = `notification ${type}`;
+            notification.innerHTML = `
+                <i class="fas fa-${type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : type === 'warning' ? 'exclamation-triangle' : 'info-circle'}"></i>
+                <span>${message}</span>
+            `;
+            
+            document.body.appendChild(notification);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                notification.style.animation = 'slideOut 0.3s ease';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.remove();
                     }
+                }, 300);
+            }, 3000);
+        }
+        
+        // Load data - IMPROVED VERSION
+        function loadData() {
+            try {
+                const originalText = elements.refreshBtn.innerHTML;
+                elements.refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
+                elements.refreshBtn.disabled = true;
+                
+                updateStatus('loading', 'Loading safety data...');
+                
+                console.log('Loading data from sample...');
+                
+                // Always use sample data
+                allData = getSampleData();
+                filteredData = [...allData];
+                
+                updateStatistics();
+                updateCalendarStats();
+                updateCharts();
+                
+                currentPage = 1;
+                updateTableWithPagination();
+                
+                const now = new Date();
+                elements.lastUpdate.textContent = now.toLocaleTimeString('en-US', {
+                    hour: '2-digit',
+                    minute: '2-digit',
+                    second: '2-digit'
+                });
+                
+                updateStatus('success', 'Data loaded successfully');
+                showNotification('Dashboard loaded with sample data', 'success');
+                
+            } catch (error) {
+                console.error('Error loading safety data:', error);
+                
+                // Fallback to empty data
+                allData = [];
+                filteredData = [];
+                updateStatistics();
+                updateCalendarStats();
+                currentPage = 1;
+                updateTableWithPagination();
+                
+                showNotification('Error loading data', 'error');
+                updateStatus('error', 'Error loading data');
+                
+            } finally {
+                elements.refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
+                elements.refreshBtn.disabled = false;
+            }
+        }
+        
+        // Get sample data for demonstration
+        function getSampleData() {
+            const data = [
+                {
+                    timestamp: "2026-01-12 20:37:22",
+                    datetime: "01/12/2026 20:37:22",
+                    noGlove: "",
+                    noHelmet: "",
+                    imageUrl: "https://drive.google.com/uc?id=1Bnw8BU-pNPk2dji6ACltjNYLHBR8Vg_O",
+                    boxDetect: "",
+                    helmetStatus: "helmet",
+                    gloveStatus: "glove"
                 },
-                error: function(xhr, status, error) {
-                    console.error('API Error:', error);
-                    showError('Connection error: ' + error);
-                    
-                    if (CONFIG.USE_MOCK_DATA) {
-                        loadMockData();
-                    }
+                {
+                    timestamp: "2026-01-12 20:37:03",
+                    datetime: "01/12/2026 20:37:03",
+                    noGlove: "",
+                    noHelmet: "",
+                    imageUrl: "",
+                    boxDetect: "",
+                    helmetStatus: "helmet",
+                    gloveStatus: "glove"
+                },
+                {
+                    timestamp: "2026-01-12 20:33:20",
+                    datetime: "01/12/2026 20:33:20",
+                    noGlove: "",
+                    noHelmet: "",
+                    imageUrl: "https://drive.google.com/uc?id=1EW6p6xt8XS8w8niDZs6QRVOeqL-2lRsx",
+                    boxDetect: "",
+                    helmetStatus: "helmet",
+                    gloveStatus: "glove"
+                },
+                {
+                    timestamp: "2026-01-11 18:45:10",
+                    datetime: "01/11/2026 18:45:10",
+                    noGlove: "no_glove",
+                    noHelmet: "helmet",
+                    imageUrl: "",
+                    boxDetect: "Box Count: 2",
+                    helmetStatus: "helmet",
+                    gloveStatus: "no glove"
+                },
+                {
+                    timestamp: "2026-01-11 15:22:45",
+                    datetime: "01/11/2026 15:22:45",
+                    noGlove: "glove",
+                    noHelmet: "no_helmet",
+                    imageUrl: "",
+                    boxDetect: "Box Count: 1",
+                    helmetStatus: "no helmet",
+                    gloveStatus: "glove"
+                },
+                {
+                    timestamp: "2026-01-10 14:10:30",
+                    datetime: "01/10/2026 14:10:30",
+                    noGlove: "no_glove",
+                    noHelmet: "no_helmet",
+                    imageUrl: "",
+                    boxDetect: "Box Count: 3",
+                    helmetStatus: "no helmet",
+                    gloveStatus: "no glove"
+                },
+                {
+                    timestamp: "2026-01-10 11:05:15",
+                    datetime: "01/10/2026 11:05:15",
+                    noGlove: "",
+                    noHelmet: "",
+                    imageUrl: "",
+                    boxDetect: "",
+                    helmetStatus: "helmet",
+                    gloveStatus: "glove"
+                },
+                {
+                    timestamp: "2026-01-09 16:40:31",
+                    datetime: "01/09/2026 16:40:31",
+                    noGlove: "no_glove",
+                    noHelmet: "no_helmet",
+                    imageUrl: "",
+                    boxDetect: "Box Count: 1",
+                    helmetStatus: "no helmet",
+                    gloveStatus: "no glove"
+                },
+                {
+                    timestamp: "2026-01-09 16:40:33",
+                    datetime: "01/09/2026 16:40:33",
+                    noGlove: "no_glove",
+                    noHelmet: "no_helmet",
+                    imageUrl: "",
+                    boxDetect: "Box Count: 1",
+                    helmetStatus: "no helmet",
+                    gloveStatus: "no glove"
+                },
+                {
+                    timestamp: "2026-01-08 09:15:22",
+                    datetime: "01/08/2026 09:15:22",
+                    noGlove: "glove",
+                    noHelmet: "helmet",
+                    imageUrl: "",
+                    boxDetect: "Box Count: 2",
+                    helmetStatus: "helmet",
+                    gloveStatus: "glove"
+                },
+                {
+                    timestamp: "2026-01-07 13:45:18",
+                    datetime: "01/07/2026 13:45:18",
+                    noGlove: "",
+                    noHelmet: "no_helmet",
+                    imageUrl: "",
+                    boxDetect: "",
+                    helmetStatus: "no helmet",
+                    gloveStatus: "glove"
+                },
+                {
+                    timestamp: "2026-01-06 10:30:45",
+                    datetime: "01/06/2026 10:30:45",
+                    noGlove: "no_glove",
+                    noHelmet: "",
+                    imageUrl: "",
+                    boxDetect: "",
+                    helmetStatus: "helmet",
+                    gloveStatus: "no glove"
+                },
+                {
+                    timestamp: "2026-01-05 08:20:33",
+                    datetime: "01/05/2026 08:20:33",
+                    noGlove: "glove",
+                    noHelmet: "helmet",
+                    imageUrl: "",
+                    boxDetect: "Box Count: 1",
+                    helmetStatus: "helmet",
+                    gloveStatus: "glove"
+                },
+                {
+                    timestamp: "2026-01-04 16:55:12",
+                    datetime: "01/04/2026 16:55:12",
+                    noGlove: "no_glove",
+                    noHelmet: "helmet",
+                    imageUrl: "",
+                    boxDetect: "Box Count: 2",
+                    helmetStatus: "helmet",
+                    gloveStatus: "no glove"
+                },
+                {
+                    timestamp: "2026-01-03 11:40:27",
+                    datetime: "01/03/2026 11:40:27",
+                    noGlove: "glove",
+                    noHelmet: "no_helmet",
+                    imageUrl: "",
+                    boxDetect: "Box Count: 1",
+                    helmetStatus: "no helmet",
+                    gloveStatus: "glove"
+                },
+                {
+                    timestamp: "2026-01-02 14:25:39",
+                    datetime: "01/02/2026 14:25:39",
+                    noGlove: "no_glove",
+                    noHelmet: "no_helmet",
+                    imageUrl: "",
+                    boxDetect: "Box Count: 3",
+                    helmetStatus: "no helmet",
+                    gloveStatus: "no glove"
+                },
+                {
+                    timestamp: "2026-01-01 09:10:15",
+                    datetime: "01/01/2026 09:10:15",
+                    noGlove: "glove",
+                    noHelmet: "helmet",
+                    imageUrl: "",
+                    boxDetect: "Box Count: 1",
+                    helmetStatus: "helmet",
+                    gloveStatus: "glove"
                 }
+            ];
+            
+            // Sort data by timestamp (newest first)
+            return data.sort((a, b) => {
+                return new Date(b.timestamp) - new Date(a.timestamp);
             });
         }
-
-        function loadStatistics() {
-            $.ajax({
-                url: CONFIG.API_URL + '?action=getStats',
-                method: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        updateStatistics(response.stats);
-                    }
-                },
-                error: function() {
-                    // Silently fail - we'll try again next refresh
-                }
-            });
-        }
-
-        function loadRecentData() {
-            $.ajax({
-                url: CONFIG.API_URL + '?action=getRecent&limit=50',
-                method: 'GET',
-                dataType: 'json',
-                success: function(response) {
-                    if (response.success) {
-                        processData(response.data);
-                        updateTable();
-                        updateCharts();
-                    }
-                },
-                error: function() {
-                    // Silently fail
-                },
-                complete: function() {
-                    showLoading(false);
-                }
-            });
-        }
-
-        // ================= DATA PROCESSING =================
-        function processData(data) {
-            allData = data.map(item => {
-                const timestamp = new Date(item.timestamp || item.datetime);
+        
+        // Calculate statistics from data
+        function calculateStats(data) {
+            if (!data || data.length === 0) {
+                return {
+                    totalViolations: 0,
+                    helmetViolations: 0,
+                    gloveViolations: 0,
+                    fullPPE: 0,
+                    helmetOK: 0,
+                    gloveOK: 0,
+                    total: 0
+                };
+            }
+            
+            let totalViolations = 0;
+            let helmetViolations = 0;
+            let gloveViolations = 0;
+            let fullPPE = 0;
+            let helmetOK = 0;
+            let gloveOK = 0;
+            
+            data.forEach(item => {
                 const hasHelmet = item.helmetStatus === 'helmet';
                 const hasGlove = item.gloveStatus === 'glove';
-                const isCompliant = hasHelmet && hasGlove;
                 
-                return {
-                    id: item.id || Date.now() + Math.random(),
-                    timestamp: timestamp,
-                    dateStr: timestamp.toLocaleDateString(),
-                    timeStr: timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                    hasHelmet: hasHelmet,
-                    hasGlove: hasGlove,
-                    helmetStatus: item.helmetStatus || 'unknown',
-                    gloveStatus: item.gloveStatus || 'unknown',
-                    imageUrl: item.imageUrl || '',
-                    logType: item.logType || 'unknown',
-                    isCompliant: isCompliant,
-                    relativeTime: item.formattedTime || formatRelativeTime(timestamp)
-                };
+                if (!hasHelmet) helmetViolations++;
+                if (!hasGlove) gloveViolations++;
+                if (!hasHelmet || !hasGlove) totalViolations++;
+                if (hasHelmet && hasGlove) fullPPE++;
+                if (hasHelmet) helmetOK++;
+                if (hasGlove) gloveOK++;
             });
             
-            // Sort by timestamp (newest first)
-            allData.sort((a, b) => b.timestamp - a.timestamp);
-            
-            // Apply filters
-            applyFilters();
+            return {
+                totalViolations: totalViolations,
+                helmetViolations: helmetViolations,
+                gloveViolations: gloveViolations,
+                fullPPE: fullPPE,
+                helmetOK: helmetOK,
+                gloveOK: gloveOK,
+                total: data.length
+            };
         }
-
-        function applyFilters() {
-            filteredData = showViolationsOnly 
-                ? allData.filter(item => !item.isCompliant)
-                : allData;
+        
+        // Update statistics display
+        function updateStatistics() {
+            const stats = calculateStats(allData);
             
-            currentPage = 1; // Reset to first page
+            elements.totalViolations.textContent = stats.totalViolations;
+            elements.helmetViolations.textContent = stats.helmetViolations;
+            elements.gloveViolations.textContent = stats.gloveViolations;
+            elements.fullPPE.textContent = stats.fullPPE;
+            elements.helmetOK.textContent = stats.helmetOK;
+            elements.gloveOK.textContent = stats.gloveOK;
+            elements.totalRecords.textContent = stats.total;
+            
+            elements.withHelmet.textContent = stats.helmetOK;
+            elements.withoutHelmet.textContent = stats.helmetViolations;
+            elements.withGloves.textContent = stats.gloveOK;
+            elements.withoutGloves.textContent = stats.gloveViolations;
         }
-
-        // ================= UI UPDATES =================
-        function updateSystemStatus(data) {
-            $('#systemStatusText').html(`
-                <span class="badge bg-success">${data.systemStatus}</span>
-                <span class="ms-2">${data.serverConnection}</span>
-            `);
+        
+        // Update calendar statistics
+        function updateCalendarStats() {
+            const today = new Date();
+            const todayStr = today.toISOString().split('T')[0];
             
-            // Update system info
-            if (data.systemInfo) {
-                $('#systemInfo').html(`
-                    <div class="col-md-6 mb-3">
-                        <strong>Server IP:</strong><br>
-                        <code>${data.systemInfo.serverIP}</code>
-                    </div>
-                    <div class="col-md-6 mb-3">
-                        <strong>RTSP Port:</strong><br>
-                        ${data.systemInfo.rtspPort}
-                    </div>
-                    <div class="col-md-12">
-                        <strong>Stream URL:</strong><br>
-                        <small>${data.systemInfo.streamUrl}</small>
-                    </div>
-                `);
-            }
-        }
-
-        function updateStatistics(stats) {
-            if (!stats) return;
+            // Get last 7 days
+            const lastWeek = new Date();
+            lastWeek.setDate(lastWeek.getDate() - 7);
             
-            $('#statsRow').html(`
-                <div class="col-md-3">
-                    <div class="card stat-card stat-1">
-                        <div class="stat-number">${stats.total || 0}</div>
-                        <div class="stat-label">Total Detections</div>
-                        <div class="mt-2">
-                            <small class="text-muted">${stats.todayRecords || 0} today</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card stat-card stat-2">
-                        <div class="stat-number">${stats.compliance?.overall || 0}%</div>
-                        <div class="stat-label">Overall Compliance</div>
-                        <div class="mt-2">
-                            <small class="text-muted">${stats.fullPPE || 0} full PPE</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card stat-card stat-3">
-                        <div class="stat-number">${stats.compliance?.helmet || 0}%</div>
-                        <div class="stat-label">Helmet Compliance</div>
-                        <div class="mt-2">
-                            <small class="text-muted">${stats.helmetOK || 0} OK / ${stats.helmetViolations || 0} violations</small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-3">
-                    <div class="card stat-card stat-4">
-                        <div class="stat-number">${stats.compliance?.glove || 0}%</div>
-                        <div class="stat-label">Glove Compliance</div>
-                        <div class="mt-2">
-                            <small class="text-muted">${stats.gloveOK || 0} OK / ${stats.gloveViolations || 0} violations</small>
-                        </div>
-                    </div>
-                </div>
-            `);
-        }
-
-        function updateTable() {
-            const tableBody = $('#detectionsBody');
-            const totalRecords = filteredData.length;
-            
-            if (totalRecords === 0) {
-                tableBody.html(`
-                    <tr>
-                        <td colspan="6" class="text-center py-5">
-                            <i class="fas fa-inbox fa-2x text-muted mb-3"></i>
-                            <p class="text-muted">No detection records found</p>
-                        </td>
-                    </tr>
-                `);
-                updatePagination(0);
-                return;
-            }
-            
-            // Calculate pagination
-            const totalPages = Math.ceil(totalRecords / CONFIG.ITEMS_PER_PAGE);
-            const startIndex = (currentPage - 1) * CONFIG.ITEMS_PER_PAGE;
-            const endIndex = Math.min(startIndex + CONFIG.ITEMS_PER_PAGE, totalRecords);
-            const pageData = filteredData.slice(startIndex, endIndex);
-            
-            // Build table rows
-            let tableHTML = '';
-            
-            pageData.forEach(item => {
-                const rowClass = item.isCompliant ? 'compliance-row' : 'violation-row';
-                
-                const helmetBadge = item.hasHelmet ? 
-                    '<span class="badge bg-success">Helmet</span>' : 
-                    '<span class="badge bg-danger">No Helmet</span>';
-                    
-                const gloveBadge = item.hasGlove ? 
-                    '<span class="badge bg-success">Glove</span>' : 
-                    '<span class="badge bg-danger">No Glove</span>';
-                
-                const imageCell = item.imageUrl ? 
-                    `<td>
-                        <img src="${item.imageUrl}" 
-                             alt="Detection" 
-                             class="image-preview" 
-                             onclick="viewImage('${item.imageUrl}', '${item.dateStr} ${item.timeStr}')"
-                             onerror="this.style.display='none'">
-                    </td>` : 
-                    `<td class="text-muted">No image</td>`;
-                
-                const logTypeBadge = item.logType === 'violation' ? 
-                    '<span class="badge bg-danger">Violation</span>' : 
-                    '<span class="badge bg-secondary">' + item.logType + '</span>';
-                
-                tableHTML += `
-                    <tr class="${rowClass}">
-                        <td>
-                            <div class="fw-bold">${item.dateStr}</div>
-                            <div class="text-muted small">${item.timeStr}</div>
-                        </td>
-                        <td>${helmetBadge}</td>
-                        <td>${gloveBadge}</td>
-                        ${imageCell}
-                        <td>${logTypeBadge}</td>
-                        <td>
-                            <small class="text-muted">${item.relativeTime}</small>
-                        </td>
-                    </tr>
-                `;
+            const todayData = allData.filter(item => {
+                try {
+                    const itemDate = new Date(item.timestamp || item.datetime);
+                    return itemDate.toISOString().split('T')[0] === todayStr;
+                } catch (e) {
+                    return false;
+                }
             });
             
-            tableBody.html(tableHTML);
-            updatePagination(totalRecords, startIndex, endIndex, totalPages);
-        }
-
-        function updatePagination(totalRecords, startIndex = 0, endIndex = 0, totalPages = 0) {
-            $('#showingCount').text(totalRecords > 0 ? `${startIndex + 1}-${endIndex}` : '0');
-            $('#totalCount').text(totalRecords);
-            $('#currentPage').text(currentPage);
+            const weekData = allData.filter(item => {
+                try {
+                    const itemDate = new Date(item.timestamp || item.datetime);
+                    return itemDate >= lastWeek;
+                } catch (e) {
+                    return false;
+                }
+            });
             
-            $('#prevBtn').prop('disabled', currentPage <= 1);
-            $('#nextBtn').prop('disabled', currentPage >= totalPages);
+            const todayStats = calculateStats(todayData);
+            const weekStats = calculateStats(weekData);
+            
+            elements.todayViolations.textContent = todayStats.totalViolations;
+            elements.todayCompliance.textContent = todayStats.fullPPE;
+            elements.todayTotal.textContent = todayStats.total;
+            
+            // Calculate weekly compliance rate
+            const weekComplianceRate = weekStats.total > 0 
+                ? Math.round((weekStats.fullPPE / weekStats.total) * 100)
+                : 0;
+            
+            elements.weeklyCompliance.textContent = `${weekComplianceRate}%`;
+            elements.weeklyViolations.textContent = weekStats.totalViolations;
         }
-
+        
+        // Update charts
         function updateCharts() {
-            updateComplianceChart();
-            updateViolationsChart();
-        }
-
-        function updateComplianceChart() {
-            const ctx = document.getElementById('complianceChart').getContext('2d');
-            
-            // Destroy existing chart
             if (complianceChart) {
                 complianceChart.destroy();
             }
-            
-            if (allData.length === 0) {
-                renderNoDataChart(ctx, 'complianceChart', 'No data available');
-                return;
+            if (distributionChart) {
+                distributionChart.destroy();
             }
             
-            const stats = calculateChartData();
+            createComplianceChart();
+            createDistributionChart();
+        }
+        
+        function refreshCharts() {
+            updateCharts();
+            showNotification('Charts refreshed successfully', 'success');
+        }
+        
+        function createComplianceChart() {
+            const ctx = document.getElementById('complianceChart').getContext('2d');
+            
+            // Prepare data based on selected type
+            let labels = [];
+            let compliantData = [];
+            let violationData = [];
+            
+            if (currentChartsType === 'daily') {
+                // Last 7 days daily data
+                const last7Days = [];
+                for (let i = 6; i >= 0; i--) {
+                    const date = new Date();
+                    date.setDate(date.getDate() - i);
+                    const dateStr = date.toISOString().split('T')[0];
+                    last7Days.push(dateStr);
+                }
+                
+                labels = last7Days.map(date => {
+                    const d = new Date(date);
+                    return d.toLocaleDateString('en-US', { weekday: 'short', month: 'short', day: 'numeric' });
+                });
+                
+                // Count data for each day
+                last7Days.forEach(dateStr => {
+                    const dayData = allData.filter(item => {
+                        try {
+                            const itemDate = new Date(item.timestamp || item.datetime);
+                            return itemDate.toISOString().split('T')[0] === dateStr;
+                        } catch (e) {
+                            return false;
+                        }
+                    });
+                    
+                    const stats = calculateStats(dayData);
+                    compliantData.push(stats.fullPPE);
+                    violationData.push(stats.totalViolations);
+                });
+            } else if (currentChartsType === 'weekly') {
+                // Last 4 weeks
+                labels = ['Week 1', 'Week 2', 'Week 3', 'Week 4'];
+                // Simplified data for demo
+                compliantData = [8, 12, 10, 15];
+                violationData = [4, 2, 3, 1];
+            } else { // monthly
+                // Last 6 months
+                const months = [];
+                for (let i = 5; i >= 0; i--) {
+                    const date = new Date();
+                    date.setMonth(date.getMonth() - i);
+                    months.push(date.toLocaleDateString('en-US', { month: 'short' }));
+                }
+                labels = months;
+                // Simplified data for demo
+                compliantData = [45, 52, 48, 55, 60, 65];
+                violationData = [12, 8, 10, 6, 5, 3];
+            }
             
             complianceChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [
+                        {
+                            label: 'Compliant',
+                            data: compliantData,
+                            borderColor: '#34a853',
+                            backgroundColor: 'rgba(52, 168, 83, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        },
+                        {
+                            label: 'Violations',
+                            data: violationData,
+                            borderColor: '#ea4335',
+                            backgroundColor: 'rgba(234, 67, 53, 0.1)',
+                            borderWidth: 3,
+                            tension: 0.4,
+                            fill: true
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                            labels: {
+                                color: 'white',
+                                font: {
+                                    size: 12
+                                }
+                            }
+                        },
+                        tooltip: {
+                            mode: 'index',
+                            intersect: false,
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                            titleColor: 'white',
+                            bodyColor: 'white'
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(255, 255, 255, 0.1)'
+                            },
+                            ticks: {
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function createDistributionChart() {
+            const ctx = document.getElementById('distributionChart').getContext('2d');
+            
+            const stats = calculateStats(allData);
+            const total = stats.total;
+            
+            const data = [
+                stats.fullPPE, // Full PPE
+                stats.helmetOK - stats.fullPPE, // Helmet only
+                stats.gloveOK - stats.fullPPE, // Glove only
+                stats.totalViolations - (stats.helmetViolations + stats.gloveViolations - (total - stats.fullPPE)) // No PPE
+            ];
+            
+            // Ensure no negative values
+            const cleanData = data.map(value => Math.max(0, value));
+            
+            distributionChart = new Chart(ctx, {
                 type: 'doughnut',
                 data: {
                     labels: ['Full PPE', 'Helmet Only', 'Glove Only', 'No PPE'],
                     datasets: [{
-                        data: [
-                            stats.fullPPE,
-                            stats.helmetOnly,
-                            stats.gloveOnly,
-                            stats.noPPE
-                        ],
+                        data: cleanData,
                         backgroundColor: [
-                            '#27ae60', // Green for full PPE
-                            '#3498db', // Blue for helmet only
-                            '#f39c12', // Orange for glove only
-                            '#e74c3c'  // Red for no PPE
+                            'rgba(52, 168, 83, 0.8)',
+                            'rgba(26, 115, 232, 0.8)',
+                            'rgba(251, 188, 5, 0.8)',
+                            'rgba(234, 67, 53, 0.8)'
                         ],
-                        borderWidth: 2,
-                        borderColor: '#fff'
+                        borderColor: [
+                            'rgba(52, 168, 83, 1)',
+                            'rgba(26, 115, 232, 1)',
+                            'rgba(251, 188, 5, 1)',
+                            'rgba(234, 67, 53, 1)'
+                        ],
+                        borderWidth: 2
                     }]
                 },
                 options: {
@@ -772,6 +2284,7 @@
                         legend: {
                             position: 'right',
                             labels: {
+                                color: 'white',
                                 padding: 15,
                                 usePointStyle: true
                             }
@@ -781,246 +2294,438 @@
                                 label: function(context) {
                                     const label = context.label || '';
                                     const value = context.raw || 0;
-                                    const total = allData.length;
-                                    const percentage = Math.round((value / total) * 100);
+                                    const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
                                     return `${label}: ${value} (${percentage}%)`;
                                 }
-                            }
+                            },
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                            titleColor: 'white',
+                            bodyColor: 'white'
                         }
                     }
                 }
             });
         }
-
-        function updateViolationsChart() {
-            const ctx = document.getElementById('violationsChart').getContext('2d');
+        
+        // Update table with pagination
+        function updateTableWithPagination() {
+            const totalItems = filteredData.length;
+            const totalPages = Math.ceil(totalItems / itemsPerPage);
+            const startIndex = (currentPage - 1) * itemsPerPage;
+            const endIndex = Math.min(startIndex + itemsPerPage, totalItems);
+            const currentData = filteredData.slice(startIndex, endIndex);
             
-            // Destroy existing chart
-            if (violationsChart) {
-                violationsChart.destroy();
+            elements.currentPage.textContent = currentPage;
+            elements.totalPages.textContent = totalPages;
+            elements.pageStart.textContent = totalItems > 0 ? startIndex + 1 : 0;
+            elements.pageEnd.textContent = endIndex;
+            elements.totalRecordsCount.textContent = totalItems;
+            elements.showingRange.textContent = `${startIndex + 1}-${endIndex}`;
+            elements.totalFiltered.textContent = totalItems;
+            
+            if (selectedDate) {
+                elements.filterStatus.textContent = `Date: ${selectedDate}`;
+            } else {
+                elements.filterStatus.textContent = 'All Safety Records';
             }
             
-            if (allData.length === 0) {
-                renderNoDataChart(ctx, 'violationsChart', 'No data available');
+            updateTableContent(currentData, startIndex);
+            updatePaginationControls(totalPages);
+        }
+        
+        // Update table content
+        function updateTableContent(data, startIndex) {
+            if (!data || data.length === 0) {
+                elements.tableBody.innerHTML = `
+                    <tr>
+                        <td colspan="6">
+                            <div class="empty-state">
+                                <i class="fas fa-database"></i>
+                                <h4>No Safety Data Available</h4>
+                                <p>No safety compliance records found for the selected filter.</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
                 return;
             }
             
-            // Get today's violations by hour
-            const today = new Date().toDateString();
-            const todayData = allData.filter(item => 
-                item.timestamp.toDateString() === today && !item.isCompliant
-            );
+            let tableHTML = '';
             
-            // Group by hour
-            const hourlyViolations = {};
-            for (let i = 0; i < 24; i++) {
-                hourlyViolations[i] = 0;
+            data.forEach((item, index) => {
+                const globalIndex = startIndex + index;
+                
+                const isCompliant = item.helmetStatus === 'helmet' && item.gloveStatus === 'glove';
+                const helmetText = item.helmetStatus === 'helmet' ? 'HELMET OK' : 'NO HELMET';
+                const gloveText = item.gloveStatus === 'glove' ? 'GLOVES OK' : 'NO GLOVES';
+                const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
+                
+                const helmetBadgeClass = item.helmetStatus === 'helmet' ? 'badge-success' : 'badge-danger';
+                const gloveBadgeClass = item.gloveStatus === 'glove' ? 'badge-success' : 'badge-danger';
+                const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
+                
+                let formattedTime = item.datetime || item.timestamp || 'Unknown Time';
+                try {
+                    const date = new Date(item.timestamp || item.datetime);
+                    if (!isNaN(date.getTime())) {
+                        formattedTime = date.toLocaleString('en-US', {
+                            year: 'numeric',
+                            month: '2-digit',
+                            day: '2-digit',
+                            hour: '2-digit',
+                            minute: '2-digit',
+                            second: '2-digit'
+                        });
+                    }
+                } catch (e) {
+                    // Keep original format if parsing fails
+                }
+                
+                const iconButtonClass = isCompliant ? 'compliant-btn' : 'violation-btn';
+                const iconType = isCompliant ? 'fa-check-circle' : 'fa-exclamation-triangle';
+                const buttonText = isCompliant ? 'COMPLIANT' : 'VIOLATION';
+                
+                // Safe string handling
+                const safeDateTime = formattedTime.replace(/'/g, "\\'");
+                const safeImageUrl = (item.imageUrl || '').replace(/'/g, "\\'");
+                const safeHelmetStatus = (item.helmetStatus || '').replace(/'/g, "\\'");
+                const safeGloveStatus = (item.gloveStatus || '').replace(/'/g, "\\'");
+                
+                const iconButtonHTML = `
+                    <button class="ppe-icon-btn ${iconButtonClass}" 
+                            onclick="openDetailsModal('${safeDateTime}', 
+                                    '${safeHelmetStatus}', '${safeGloveStatus}', '${safeImageUrl}')"
+                            title="Click to view safety compliance details">
+                        <i class="fas ${iconType}"></i>
+                        <span>${buttonText}</span>
+                    </button>
+                `;
+                
+                tableHTML += `
+                    <tr>
+                        <td class="row-number">${globalIndex + 1}</td>
+                        <td class="datetime-cell">${formattedTime}</td>
+                        <td class="image-cell">${iconButtonHTML}</td>
+                        <td><span class="status-badge ${helmetBadgeClass}">${helmetText}</span></td>
+                        <td><span class="status-badge ${gloveBadgeClass}">${gloveText}</span></td>
+                        <td><span class="status-badge ${complianceBadgeClass}">${complianceText}</span></td>
+                    </tr>
+                `;
+            });
+            
+            elements.tableBody.innerHTML = tableHTML;
+        }
+        
+        // Update pagination controls
+        function updatePaginationControls(totalPages) {
+            elements.firstPage.disabled = currentPage === 1;
+            elements.prevPage.disabled = currentPage === 1;
+            elements.nextPage.disabled = currentPage === totalPages || totalPages === 0;
+            elements.lastPage.disabled = currentPage === totalPages || totalPages === 0;
+            
+            let pageNumbersHTML = '';
+            const maxPagesToShow = 5;
+            
+            if (totalPages <= maxPagesToShow) {
+                for (let i = 1; i <= totalPages; i++) {
+                    pageNumbersHTML += `
+                        <div class="page-number ${i === currentPage ? 'active' : ''}" 
+                             onclick="goToPage(${i})">${i}</div>
+                    `;
+                }
+            } else {
+                let startPage = Math.max(1, currentPage - 2);
+                let endPage = Math.min(totalPages, startPage + maxPagesToShow - 1);
+                
+                if (endPage - startPage + 1 < maxPagesToShow) {
+                    startPage = Math.max(1, endPage - maxPagesToShow + 1);
+                }
+                
+                if (startPage > 1) {
+                    pageNumbersHTML += `
+                        <div class="page-number" onclick="goToPage(1)">1</div>
+                        <div class="page-number" style="pointer-events: none;">...</div>
+                    `;
+                }
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    pageNumbersHTML += `
+                        <div class="page-number ${i === currentPage ? 'active' : ''}" 
+                             onclick="goToPage(${i})">${i}</div>
+                    `;
+                }
+                
+                if (endPage < totalPages) {
+                    pageNumbersHTML += `
+                        <div class="page-number" style="pointer-events: none;">...</div>
+                        <div class="page-number" onclick="goToPage(${totalPages})">${totalPages}</div>
+                    `;
+                }
             }
             
-            todayData.forEach(item => {
-                const hour = item.timestamp.getHours();
-                hourlyViolations[hour] = (hourlyViolations[hour] || 0) + 1;
-            });
+            elements.pageNumbers.innerHTML = pageNumbersHTML;
+        }
+        
+        // Change page
+        function changePage(delta) {
+            const newPage = currentPage + delta;
+            goToPage(newPage);
+        }
+        
+        // Go to specific page
+        function goToPage(page) {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
             
-            const hours = Array.from({length: 24}, (_, i) => `${i}:00`);
-            const violationCounts = hours.map((_, hour) => hourlyViolations[hour] || 0);
+            if (page < 1) page = 1;
+            if (page > totalPages) page = totalPages;
             
-            violationsChart = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: hours,
-                    datasets: [{
-                        label: 'Violations',
-                        data: violationCounts,
-                        backgroundColor: 'rgba(231, 76, 60, 0.7)',
-                        borderColor: 'rgba(231, 76, 60, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Number of Violations'
-                            },
-                            ticks: {
-                                stepSize: 1
-                            }
-                        },
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Hour of Day'
-                            },
-                            ticks: {
-                                maxTicksLimit: 12
-                            }
-                        }
-                    }
+            currentPage = page;
+            updateTableWithPagination();
+        }
+        
+        // Go to last page
+        function goToLastPage() {
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            goToPage(totalPages);
+        }
+        
+        // Filter by date
+        function filterByDate() {
+            if (!selectedDate) {
+                selectedDate = elements.dateFilter.value;
+                if (!selectedDate) {
+                    showNotification('Please select a date to filter safety records', 'warning');
+                    return;
+                }
+            }
+            
+            filteredData = allData.filter(item => {
+                try {
+                    const itemDate = new Date(item.timestamp || item.datetime);
+                    const filterDate = new Date(selectedDate);
+                    
+                    return itemDate.toISOString().split('T')[0] === filterDate.toISOString().split('T')[0];
+                } catch (e) {
+                    return false;
                 }
             });
+            
+            currentPage = 1;
+            updateTableWithPagination();
+            updateCalendarStats();
+            showNotification(`Filtered by date: ${selectedDate}`, 'info');
         }
-
-        function renderNoDataChart(ctx, chartId, message) {
-            new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: ['No Data'],
-                    datasets: [{
-                        data: [1],
-                        backgroundColor: ['#f8f9fa']
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: { enabled: false }
-                    }
-                },
-                plugins: [{
-                    beforeDraw: function(chart) {
-                        const width = chart.width;
-                        const height = chart.height;
-                        const ctx = chart.ctx;
-                        
-                        ctx.restore();
-                        ctx.font = "14px 'Segoe UI'";
-                        ctx.textBaseline = "middle";
-                        ctx.fillStyle = "#6c757d";
-                        
-                        const text = message;
-                        const textX = Math.round((width - ctx.measureText(text).width) / 2);
-                        const textY = height / 2;
-                        
-                        ctx.fillText(text, textX, textY);
-                        ctx.save();
-                    }
-                }]
-            });
+        
+        // Clear date filter
+        function clearDateFilter() {
+            selectedDate = null;
+            elements.dateFilter.value = '';
+            filteredData = [...allData];
+            currentPage = 1;
+            updateTableWithPagination();
+            updateCalendarStats();
+            showNotification('Date filter cleared', 'info');
         }
-
-        // ================= HELPER FUNCTIONS =================
-        function calculateChartData() {
-            const stats = {
-                fullPPE: 0,
-                helmetOnly: 0,
-                gloveOnly: 0,
-                noPPE: 0
+        
+        // Open details modal
+        function openDetailsModal(time, helmetStatus, gloveStatus, imageUrl) {
+            elements.modalTime.textContent = time;
+            
+            const isHelmetOK = helmetStatus === 'helmet';
+            const helmetBadgeClass = isHelmetOK ? 'badge-success' : 'badge-danger';
+            const helmetText = isHelmetOK ? 'HELMET DETECTED' : 'NO HELMET - SAFETY VIOLATION';
+            elements.modalHelmetStatus.className = `status-badge ${helmetBadgeClass}`;
+            elements.modalHelmetStatus.textContent = helmetText;
+            
+            const isGloveOK = gloveStatus === 'glove';
+            const gloveBadgeClass = isGloveOK ? 'badge-success' : 'badge-danger';
+            const gloveText = isGloveOK ? 'GLOVES DETECTED' : 'NO GLOVES - SAFETY VIOLATION';
+            elements.modalGloveStatus.className = `status-badge ${gloveBadgeClass}`;
+            elements.modalGloveStatus.textContent = gloveText;
+            
+            const isCompliant = isHelmetOK && isGloveOK;
+            const complianceBadgeClass = isCompliant ? 'badge-success' : 'badge-danger';
+            const complianceText = isCompliant ? 'SAFETY COMPLIANT' : 'SAFETY VIOLATION';
+            elements.modalCompliance.className = `status-badge ${complianceBadgeClass}`;
+            elements.modalCompliance.textContent = complianceText;
+            
+            // Store image URL for later use
+            currentModalImageUrl = imageUrl || '';
+            
+            // Reset image display
+            elements.safetyImage.style.display = 'none';
+            elements.safetyImage.src = '';
+            elements.imagePlaceholder.style.display = 'flex';
+            elements.imagePlaceholder.innerHTML = `
+                <i class="fas fa-image"></i>
+                <div>Click "View Safety Image" to load image</div>
+            `;
+            elements.loadImageBtn.disabled = false;
+            elements.loadImageBtn.innerHTML = '<i class="fas fa-eye"></i> View Safety Image';
+            elements.downloadImageBtn.style.display = 'none';
+            
+            elements.detailsModal.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+        }
+        
+        // Load safety image
+        function loadSafetyImage() {
+            if (!currentModalImageUrl || currentModalImageUrl.trim() === '') {
+                showNotification('No image available for this record', 'warning');
+                return;
+            }
+            
+            elements.loadImageBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading Image...';
+            elements.loadImageBtn.disabled = true;
+            
+            // Create image element
+            const img = elements.safetyImage;
+            
+            // Set image source with cache busting
+            const imageUrlWithCache = currentModalImageUrl.includes('?') 
+                ? `${currentModalImageUrl}&t=${Date.now()}`
+                : `${currentModalImageUrl}?t=${Date.now()}`;
+            
+            img.src = imageUrlWithCache;
+            
+            img.onload = function() {
+                elements.imagePlaceholder.style.display = 'none';
+                img.style.display = 'block';
+                elements.loadImageBtn.innerHTML = '<i class="fas fa-check"></i> Image Loaded';
+                elements.downloadImageBtn.style.display = 'inline-block';
+                showNotification('Safety image loaded successfully', 'success');
             };
             
-            allData.forEach(item => {
-                if (item.hasHelmet && item.hasGlove) {
-                    stats.fullPPE++;
-                } else if (item.hasHelmet && !item.hasGlove) {
-                    stats.helmetOnly++;
-                } else if (!item.hasHelmet && item.hasGlove) {
-                    stats.gloveOnly++;
-                } else {
-                    stats.noPPE++;
-                }
-            });
-            
-            return stats;
+            img.onerror = function() {
+                elements.imagePlaceholder.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>Failed to load safety image</div>
+                    <div style="font-size: 0.8rem; margin-top: 10px; color: #fbbc05;">
+                        Image URL may not be accessible
+                    </div>
+                `;
+                elements.imagePlaceholder.style.display = 'flex';
+                elements.loadImageBtn.innerHTML = '<i class="fas fa-eye"></i> View Safety Image';
+                elements.loadImageBtn.disabled = false;
+                showNotification('Failed to load safety image', 'error');
+            };
         }
-
-        function formatRelativeTime(date) {
-            if (!date) return 'Unknown';
+        
+        // Download safety image
+        function downloadSafetyImage() {
+            if (!currentModalImageUrl || elements.safetyImage.src === '') {
+                showNotification('No image available to download', 'warning');
+                return;
+            }
             
-            const now = new Date();
-            const diffMs = now - date;
-            const diffMins = Math.floor(diffMs / 60000);
-            const diffHours = Math.floor(diffMs / 3600000);
-            const diffDays = Math.floor(diffMs / 86400000);
+            const link = document.createElement('a');
+            link.href = elements.safetyImage.src;
+            link.download = `safety-image-${Date.now()}.jpg`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             
-            if (diffMins < 1) return 'Just now';
-            if (diffMins < 60) return `${diffMins}m ago`;
-            if (diffHours < 24) return `${diffHours}h ago`;
-            if (diffDays < 7) return `${diffDays}d ago`;
-            
-            return date.toLocaleDateString();
+            showNotification('Image download started', 'success');
         }
-
-        function viewImage(url, timestamp) {
-            $('#modalImage').attr('src', url);
-            $('#imageTimestamp').text(timestamp || '');
-            $('#imageStatus').html(`<a href="${url}" target="_blank">Open in new tab</a>`);
-            
-            const modal = new bootstrap.Modal(document.getElementById('imageModal'));
-            modal.show();
+        
+        // Close modal
+        function closeModal() {
+            elements.detailsModal.style.display = 'none';
+            document.body.style.overflow = 'auto';
         }
-
-        function toggleViolationsOnly() {
-            showViolationsOnly = !showViolationsOnly;
-            applyFilters();
-            updateTable();
+        
+        // Close modal when clicking outside
+        elements.detailsModal.addEventListener('click', function(event) {
+            if (event.target === elements.detailsModal) {
+                closeModal();
+            }
+        });
+        
+        // Update connection status
+        function updateStatus(status, message) {
+            const statusColors = {
+                'success': '#34a853',
+                'loading': '#fbbc05',
+                'error': '#ea4335',
+                'warning': '#fbbc05'
+            };
             
-            const btn = event.target.closest('button');
-            if (showViolationsOnly) {
-                btn.innerHTML = '<i class="fas fa-filter"></i> Show All';
-                btn.classList.add('btn-primary');
-                btn.classList.remove('btn-outline-secondary');
+            elements.statusDot.style.background = statusColors[status] || '#ea4335';
+            elements.statusText.textContent = message;
+            elements.apiStatus.textContent = message;
+            elements.apiStatus.style.color = statusColors[status] || '#ea4335';
+        }
+        
+        // Toggle auto refresh
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = !autoRefreshEnabled;
+            
+            if (autoRefreshEnabled) {
+                startAutoRefresh(30000);
+                elements.autoRefreshStatus.textContent = 'ON';
+                elements.autoRefreshFooter.textContent = 'ON (30s)';
+                elements.autoRefreshBtn.innerHTML = '<i class="fas fa-clock"></i> Auto Refresh: ON';
+                elements.autoRefreshBtn.classList.add('btn-success');
+                elements.autoRefreshBtn.classList.remove('btn-secondary');
+                showNotification('Auto refresh enabled (30 seconds)', 'success');
             } else {
-                btn.innerHTML = '<i class="fas fa-filter"></i> Show Violations Only';
-                btn.classList.remove('btn-primary');
-                btn.classList.add('btn-outline-secondary');
+                stopAutoRefresh();
+                elements.autoRefreshStatus.textContent = 'OFF';
+                elements.autoRefreshFooter.textContent = 'OFF';
+                elements.autoRefreshBtn.innerHTML = '<i class="fas fa-clock"></i> Auto Refresh: OFF';
+                elements.autoRefreshBtn.classList.remove('btn-success');
+                elements.autoRefreshBtn.classList.add('btn-secondary');
+                showNotification('Auto refresh disabled', 'info');
             }
         }
-
-        function clearFilters() {
-            showViolationsOnly = false;
-            const filterBtn = document.querySelector('[onclick="toggleViolationsOnly()"]');
-            if (filterBtn) {
-                filterBtn.innerHTML = '<i class="fas fa-filter"></i> Show Violations Only';
-                filterBtn.classList.remove('btn-primary');
-                filterBtn.classList.add('btn-outline-secondary');
-            }
-            applyFilters();
-            updateTable();
+        
+        // Start auto refresh
+        function startAutoRefresh(interval) {
+            stopAutoRefresh();
+            autoRefreshInterval = setInterval(loadData, interval);
         }
-
-        function prevPage() {
-            if (currentPage > 1) {
-                currentPage--;
-                updateTable();
+        
+        // Stop auto refresh
+        function stopAutoRefresh() {
+            if (autoRefreshInterval) {
+                clearInterval(autoRefreshInterval);
+                autoRefreshInterval = null;
             }
         }
-
-        function nextPage() {
-            const totalPages = Math.ceil(filteredData.length / CONFIG.ITEMS_PER_PAGE);
-            if (currentPage < totalPages) {
-                currentPage++;
-                updateTable();
-            }
-        }
-
+        
+        // Add export functionality
         function exportData() {
-            if (allData.length === 0) {
-                alert('No data to export!');
+            if (filteredData.length === 0) {
+                showNotification('No data to export', 'warning');
                 return;
             }
             
             // Create CSV content
-            const headers = ['Timestamp', 'Date', 'Time', 'Helmet', 'Gloves', 'Status', 'Image URL'];
+            const headers = ['Timestamp', 'Date', 'Time', 'Helmet Status', 'Glove Status', 'Compliance', 'Image URL'];
             const csvRows = [];
             
             csvRows.push(headers.join(','));
             
-            allData.forEach(item => {
+            filteredData.forEach(item => {
+                const timestamp = item.timestamp || item.datetime || '';
+                const date = timestamp ? new Date(timestamp).toLocaleDateString() : '';
+                const time = timestamp ? new Date(timestamp).toLocaleTimeString() : '';
+                const helmetStatus = item.helmetStatus === 'helmet' ? 'HELMET OK' : 'NO HELMET';
+                const gloveStatus = item.gloveStatus === 'glove' ? 'GLOVES OK' : 'NO GLOVES';
+                const isCompliant = item.helmetStatus === 'helmet' && item.gloveStatus === 'glove';
+                const compliance = isCompliant ? 'COMPLIANT' : 'VIOLATION';
+                const imageUrl = item.imageUrl || '';
+                
                 const row = [
-                    `"${item.timestamp.toISOString()}"`,
-                    `"${item.dateStr}"`,
-                    `"${item.timeStr}"`,
-                    item.hasHelmet ? 'YES' : 'NO',
-                    item.hasGlove ? 'YES' : 'NO',
-                    item.isCompliant ? 'COMPLIANT' : 'VIOLATION',
-                    `"${item.imageUrl}"`
+                    `"${timestamp}"`,
+                    `"${date}"`,
+                    `"${time}"`,
+                    `"${helmetStatus}"`,
+                    `"${gloveStatus}"`,
+                    `"${compliance}"`,
+                    `"${imageUrl}"`
                 ];
+                
                 csvRows.push(row.join(','));
             });
             
@@ -1031,176 +2736,51 @@
             
             const timestamp = new Date().toISOString().split('T')[0];
             link.setAttribute('href', url);
-            link.setAttribute('download', `ppe_detections_${timestamp}.csv`);
+            link.setAttribute('download', `safety-data-${timestamp}.csv`);
             link.style.visibility = 'hidden';
             document.body.appendChild(link);
             link.click();
             document.body.removeChild(link);
             
-            showNotification('Data exported successfully!', 'success');
+            showNotification('Data exported successfully', 'success');
         }
-
-        function updateLastUpdateTime() {
-            const now = new Date();
-            $('#lastUpdate').text(now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}));
-        }
-
-        function updateClock() {
-            const now = new Date();
-            $('#currentTime').text(now.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', second:'2-digit'}));
-        }
-
-        function showLoading(show) {
-            const loadingRow = $('#loadingRow');
-            if (show) {
-                loadingRow.show();
-            } else {
-                loadingRow.hide();
-            }
-        }
-
-        function showError(message) {
-            $('#systemStatusText').html(`
-                <span class="badge bg-danger">ERROR</span>
-                <span class="ms-2 text-danger">${message}</span>
-            `);
-            showNotification(message, 'danger');
-        }
-
-        function showNotification(message, type = 'info') {
-            // Remove existing notifications
-            $('.alert-notification').remove();
+        
+        // Add export button to controls
+        document.addEventListener('DOMContentLoaded', function() {
+            const exportBtn = document.createElement('button');
+            exportBtn.className = 'btn btn-success';
+            exportBtn.innerHTML = '<i class="fas fa-download"></i> Export Data';
+            exportBtn.onclick = exportData;
             
-            const notification = $(`
-                <div class="alert alert-${type} alert-notification alert-dismissible fade show position-fixed"
-                     style="top: 20px; right: 20px; z-index: 9999; min-width: 300px;">
-                    ${message}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            `);
-            
-            $('body').append(notification);
-            
-            setTimeout(() => {
-                notification.alert('close');
-            }, 5000);
-        }
-
-        // ================= TEST FUNCTIONS =================
-        function testAPI() {
-            $.ajax({
-                url: CONFIG.API_URL + '?action=test',
-                method: 'GET',
-                success: function(response) {
-                    alert(`API Test Successful!\n\nVersion: ${response.version}\nMessage: ${response.message}`);
-                },
-                error: function() {
-                    alert('API Test Failed - Check console for details');
+            elements.controlsRight.appendChild(exportBtn);
+        });
+        
+        // Add CSS for animations
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes slideIn {
+                from {
+                    transform: translateX(100%);
+                    opacity: 0;
                 }
-            });
-        }
-
-        function addTestRecord() {
-            const testData = {
-                action: 'log_ppe',
-                timestamp: new Date().toISOString(),
-                helmet_status: Math.random() > 0.5 ? 'helmet' : 'no_helmet',
-                glove_status: Math.random() > 0.5 ? 'glove' : 'no_glove',
-                has_image: 'false',
-                log_type: 'test'
-            };
-            
-            $.ajax({
-                url: CONFIG.API_URL,
-                method: 'POST',
-                contentType: 'application/json',
-                data: JSON.stringify(testData),
-                success: function(response) {
-                    if (response.success) {
-                        showNotification('Test record added successfully!', 'success');
-                        setTimeout(loadDashboardData, 1000);
-                    } else {
-                        showNotification('Failed to add record: ' + response.error, 'danger');
-                    }
-                },
-                error: function() {
-                    showNotification('Failed to connect to API', 'danger');
+                to {
+                    transform: translateX(0);
+                    opacity: 1;
                 }
-            });
-        }
-
-        function checkUrlParams() {
-            const urlParams = new URLSearchParams(window.location.search);
-            if (urlParams.get('test') === 'true') {
-                testAPI();
-            }
-        }
-
-        // ================= MOCK DATA FOR TESTING =================
-        function loadMockData() {
-            console.log('Loading mock data for demonstration...');
-            
-            const mockStats = {
-                total: 125,
-                helmetOK: 95,
-                helmetViolations: 30,
-                gloveOK: 105,
-                gloveViolations: 20,
-                fullPPE: 85,
-                totalViolations: 50,
-                todayRecords: 15,
-                violationsToday: 5,
-                compliance: {
-                    helmet: 76,
-                    glove: 84,
-                    overall: 68
-                }
-            };
-            
-            const mockData = [];
-            const now = new Date();
-            
-            // Generate mock data
-            for (let i = 0; i < 50; i++) {
-                const timestamp = new Date(now.getTime() - Math.random() * 7 * 24 * 60 * 60 * 1000);
-                const hasHelmet = Math.random() > 0.3;
-                const hasGlove = Math.random() > 0.2;
-                const isCompliant = hasHelmet && hasGlove;
-                
-                mockData.push({
-                    id: i,
-                    timestamp: timestamp,
-                    dateStr: timestamp.toLocaleDateString(),
-                    timeStr: timestamp.toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}),
-                    hasHelmet: hasHelmet,
-                    hasGlove: hasGlove,
-                    helmetStatus: hasHelmet ? 'helmet' : 'no_helmet',
-                    gloveStatus: hasGlove ? 'glove' : 'no_glove',
-                    imageUrl: Math.random() > 0.7 ? 'https://via.placeholder.com/300x200/4CAF50/FFFFFF?text=PPE+Detection' : '',
-                    logType: isCompliant ? 'normal' : 'violation',
-                    isCompliant: isCompliant,
-                    relativeTime: formatRelativeTime(timestamp)
-                });
             }
             
-            // Update UI with mock data
-            updateSystemStatus({
-                systemStatus: 'READY',
-                serverConnection: 'Connected (Mock Data)',
-                systemInfo: {
-                    serverIP: '192.168.110.50',
-                    rtspPort: '554',
-                    streamUrl: '/video',
-                    model: 'YOLO v6'
+            @keyframes slideOut {
+                from {
+                    transform: translateX(0);
+                    opacity: 1;
                 }
-            });
-            
-            updateStatistics(mockStats);
-            processData(mockData);
-            updateTable();
-            updateCharts();
-            showLoading(false);
-        }
+                to {
+                    transform: translateX(100%);
+                    opacity: 0;
+                }
+            }
+        `;
+        document.head.appendChild(style);
     </script>
 </body>
 </html>
