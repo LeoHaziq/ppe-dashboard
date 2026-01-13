@@ -1291,7 +1291,7 @@
                 </button>
                 <div class="status-indicator">
                     <div class="status-dot" id="statusDot"></div>
-                    <span id="statusText">Connected to Safety System</span>
+                    <span id="statusText">Connecting to Google Sheets...</span>
                 </div>
             </div>
             <div class="controls-right">
@@ -1331,7 +1331,7 @@
                             <td colspan="6">
                                 <div class="loading">
                                     <div class="spinner"></div>
-                                    <div>Loading safety compliance data...</div>
+                                    <div>Loading safety compliance data from Google Sheets...</div>
                                 </div>
                             </td>
                         </tr>
@@ -1376,7 +1376,7 @@
             <div class="footer-stats">
                 <div class="footer-stat">
                     <i class="fas fa-server"></i>
-                    System Status: <span id="apiStatus">Checking...</span>
+                    System Status: <span id="apiStatus">Connecting...</span>
                 </div>
                 <div class="footer-stat">
                     <i class="fas fa-sync-alt"></i>
@@ -1451,8 +1451,8 @@
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
     <script>
         // ================= KONFIGURASI =================
-        // Data akan diambil dari localStorage atau data sample
-        // Tidak perlu koneksi ke Flask atau Google Sheets untuk demo
+        // URL Google Apps Script API
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbychvZatXKiHyZ4eEJM7aSFheGWfdWTAvW_Lo4oww_Kyc8owOKhueGEhhHaK4RL0EbF/exec";
         
         let autoRefreshInterval = null;
         let autoRefreshEnabled = false;
@@ -1533,7 +1533,7 @@
         document.addEventListener('DOMContentLoaded', function() {
             initDateTime();
             initCalendar();
-            loadData();
+            loadData(); // Load real data on page load
             startAutoRefresh(30000); // Auto refresh setiap 30 detik
         });
         
@@ -1593,19 +1593,34 @@
             }, 3000);
         }
         
-        // Load data - FIXED VERSION (No external API calls)
-        function loadData() {
+        // Load REAL data from Google Sheets
+        async function loadData() {
             try {
                 const originalText = elements.refreshBtn.innerHTML;
                 elements.refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Loading...';
                 elements.refreshBtn.disabled = true;
                 
-                updateStatus('loading', 'Loading safety data...');
+                updateStatus('loading', 'Loading real data from Google Sheets...');
                 
-                console.log('Loading data from sample...');
+                console.log('Fetching real data from Google Sheets API...');
                 
-                // Always use sample data - NO API CALLS
-                allData = getSampleData();
+                // Fetch data from Google Apps Script
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=getData&timestamp=${Date.now()}`);
+                
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
+                }
+                
+                const result = await response.json();
+                
+                if (!result.success) {
+                    throw new Error(result.error || 'Failed to load data');
+                }
+                
+                console.log('Data loaded successfully:', result.data ? result.data.length : 0, 'records');
+                
+                // Process data from Google Sheets
+                allData = processGoogleSheetsData(result.data || []);
                 filteredData = [...allData];
                 
                 updateStatistics();
@@ -1621,11 +1636,16 @@
                     second: '2-digit'
                 });
                 
-                updateStatus('success', 'Data loaded successfully');
-                showNotification('Dashboard loaded with sample data', 'success');
+                updateStatus('success', `Data loaded: ${allData.length} records`);
+                showNotification(`Dashboard loaded with ${allData.length} real records from Google Sheets`, 'success');
+                
+                // Update stats if available in API response
+                if (result.stats) {
+                    updateStatsFromAPI(result.stats);
+                }
                 
             } catch (error) {
-                console.error('Error loading safety data:', error);
+                console.error('Error loading data from Google Sheets:', error);
                 
                 // Fallback to empty data
                 allData = [];
@@ -1635,8 +1655,16 @@
                 currentPage = 1;
                 updateTableWithPagination();
                 
-                showNotification('Error loading data', 'error');
+                showNotification('Error loading data: ' + error.message, 'error');
                 updateStatus('error', 'Error loading data');
+                
+                // Try to use sample data as last resort
+                setTimeout(() => {
+                    if (allData.length === 0) {
+                        showNotification('Using sample data as fallback', 'warning');
+                        loadSampleDataAsFallback();
+                    }
+                }, 1000);
                 
             } finally {
                 elements.refreshBtn.innerHTML = '<i class="fas fa-sync-alt"></i> Refresh Data';
@@ -1644,128 +1672,103 @@
             }
         }
         
-        // Get sample data for demonstration
+        // Process data from Google Sheets API response
+        function processGoogleSheetsData(data) {
+            console.log('Processing Google Sheets data:', data);
+            
+            return data.map((item, index) => {
+                // Standardize the data format
+                // Based on Google Sheet columns: Timestamp, DateTime, GloveStatus, HelmetStatus, Image_Url, Box detect
+                
+                // Get helmet status from different possible field names
+                let helmetStatus = '';
+                if (item.helmetStatus) {
+                    helmetStatus = item.helmetStatus.toLowerCase();
+                } else if (item.noHelmet) {
+                    helmetStatus = item.noHelmet.toLowerCase().includes('helmet') ? 'no helmet' : 'helmet';
+                } else if (item.HelmetStatus) {
+                    helmetStatus = item.HelmetStatus.toLowerCase();
+                }
+                
+                // Get glove status from different possible field names
+                let gloveStatus = '';
+                if (item.gloveStatus) {
+                    gloveStatus = item.gloveStatus.toLowerCase();
+                } else if (item.noGlove) {
+                    gloveStatus = item.noGlove.toLowerCase().includes('glove') ? 'no glove' : 'glove';
+                } else if (item.GloveStatus) {
+                    gloveStatus = item.GloveStatus.toLowerCase();
+                }
+                
+                // Get image URL
+                let imageUrl = item.imageUrl || item.Image_Url || '';
+                
+                // Get timestamp/date
+                const timestamp = item.timestamp || item.Timestamp || '';
+                const datetime = item.datetime || item.DateTime || timestamp;
+                
+                // Get box count
+                let boxCount = 0;
+                if (item.boxDetect || item['Box detect']) {
+                    const boxStr = item.boxDetect || item['Box detect'];
+                    const match = boxStr.match(/Box Count:\s*(\d+)/);
+                    if (match) {
+                        boxCount = parseInt(match[1]);
+                    }
+                }
+                
+                return {
+                    id: index + 1,
+                    timestamp: timestamp,
+                    datetime: datetime,
+                    helmetStatus: helmetStatus.includes('helmet') ? 'helmet' : 'no helmet',
+                    gloveStatus: gloveStatus.includes('glove') ? 'glove' : 'no glove',
+                    imageUrl: imageUrl,
+                    boxDetect: item.boxDetect || item['Box detect'] || '',
+                    boxCount: boxCount,
+                    isViolation: (helmetStatus.includes('no') || helmetStatus === '') || 
+                                 (gloveStatus.includes('no') || gloveStatus === '')
+                };
+            });
+        }
+        
+        // Fallback to sample data if API fails
+        function loadSampleDataAsFallback() {
+            allData = getSampleData();
+            filteredData = [...allData];
+            updateStatistics();
+            updateCalendarStats();
+            currentPage = 1;
+            updateTableWithPagination();
+            updateStatus('warning', 'Using sample data (API failed)');
+        }
+        
+        // Get sample data as fallback
         function getSampleData() {
             return [
                 {
                     timestamp: "2026-01-09 16:40:31",
                     datetime: "01/09/2026 16:40:31",
-                    noGlove: "no_glove",
-                    noHelmet: "no_helmet",
-                    imageUrl: "https://drive.google.com/uc?id=1Bnw8BU-pNPk2dji6ACltjNYLHBR8Vg_O",
-                    boxDetect: "Box Count: 1",
                     helmetStatus: "no helmet",
-                    gloveStatus: "no glove"
+                    gloveStatus: "no glove",
+                    imageUrl: "https://drive.google.com/uc?id=1Bnw8BU-pNPk2dji6ACltjNYLHBR8Vg_O",
+                    boxDetect: "Box Count: 1"
                 },
                 {
                     timestamp: "2026-01-09 16:40:33",
                     datetime: "01/09/2026 16:40:33",
-                    noGlove: "no_glove",
-                    noHelmet: "no_helmet",
-                    imageUrl: "https://drive.google.com/uc?id=1EW6p6xt8XS8w8niDZs6QRVOeqL-2lRsx",
-                    boxDetect: "Box Count: 1",
                     helmetStatus: "no helmet",
-                    gloveStatus: "no glove"
+                    gloveStatus: "no glove",
+                    imageUrl: "https://drive.google.com/uc?id=1EW6p6xt8XS8w8niDZs6QRVOeqL-2lRsx",
+                    boxDetect: "Box Count: 1"
                 },
                 {
                     timestamp: "2026-01-12 20:37:22",
                     datetime: "01/12/2026 20:37:22",
-                    noGlove: "",
-                    noHelmet: "",
-                    imageUrl: "",
-                    boxDetect: "",
                     helmetStatus: "helmet",
-                    gloveStatus: "glove"
-                },
-                {
-                    timestamp: "2026-01-12 20:37:03",
-                    datetime: "01/12/2026 20:37:03",
-                    noGlove: "",
-                    noHelmet: "",
+                    gloveStatus: "glove",
                     imageUrl: "",
-                    boxDetect: "",
-                    helmetStatus: "helmet",
-                    gloveStatus: "glove"
-                },
-                {
-                    timestamp: "2026-01-12 20:33:20",
-                    datetime: "01/12/2026 20:33:20",
-                    noGlove: "",
-                    noHelmet: "",
-                    imageUrl: "",
-                    boxDetect: "",
-                    helmetStatus: "helmet",
-                    gloveStatus: "glove"
-                },
-                {
-                    timestamp: "2026-01-12 20:33:14",
-                    datetime: "01/12/2026 20:33:14",
-                    noGlove: "",
-                    noHelmet: "",
-                    imageUrl: "",
-                    boxDetect: "",
-                    helmetStatus: "helmet",
-                    gloveStatus: "glove"
-                },
-                {
-                    timestamp: "2026-01-12 20:33:11",
-                    datetime: "01/12/2026 20:33:11",
-                    noGlove: "",
-                    noHelmet: "",
-                    imageUrl: "",
-                    boxDetect: "",
-                    helmetStatus: "helmet",
-                    gloveStatus: "glove"
-                },
-                {
-                    timestamp: "2026-01-12 08:37:22",
-                    datetime: "01/12/2026 08:37:22",
-                    noGlove: "",
-                    noHelmet: "",
-                    imageUrl: "",
-                    boxDetect: "",
-                    helmetStatus: "helmet",
-                    gloveStatus: "glove"
-                },
-                {
-                    timestamp: "2026-01-12 08:37:03",
-                    datetime: "01/12/2026 08:37:03",
-                    noGlove: "",
-                    noHelmet: "",
-                    imageUrl: "",
-                    boxDetect: "",
-                    helmetStatus: "helmet",
-                    gloveStatus: "glove"
-                },
-                {
-                    timestamp: "2026-01-12 08:33:20",
-                    datetime: "01/12/2026 08:33:20",
-                    noGlove: "",
-                    noHelmet: "",
-                    imageUrl: "",
-                    boxDetect: "",
-                    helmetStatus: "helmet",
-                    gloveStatus: "glove"
-                },
-                {
-                    timestamp: "2026-01-12 08:33:14",
-                    datetime: "01/12/2026 08:33:14",
-                    noGlove: "",
-                    noHelmet: "",
-                    imageUrl: "",
-                    boxDetect: "",
-                    helmetStatus: "helmet",
-                    gloveStatus: "glove"
-                },
-                {
-                    timestamp: "2026-01-12 08:33:11",
-                    datetime: "01/12/2026 08:33:11",
-                    noGlove: "",
-                    noHelmet: "",
-                    imageUrl: "",
-                    boxDetect: "",
-                    helmetStatus: "helmet",
-                    gloveStatus: "glove"
+                    boxDetect: ""
                 }
             ];
         }
@@ -1812,6 +1815,24 @@
                 gloveOK: gloveOK,
                 total: data.length
             };
+        }
+        
+        // Update statistics from API if available
+        function updateStatsFromAPI(apiStats) {
+            if (apiStats) {
+                elements.totalViolations.textContent = apiStats.totalViolations || 0;
+                elements.helmetViolations.textContent = apiStats.helmetViolations || 0;
+                elements.gloveViolations.textContent = apiStats.gloveViolations || 0;
+                elements.fullPPE.textContent = apiStats.fullPPE || 0;
+                elements.helmetOK.textContent = apiStats.helmetOK || 0;
+                elements.gloveOK.textContent = apiStats.gloveOK || 0;
+                elements.totalRecords.textContent = apiStats.total || allData.length;
+                
+                elements.withHelmet.textContent = apiStats.helmetOK || 0;
+                elements.withoutHelmet.textContent = apiStats.helmetViolations || 0;
+                elements.withGloves.textContent = apiStats.gloveOK || 0;
+                elements.withoutGloves.textContent = apiStats.gloveViolations || 0;
+            }
         }
         
         // Update statistics display
@@ -2117,7 +2138,7 @@
             document.body.style.overflow = 'hidden';
         }
         
-        // Load safety image - FIXED VERSION
+        // Load safety image
         function loadSafetyImage() {
             if (!currentModalImageUrl || currentModalImageUrl === '') {
                 showNotification('No image available for this record', 'warning');
@@ -2162,52 +2183,20 @@
             };
             
             img.onerror = function() {
-                // Try alternative image if first fails
-                const fallbackImage = "https://images.unsplash.com/photo-1581094794329-c8112a89af12?w=800&auto=format&fit=crop";
-                
-                // Try fallback image
-                img.src = fallbackImage + '&t=' + Date.now();
-                
-                img.onload = function() {
-                    elements.imagePlaceholder.style.display = 'none';
-                    img.style.display = 'block';
-                    elements.loadImageBtn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> Using Demo Image';
-                    showNotification('Original image not available. Showing demo image.', 'warning');
-                    
-                    // Add download button for demo image
-                    const downloadBtn = document.createElement('button');
-                    downloadBtn.className = 'btn btn-success download-image-btn';
-                    downloadBtn.innerHTML = '<i class="fas fa-download"></i> Download Demo Image';
-                    downloadBtn.style.marginLeft = '10px';
-                    downloadBtn.onclick = function() {
-                        const link = document.createElement('a');
-                        link.href = img.src;
-                        link.download = `demo-safety-image-${Date.now()}.jpg`;
-                        link.click();
-                    };
-                    
-                    const buttonContainer = elements.safetyImageContainer.nextElementSibling;
-                    if (buttonContainer) {
-                        buttonContainer.appendChild(downloadBtn);
-                    }
-                };
-                
-                img.onerror = function() {
-                    elements.imagePlaceholder.innerHTML = `
-                        <i class="fas fa-exclamation-triangle"></i>
-                        <div>Failed to load safety image</div>
-                        <div style="font-size: 0.8rem; margin-top: 10px; word-break: break-all;">
-                            URL: ${currentModalImageUrl.substring(0, 80)}...
-                        </div>
-                        <div style="font-size: 0.7rem; margin-top: 5px; color: #fbbc05;">
-                            Make sure the image is publicly accessible
-                        </div>
-                    `;
-                    elements.imagePlaceholder.style.display = 'flex';
-                    elements.loadImageBtn.innerHTML = '<i class="fas fa-redo"></i> Retry Loading Image';
-                    elements.loadImageBtn.disabled = false;
-                    showNotification('Failed to load safety image. Please check the URL.', 'error');
-                };
+                elements.imagePlaceholder.innerHTML = `
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>Failed to load safety image</div>
+                    <div style="font-size: 0.8rem; margin-top: 10px; word-break: break-all;">
+                        URL: ${currentModalImageUrl.substring(0, 80)}...
+                    </div>
+                    <div style="font-size: 0.7rem; margin-top: 5px; color: #fbbc05;">
+                        Make sure the image is publicly accessible
+                    </div>
+                `;
+                elements.imagePlaceholder.style.display = 'flex';
+                elements.loadImageBtn.innerHTML = '<i class="fas fa-redo"></i> Retry Loading Image';
+                elements.loadImageBtn.disabled = false;
+                showNotification('Failed to load safety image. Please check the URL.', 'error');
             };
         }
         
@@ -2282,7 +2271,30 @@
             }
         }
         
-        // Add manual data upload feature
+        // Test connection to Google Sheets API
+        async function testConnection() {
+            try {
+                updateStatus('loading', 'Testing connection to Google Sheets...');
+                const response = await fetch(`${GOOGLE_SCRIPT_URL}?action=test&timestamp=${Date.now()}`);
+                const result = await response.json();
+                
+                if (result.success) {
+                    updateStatus('success', 'Connected to Google Sheets API');
+                    showNotification('Google Sheets API connection successful', 'success');
+                    return true;
+                } else {
+                    updateStatus('error', 'Google Sheets API test failed');
+                    showNotification('Google Sheets API test failed', 'error');
+                    return false;
+                }
+            } catch (error) {
+                updateStatus('error', 'Connection failed: ' + error.message);
+                showNotification('Failed to connect to Google Sheets API', 'error');
+                return false;
+            }
+        }
+        
+        // Add manual data upload feature (for debugging)
         function addManualDataUpload() {
             const uploadSection = document.createElement('div');
             uploadSection.innerHTML = `
@@ -2292,12 +2304,11 @@
                     </button>
                 </div>
                 <div id="uploadForm" style="display: none; background: var(--dark-secondary); padding: 20px; border-radius: 15px; margin: 20px 0;">
-                    <h4><i class="fas fa-file-upload"></i> Upload Custom Data</h4>
+                    <h4><i class="fas fa-file-upload"></i> Upload Custom Data (Debug)</h4>
                     <p>Paste your Google Sheets data in CSV format:</p>
                     <textarea id="csvData" style="width: 100%; height: 200px; background: rgba(255,255,255,0.05); color: white; border: 1px solid rgba(255,255,255,0.1); padding: 10px; border-radius: 8px; font-family: monospace;" 
-                    placeholder="Timestamp,DateTime,No_Glove,No_Helmet,Image_Url,Box detect
-2026-01-09 16:40:31,01/09/2026 16:40:31,no_glove,no_helmet,https://drive.google.com/uc?id=1Bnw8BU-pNPk2dji6ACltjNYLHBR8Vg_O,Box Count: 1
-2026-01-09 16:40:33,01/09/2026 16:40:33,no_glove,no_helmet,https://drive.google.com/uc?id=1EW6p6xt8XS8w8niDZs6QRVOeqL-2lRsx,Box Count: 1"></textarea>
+                    placeholder="Timestamp,DateTime,GloveStatus,HelmetStatus,Image_Url,Box detect
+2026-01-09 16:40:31,01/09/2026 16:40:31,no_glove,no_helmet,https://drive.google.com/uc?id=1Bnw8BU-pNPk2dji6ACltjNYLHBR8Vg_O,Box Count: 1"></textarea>
                     <div style="margin-top: 15px; display: flex; gap: 10px;">
                         <button class="btn btn-primary" onclick="parseCSVData()">
                             <i class="fas fa-check"></i> Load Data
@@ -2305,8 +2316,8 @@
                         <button class="btn btn-secondary" onclick="hideDataUploadForm()">
                             <i class="fas fa-times"></i> Cancel
                         </button>
-                        <button class="btn btn-warning" onclick="resetToSampleData()">
-                            <i class="fas fa-redo"></i> Reset to Sample Data
+                        <button class="btn btn-warning" onclick="loadData()">
+                            <i class="fas fa-redo"></i> Reload from Google Sheets
                         </button>
                     </div>
                 </div>
@@ -2334,24 +2345,9 @@
                 const lines = csvData.split('\n');
                 const headers = lines[0].split(',').map(h => h.trim());
                 
-                // Check if headers match expected format
-                const expectedHeaders = ['Timestamp', 'DateTime', 'No_Glove', 'No_Helmet', 'Image_Url', 'Box detect'];
-                let headerMatch = true;
-                for (let i = 0; i < Math.min(headers.length, expectedHeaders.length); i++) {
-                    if (headers[i].toLowerCase() !== expectedHeaders[i].toLowerCase().replace(' ', '_')) {
-                        headerMatch = false;
-                        break;
-                    }
-                }
-                
-                if (!headerMatch) {
-                    showNotification('CSV headers do not match expected format. Using default headers.', 'warning');
-                }
-                
                 const parsedData = [];
-                const startIndex = headerMatch ? 1 : 0;
                 
-                for (let i = startIndex; i < lines.length; i++) {
+                for (let i = 1; i < lines.length; i++) {
                     const line = lines[i].trim();
                     if (!line) continue;
                     
@@ -2360,18 +2356,16 @@
                         parsedData.push({
                             timestamp: values[0] || '',
                             datetime: values[1] || values[0] || '',
-                            noGlove: values[2] || '',
-                            noHelmet: values[3] || '',
-                            imageUrl: values[4] || '',
-                            boxDetect: values[5] || '',
-                            helmetStatus: (values[3] || '').toLowerCase().includes('helmet') ? 'helmet' : 'no helmet',
-                            gloveStatus: (values[2] || '').toLowerCase().includes('glove') ? 'glove' : 'no glove'
+                            GloveStatus: values[2] || '',
+                            HelmetStatus: values[3] || '',
+                            Image_Url: values[4] || '',
+                            'Box detect': values[5] || ''
                         });
                     }
                 }
                 
                 if (parsedData.length > 0) {
-                    allData = parsedData;
+                    allData = processGoogleSheetsData(parsedData);
                     filteredData = [...allData];
                     updateStatistics();
                     updateCalendarStats();
@@ -2379,7 +2373,7 @@
                     updateTableWithPagination();
                     
                     hideDataUploadForm();
-                    showNotification(`Successfully loaded ${parsedData.length} records from CSV`, 'success');
+                    showNotification(`Loaded ${parsedData.length} records from CSV`, 'success');
                 } else {
                     showNotification('No valid data found in CSV', 'error');
                 }
@@ -2387,17 +2381,6 @@
                 console.error('Error parsing CSV:', error);
                 showNotification('Error parsing CSV data: ' + error.message, 'error');
             }
-        }
-        
-        function resetToSampleData() {
-            allData = getSampleData();
-            filteredData = [...allData];
-            updateStatistics();
-            updateCalendarStats();
-            currentPage = 1;
-            updateTableWithPagination();
-            hideDataUploadForm();
-            showNotification('Reset to sample data', 'success');
         }
         
         // Add CSS for notifications
@@ -2411,31 +2394,20 @@
                 from { transform: translateX(0); opacity: 1; }
                 to { transform: translateX(100%); opacity: 0; }
             }
-            
-            /* Debug panel */
-            .debug-panel {
-                position: fixed;
-                bottom: 10px;
-                left: 10px;
-                background: rgba(0,0,0,0.8);
-                color: white;
-                padding: 10px;
-                border-radius: 5px;
-                font-size: 12px;
-                z-index: 10000;
-            }
         `;
         document.head.appendChild(style);
         
-        // Initialize with manual upload feature
+        // Initialize
         document.addEventListener('DOMContentLoaded', function() {
-            // Add manual upload feature
-            addManualDataUpload();
-            
-            // Initial load
+            // Test connection on load
             setTimeout(() => {
-                loadData();
-                showNotification('Dashboard loaded successfully!', 'success');
+                testConnection().then(connected => {
+                    if (connected) {
+                        loadData();
+                    } else {
+                        loadSampleDataAsFallback();
+                    }
+                });
             }, 1000);
         });
     </script>
